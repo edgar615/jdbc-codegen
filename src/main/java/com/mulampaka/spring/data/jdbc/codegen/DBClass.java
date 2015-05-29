@@ -19,7 +19,7 @@
 package com.mulampaka.spring.data.jdbc.codegen;
 
 import java.util.List;
-import org.apache.commons.lang.WordUtils;
+import org.apache.commons.lang3.text.WordUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import com.mulampaka.spring.data.jdbc.codegen.util.CodeGenUtil;

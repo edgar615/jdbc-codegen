@@ -16,4 +16,10 @@ public class JdbcRepository<T extends Persistable<ID>, ID extends Serializable> 
         this.rowUnmapper = rowUnmapper;
     }
 
+    public Pagination<T> pagination(String sql, int page, int pageSize) {
+//        return pagination(example, page, pageSize);
+        return null;
+    }
+
+
 }
