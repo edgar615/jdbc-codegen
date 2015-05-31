@@ -338,7 +338,6 @@ public class CodeGenerator
 		repoClass.setName (tableName);
 		repoClass.setRootFolderPath (rootFolderPath);
 		repoClass.setPackageName (repositoryPackageName);
-
         //主键
 		ResultSet pkSet = metaData.getPrimaryKeys (null, null, tableName);
 		while (pkSet.next ())
