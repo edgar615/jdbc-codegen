@@ -58,7 +58,7 @@ public abstract class BaseClass
 	protected String[] dontPluralizeWords = null;
 	protected int fieldNameCounter = 0;
 
-	private static String COMMENT_START = "/* START Do not remove/edit this line. CodeGenerator will preserve any code between start and end tags.*/";
+	private static String COMMENT_START = "/*代码生成工具会忽略START和END之间的代码行*//* START Do not remove/edit this line. CodeGenerator will preserve any code between start and end tags.*/";
 	private static String COMMENT_END = "/* END Do not remove/edit this line. CodeGenerator will preserve any code between start and end tags.*/";
 	
 	private static String IS_COMMENT_START = "/* START";

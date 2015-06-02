@@ -45,7 +45,6 @@ public class CodeGeneratorTest extends SpringJdbcBaseTest
 		generator = new CodeGenerator ();
 		generator.setPropertiesFile ("src/test/resources/codegenerator-test.properties");
         generator.generate ();
-
 	}
 
 

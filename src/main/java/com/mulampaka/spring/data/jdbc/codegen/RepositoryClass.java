@@ -24,169 +24,164 @@ import org.apache.commons.lang3.text.WordUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-public class RepositoryClass extends BaseClass
-{
+public class RepositoryClass extends BaseClass {
 
-    final static Logger logger = LoggerFactory.getLogger (RepositoryClass2.class);
+    final static Logger logger = LoggerFactory.getLogger(RepositoryClass2.class);
     private static String CLASS_SUFFIX = "Repository";
 
     private static String TBL_DESC_CLASS = "com.nurkiewicz.jdbcrepository.TableDescription";
 
-    public RepositoryClass()
-    {
+    public RepositoryClass() {
         this.classSuffix = CLASS_SUFFIX;
-        super.setExtendsClassName ("com.edgar.core.jdbc.JdbcRepository");
-        this.addImports ();
+        super.setExtendsClassName("com.edgar.core.jdbc.JdbcRepository");
+        this.addImports();
     }
 
     @Override
-    protected void addImports ()
-    {
-        this.imports.add ("org.springframework.stereotype.Repository");
+    protected void addImports() {
+        this.imports.add("org.springframework.stereotype.Repository");
     }
 
-    protected void printClassAnnotations ()
-    {
-        sourceBuf.append ("@Repository\n");
+    protected void printClassAnnotations() {
+        sourceBuf.append("@Repository\n");
     }
 
     @Override
-    protected void printClassExtends ()
-    {
-        super.printClassExtends ();
+    protected void printClassExtends() {
+        super.printClassExtends();
 
-        if (StringUtils.isNotBlank (extendsClassName))
-        {
-            sourceBuf.append ("<");
-            sourceBuf.append (this.name + ", ");
-            if (this.pkeys.size () == 0)
-            {
-                sourceBuf.append ("String");
+        if (StringUtils.isNotBlank(extendsClassName)) {
+            sourceBuf.append("<");
+            sourceBuf.append(this.name + ", ");
+            if (this.pkeys.size() == 0) {
+                sourceBuf.append("String");
+            } else if (pkeys.size() == 1) {
+                sourceBuf.append(this.pkeys.values().iterator().next().getName());
+            } else {
+                sourceBuf.append(this.name + ".PKey");
             }
-            else if (pkeys.size () == 1)
-            {
-                sourceBuf.append (this.pkeys.values ().iterator ().next ().getName ());
-            }
-            else
-            {
-                sourceBuf.append ("Object[]");
-            }
-            sourceBuf.append (">");
+            sourceBuf.append(">");
 
         }
     }
 
     @Override
-    protected void printCtor ()
-    {
-        if (this.pkeys.size () == 0)
-        {
-            // add ctor
-            sourceBuf.append ("\tpublic " + this.name + this.classSuffix + "()\n");
-            super.printOpenBrace (1, 1);
-            sourceBuf.append ("\t\tsuper (" + this.name + DBClass.DB_CLASSSUFFIX + ".ROW_MAPPER, " + this.name + DBClass.DB_CLASSSUFFIX + ".ROW_UNMAPPER, "
-                    + this.name + DBClass.DB_CLASSSUFFIX + ".getTableName (),");
-            sourceBuf.append (this.name + DBClass.DB_CLASSSUFFIX + ".COLUMNS.ID.getColumnName()");
-            sourceBuf.append (");\n");
-            super.printCloseBrace (1, 2);
-
-        }
-        else if (this.pkeys.size () == 1)
-        {
-            // add ctor
-            sourceBuf.append ("\tpublic " + this.name + this.classSuffix + "()\n");
-            super.printOpenBrace (1, 1);
-            sourceBuf.append ("\t\tsuper (" + this.name + DBClass.DB_CLASSSUFFIX + ".ROW_MAPPER, " + this.name + DBClass.DB_CLASSSUFFIX + ".ROW_UNMAPPER);\n");
-            super.printCloseBrace (1, 2);
-
-        }
-        else
-        {
-            // add ctor
-            sourceBuf.append ("\tpublic " + this.name + this.classSuffix + "()\n");
-            super.printOpenBrace (1, 1);
-            sourceBuf.append ("\t\tsuper (" + this.name + DBClass.DB_CLASSSUFFIX + ".ROW_MAPPER, " + this.name + DBClass.DB_CLASSSUFFIX + ".ROW_UNMAPPER, "
-                    + "new TableDescription(" + this.name + DBClass.DB_CLASSSUFFIX + ".getTableName (), null,");
-            int i = this.pkeys.size ();
-            for (String key : this.pkeys.keySet ())
-            {
-                sourceBuf.append (this.name + DBClass.DB_CLASSSUFFIX + ".COLUMNS." + key.toUpperCase () + ".getColumnName()");
-                --i;
-                if (i > 0)
-                    sourceBuf.append (",");
-            }
-            sourceBuf.append ("));\n");
-            super.printCloseBrace (1, 2);
-
-        }
-        sourceBuf.append ("\n");
+    protected void printCtor() {
+        // add ctor
+        sourceBuf.append("\tpublic " + this.name + this.classSuffix + "()\n");
+        super.printOpenBrace(1, 1);
+        sourceBuf.append("\t\tsuper (" + this.name + DBClass.DB_CLASSSUFFIX + ".ROW_MAPPER, " + this.name + DBClass.DB_CLASSSUFFIX + ".ROW_UNMAPPER);\n");
+        super.printCloseBrace(1, 2);
+//        if (this.pkeys.size () == 0)
+//        {
+//            // add ctor
+//            sourceBuf.append ("\tpublic " + this.name + this.classSuffix + "()\n");
+//            super.printOpenBrace (1, 1);
+//            sourceBuf.append ("\t\tsuper (" + this.name + DBClass.DB_CLASSSUFFIX + ".ROW_MAPPER, " + this.name + DBClass.DB_CLASSSUFFIX + ".ROW_UNMAPPER, "
+//                    + this.name + DBClass.DB_CLASSSUFFIX + ".getTableName (),");
+//            sourceBuf.append (this.name + DBClass.DB_CLASSSUFFIX + ".COLUMNS.ID.getColumnName()");
+//            sourceBuf.append (");\n");
+//            super.printCloseBrace (1, 2);
+//
+//        }
+//        else if (this.pkeys.size () == 1)
+//        {
+//            // add ctor
+//            sourceBuf.append ("\tpublic " + this.name + this.classSuffix + "()\n");
+//            super.printOpenBrace (1, 1);
+//            sourceBuf.append ("\t\tsuper (" + this.name + DBClass.DB_CLASSSUFFIX + ".ROW_MAPPER, " + this.name + DBClass.DB_CLASSSUFFIX + ".ROW_UNMAPPER);\n");
+//            super.printCloseBrace (1, 2);
+//
+//        }
+//        else
+//        {
+//            // add ctor
+//            sourceBuf.append ("\tpublic " + this.name + this.classSuffix + "()\n");
+//            super.printOpenBrace (1, 1);
+//            sourceBuf.append ("\t\tsuper (" + this.name + DBClass.DB_CLASSSUFFIX + ".ROW_MAPPER, " + this.name + DBClass.DB_CLASSSUFFIX + ".ROW_UNMAPPER, "
+//                    + "new TableDescription(" + this.name + DBClass.DB_CLASSSUFFIX + ".getTableName (), null,");
+//            int i = this.pkeys.size ();
+//            for (String key : this.pkeys.keySet ())
+//            {
+//                sourceBuf.append (this.name + DBClass.DB_CLASSSUFFIX + ".COLUMNS." + key.toUpperCase () + ".getColumnName()");
+//                --i;
+//                if (i > 0)
+//                    sourceBuf.append (",");
+//            }
+//            sourceBuf.append ("));\n");
+//            super.printCloseBrace (1, 2);
+//
+//        }
+        sourceBuf.append("\n");
     }
 
 
-    protected void printFKeyMethods ()
-    {
-        logger.debug ("Generating foreign pkeys methods: # of FKeys:{} ", this.fkeys.size ());
+    protected void printFKeyMethods() {
+        logger.debug("Generating foreign pkeys methods: # of FKeys:{} ", this.fkeys.size());
         // add methods from foreign pkeys
-        if (!this.fkeys.isEmpty ())
-        {
-            for (String fkColName : this.fkeys.keySet ())
-            {
-                ForeignKey fkey = this.fkeys.get (fkColName);
-                String refObj = WordUtils.capitalize (CodeGenUtil.normalize (fkey.getFkTableName ()));
-                String methodClassName = CodeGenUtil.pluralizeName (refObj, this.getDontPluralizeWords ());
-                sourceBuf.append ("\tpublic List<" + refObj + "> get" + methodClassName + "By" + WordUtils.capitalize (CodeGenUtil.normalize (fkColName)) + " (Long " + CodeGenUtil.normalize (fkColName) + ")\n");
-                this.printOpenBrace (1, 1);
-                sourceBuf.append ("\t\tString sql = \"select * from \" + " + refObj + DBClass.DB_CLASSSUFFIX + ".getTableName() + " + "\" where \" + " + refObj + DBClass.DB_CLASSSUFFIX + ".COLUMNS." + fkColName.toUpperCase () + ".getColumnName() + \" = ? \";\n");
-                sourceBuf.append ("\t\treturn this.getJdbcOperations ().query (sql, new Object[] { " + CodeGenUtil.normalize (fkColName) + " }, " + refObj + DBClass.DB_CLASSSUFFIX + ".ROW_MAPPER);\n");
-                this.printCloseBrace (1, 2);
+        if (!this.fkeys.isEmpty()) {
+            for (String fkColName : this.fkeys.keySet()) {
+                ForeignKey fkey = this.fkeys.get(fkColName);
+                String refObj = WordUtils.capitalize(CodeGenUtil.normalize(fkey.getFkTableName()));
+                String methodClassName = CodeGenUtil.pluralizeName(refObj, this.getDontPluralizeWords());
+                sourceBuf.append("\tpublic List<" + refObj + "> get" + methodClassName + "By" + WordUtils.capitalize(CodeGenUtil.normalize(fkColName)) + " (Long " + CodeGenUtil.normalize(fkColName) + ")\n");
+                this.printOpenBrace(1, 1);
+                sourceBuf.append("\t\tString sql = \"select * from \" + " + refObj + DBClass.DB_CLASSSUFFIX + ".getTableName() + " + "\" where \" + " + refObj + DBClass.DB_CLASSSUFFIX + ".COLUMNS." + fkColName.toUpperCase() + ".getColumnName() + \" = ? \";\n");
+                sourceBuf.append("\t\treturn this.getJdbcOperations ().query (sql, new Object[] { " + CodeGenUtil.normalize(fkColName) + " }, " + refObj + DBClass.DB_CLASSSUFFIX + ".ROW_MAPPER);\n");
+                this.printCloseBrace(1, 2);
             }
         }
-        sourceBuf.append ("\n");
+        sourceBuf.append("\n");
     }
 
-    protected void preprocess ()
-    {
-        if (this.pkeys.size () != 1)
-        {
-            if (!this.imports.contains (TBL_DESC_CLASS))
-                this.imports.add (TBL_DESC_CLASS);
+    protected void printUnsupportedMethods() {
+        if (this.pkeys.size() == 0) {
+            sourceBuf.append("\tpublic " + this.name + " selectByPrimaryKey(String id)\n");
+            super.printOpenBrace(1, 1);
+            sourceBuf.append("\t\tthrow new UnsupportedOperationException(\"There is no primary key\");\n");
+            super.printCloseBrace(1, 2);
         }
-        else
-        {
-            if (!this.imports.contains ("org.springframework.jdbc.core.RowMapper"))
-                this.imports.add ("org.springframework.jdbc.core.RowMapper");
-            if (!this.imports.contains ("com.edgar.core.jdbc.RowUnmapper"))
-                this.imports.add ("com.edgar.core.jdbc.RowUnmapper");
+    }
+
+    protected void preprocess() {
+        if (this.pkeys.size() != 1) {
+            if (!this.imports.contains(TBL_DESC_CLASS))
+                this.imports.add(TBL_DESC_CLASS);
+        } else {
+            if (!this.imports.contains("org.springframework.jdbc.core.RowMapper"))
+                this.imports.add("org.springframework.jdbc.core.RowMapper");
+            if (!this.imports.contains("com.edgar.core.jdbc.RowUnmapper"))
+                this.imports.add("com.edgar.core.jdbc.RowUnmapper");
         }
     }
 
     @Override
-    public void generateSource ()
-    {
-        this.preprocess ();
+    public void generateSource() {
+        this.preprocess();
 
-        this.name = WordUtils.capitalize (CodeGenUtil.normalize (this.name));
+        this.name = WordUtils.capitalize(CodeGenUtil.normalize(this.name));
 
-        super.printPackage ();
-        super.printImports ();
-        super.printClassComments ();
+        super.printPackage();
+        super.printImports();
+        super.printClassComments();
 
-        this.printClassAnnotations ();
-        super.printClassDefn ();
-        this.printClassExtends ();
-        super.printClassImplements ();
+        this.printClassAnnotations();
+        super.printClassDefn();
+        this.printClassExtends();
+        super.printClassImplements();
 
-        super.printOpenBrace (0, 2);
-        super.printLogger ();
-        this.printCtor ();
+        super.printOpenBrace(0, 2);
+        super.printLogger();
+        this.printCtor();
 
-        this.printFKeyMethods ();
+        this.printFKeyMethods();
 
-        super.printUserSourceCode ();
+        this.printUnsupportedMethods();
 
-        super.printCloseBrace (0, 2);
+        super.printUserSourceCode();
+
+        super.printCloseBrace(0, 2);
     }
-
 
 
 }

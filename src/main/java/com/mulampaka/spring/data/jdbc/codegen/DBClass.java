@@ -49,6 +49,7 @@ public class DBClass extends BaseClass {
         this.imports.add("java.sql.ResultSet");
         this.imports.add("java.util.LinkedHashMap");
         this.imports.add("java.util.Map");
+        this.imports.add("java.util.Collections");
         this.imports.add("com.edgar.core.jdbc.RowUnmapper");
     }
 
@@ -73,7 +74,7 @@ public class DBClass extends BaseClass {
     /**
      * 生成insert的sql语句
      */
-    protected void printInsertSql() {
+    protected void printNamedInsertSql() {
         List<String> columns = new ArrayList<>();
         List<String> args = new ArrayList<>();
         for (Field field : this.fields) {
@@ -82,7 +83,7 @@ public class DBClass extends BaseClass {
                 args.add(":" + field.getName());
             }
         }
-        sourceBuf.append("\tpublic static final String INSERT_SQL = \"insert into ")
+        sourceBuf.append("\tpublic static final String NAMED_INSERT_SQL = \"insert into ")
                 .append(name).append("(").append(StringUtils.join(columns, ", "))
                 .append(") values(").append(StringUtils.join(args, ", ")).append(")\";\n\n");
     }
@@ -90,8 +91,8 @@ public class DBClass extends BaseClass {
     /**
      * 生成根据主键删除的sql
      */
-    protected void printDeleteByPkSql() {
-        sourceBuf.append("\tpublic static final String DELETE_BY_PK_SQL = \"delete from ")
+    protected void printNamedDeleteByPkSql() {
+        sourceBuf.append("\tpublic static final String NAMED_DELETE_BY_PK_SQL = \"delete from ")
                 .append(name);
         if (!pkeys.isEmpty()) {
             sourceBuf.append(" where ");
@@ -104,10 +105,26 @@ public class DBClass extends BaseClass {
     }
 
     /**
+     * 生成根据主键删除的sql
+     */
+    protected void printDeleteByPkSql() {
+        sourceBuf.append("\tpublic static final String DELETE_BY_PK_SQL = \"delete from ")
+                .append(name);
+        if (!pkeys.isEmpty()) {
+            sourceBuf.append(" where ");
+            for (String key : pkeys.keySet()) {
+                sourceBuf.append(key).append(" = ");
+                sourceBuf.append("?");
+            }
+        }
+        sourceBuf.append("\";\n\n");
+    }
+
+    /**
      * 生成根据主键更新的sql
      */
-    protected void printUpdateByPkSql() {
-        sourceBuf.append("\tpublic static final String UPDATE_BY_PK_SQL = \"update ")
+    protected void printNamedUpdateByPkSql() {
+        sourceBuf.append("\tpublic static final String NAMED_UPDATE_BY_PK_SQL = \"update ")
                 .append(name).append(" set ");
         int i = this.fields.size();
         for (Field field : this.fields) {
@@ -132,6 +149,32 @@ public class DBClass extends BaseClass {
     /**
      * 生成根据主键删除的sql
      */
+    protected void printNamedSelectByPkSql() {
+        sourceBuf.append("\tpublic static final String NAMED_SELECT_BY_PK_SQL = \"select");
+        int i = this.fields.size();
+        for (Field field : this.fields) {
+            if (field.isPersistable()) {
+                sourceBuf.append(" ").append(field.getName());
+                if (--i > 0) {
+                    sourceBuf.append(",");
+                }
+            }
+        }
+        sourceBuf.append(" from ")
+                .append(name);
+        if (!pkeys.isEmpty()) {
+            sourceBuf.append(" where ");
+            for (String key : pkeys.keySet()) {
+                sourceBuf.append(key).append(" = ");
+                sourceBuf.append(":" + key + " ");
+            }
+        }
+        sourceBuf.append("\";\n\n");
+    }
+
+    /**
+     * 生成根据主键更新的sql
+     */
     protected void printSelectByPkSql() {
         sourceBuf.append("\tpublic static final String SELECT_BY_PK_SQL = \"select");
         int i = this.fields.size();
@@ -149,7 +192,7 @@ public class DBClass extends BaseClass {
             sourceBuf.append(" where ");
             for (String key : pkeys.keySet()) {
                 sourceBuf.append(key).append(" = ");
-                sourceBuf.append(":" + key + " ");
+                sourceBuf.append("?");
             }
         }
         sourceBuf.append("\";\n\n");
@@ -178,9 +221,9 @@ public class DBClass extends BaseClass {
             }
         }
 
-        if (this.pkeys.size() > 1) {
-            sourceBuf.append("\t\t\tobj.setPersisted(true);\n");
-        }
+//        if (this.pkeys.size() > 1) {
+//            sourceBuf.append("\t\t\tobj.setPersisted(true);\n");
+//        }
         sourceBuf.append("\t\t\treturn obj;\n");
         this.printCloseBrace(2, 1);// end of method
         this.printCloseBrace(1, 2); // end of inner mapper class
@@ -206,7 +249,7 @@ public class DBClass extends BaseClass {
                 }
             }
         }
-        sourceBuf.append("\t\t\treturn mapping;\n");
+        sourceBuf.append("\t\t\treturn Collections.unmodifiableMap(mapping);\n");
         this.printCloseBrace(2, 1);
         this.printCloseBrace(1, 2);// end of inner unmapper class
     }
@@ -305,9 +348,9 @@ public class DBClass extends BaseClass {
                 sourceBuf.append("\t\t\tobj.set" + WordUtils.capitalize(CodeGenUtil.normalize(field.getName())) + "(rs.get" + typeName + "(COLUMNS." + field.getName().toUpperCase() + ".getColumnAliasName()));\n");
             }
         }
-        if (this.pkeys.size() > 1) {
-            sourceBuf.append("\t\t\tobj.setPersisted(true);\n");
-        }
+//        if (this.pkeys.size() > 1) {
+//            sourceBuf.append("\t\t\tobj.setPersisted(true);\n");
+//        }
         if (!this.fkeys.isEmpty()) {
             for (String fkColName : this.fkeys.keySet()) {
                 ForeignKey fkey = this.fkeys.get(fkColName);
@@ -424,13 +467,17 @@ public class DBClass extends BaseClass {
 
         this.printDBTableInfo();
 
-        this.printInsertSql();
+        this.printNamedInsertSql();
 
-        this.printDeleteByPkSql();
+        this.printNamedUpdateByPkSql();
 
-        this.printUpdateByPkSql();
+        this.printNamedSelectByPkSql();
+
+        this.printNamedDeleteByPkSql();
 
         this.printSelectByPkSql();
+
+        this.printDeleteByPkSql();
 
         this.printSelectAllColumns();
 

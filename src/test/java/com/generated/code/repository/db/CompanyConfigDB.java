@@ -1,12 +1,11 @@
 package com.generated.code.repository.db;
 
 import java.sql.SQLException;
-
-import com.edgar.core.jdbc.IColumn;
 import org.springframework.jdbc.core.RowMapper;
 import java.sql.ResultSet;
 import java.util.LinkedHashMap;
 import java.util.Map;
+import java.util.Collections;
 import com.edgar.core.jdbc.RowUnmapper;
 import com.generated.code.domain.CompanyConfig;
 
@@ -37,20 +36,24 @@ public class CompanyConfigDB
 		return TABLE_ALIAS;
 	}
 
-	public static final String INSERT_SQL = "insert into company_config(config_id, company_id, config_key, config_value, description) values(:config_id, :company_id, :config_key, :config_value, :description)";
+	public static final String NAMED_INSERT_SQL = "insert into company_config(config_id, company_id, config_key, config_value, description) values(:config_id, :company_id, :config_key, :config_value, :description)";
 
-	public static final String DELETE_BY_PK_SQL = "delete from company_config where config_id = :config_id ";
+	public static final String NAMED_UPDATE_BY_PK_SQL = "update company_config set  config_id = :config_id, company_id = :company_id, config_key = :config_key, config_value = :config_value, description = :description where config_id = :config_id ";
 
-	public static final String UPDATE_BY_PK_SQL = "update company_config set  config_id = :config_id, company_id = :company_id, config_key = :config_key, config_value = :config_value, description = :description where config_id = :config_id ";
+	public static final String NAMED_SELECT_BY_PK_SQL = "select config_id, company_id, config_key, config_value, description from company_config where config_id = :config_id ";
 
-	public static final String SELECT_BY_PK_SQL = "select config_id, company_id, config_key, config_value, description from company_config where config_id = :config_id ";
+	public static final String NAMED_DELETE_BY_PK_SQL = "delete from company_config where config_id = :config_id ";
+
+	public static final String SELECT_BY_PK_SQL = "select config_id, company_id, config_key, config_value, description from company_config where config_id = ?";
+
+	public static final String DELETE_BY_PK_SQL = "delete from company_config where config_id = ?";
 
 	public static String selectAllColumns(boolean ... useAlias)
 	{
 		return (useAlias[0] ? TABLE_ALIAS : TABLE_NAME) + ".*";
 	}
 
-	public enum COLUMNS implements IColumn
+	public enum COLUMNS
 	{
 		CONFIG_ID("config_id"),
 		COMPANY_ID("company_id"),
@@ -124,7 +127,7 @@ public class CompanyConfigDB
 			mapping.put(COLUMNS.CONFIG_KEY.getColumnName(), companyconfig.getConfigKey());
 			mapping.put(COLUMNS.CONFIG_VALUE.getColumnName(), companyconfig.getConfigValue());
 			mapping.put(COLUMNS.DESCRIPTION.getColumnName(), companyconfig.getDescription());
-			return mapping;
+			return Collections.unmodifiableMap(mapping);
 		}
 	}
 
