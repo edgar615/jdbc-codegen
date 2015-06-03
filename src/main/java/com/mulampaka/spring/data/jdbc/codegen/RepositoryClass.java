@@ -134,7 +134,7 @@ public class RepositoryClass extends BaseClass {
         sourceBuf.append("\n");
     }
 
-    protected void printUnsupportedMethods() {
+    protected void printInterfaceImpl() {
         if (this.pkeys.size() == 0) {
             sourceBuf.append("\tpublic " + this.name + " selectByPrimaryKey(String id)\n");
             super.printOpenBrace(1, 1);
@@ -176,7 +176,7 @@ public class RepositoryClass extends BaseClass {
 
         this.printFKeyMethods();
 
-        this.printUnsupportedMethods();
+        this.printInterfaceImpl();
 
         super.printUserSourceCode();
 

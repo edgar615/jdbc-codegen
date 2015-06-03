@@ -18,28 +18,62 @@
  */
 package com.mulampaka.spring.data.jdbc.codegen;
 
-import java.util.ArrayList;
-import java.util.List;
-
+import com.mulampaka.spring.data.jdbc.codegen.util.CodeGenUtil;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.lang3.text.WordUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import com.mulampaka.spring.data.jdbc.codegen.util.CodeGenUtil;
+
+import java.util.ArrayList;
+import java.util.List;
 
 /**
  * Class to represent the db metadata, row mappers and unmappers
  *
  * @author Kalyan Mulampaka
  */
-public class DBClass extends BaseClass {
+public class MapperXmlClass extends BaseClass {
 
-    final static Logger logger = LoggerFactory.getLogger(DBClass.class);
-    public static String DB_CLASSSUFFIX = "DB";
+    final static Logger logger = LoggerFactory.getLogger(MapperXmlClass.class);
+    public static String DB_CLASSSUFFIX = "Mapper";
 
-    public DBClass() {
+    public MapperXmlClass() {
         this.addImports();
         this.classSuffix = DB_CLASSSUFFIX;
+    }
+
+    protected String getSourceFileName ()
+    {
+        String path = "";
+        if (StringUtils.isNotBlank (this.packageName))
+        {
+            path = StringUtils.replace (this.packageName, ".", "/") + "/";
+        }
+        if (StringUtils.isNotBlank (this.rootFolderPath))
+        {
+            path = this.rootFolderPath + "/" + path;
+        }
+
+        String fileName = path + WordUtils.capitalize (CodeGenUtil.normalize (name)) + classSuffix + ".xml";
+        return fileName;
+    }
+
+    protected void printDocType() {
+        sourceBuf.append("<?xml version=\"1.0\" encoding=\"UTF-8\" ?>\n" +
+                "<!DOCTYPE mapper\n" +
+                "        PUBLIC \"-//mybatis.org//DTD Mapper 3.0//EN\"\n" +
+                "        \"http://mybatis.org/dtd/mybatis-3-mapper.dtd\">\n");
+    }
+
+    protected void printResultMap() {
+        sourceBuf.append("<resultMap id=\"" + WordUtils.capitalize (CodeGenUtil.normalize (name)) + this.classSuffix + "\" type=\"" +
+                WordUtils.capitalize (CodeGenUtil.normalize (name))+"\">\n");
+        for (Field field : this.fields) {
+            if (field.isPersistable()) {
+                sourceBuf.append("\t\t<result column=\"" + field.getName() + "\" property=\"" + CodeGenUtil.normalize(field.getName()) + "\" />\n");
+            }
+        }
+        sourceBuf.append("</resultMap>");
     }
 
     @Override
@@ -332,7 +366,7 @@ public class DBClass extends BaseClass {
                 String refObj = WordUtils.capitalize(CodeGenUtil.normalize(fkey.getFieldName()));
                 String refClass = WordUtils.capitalize(CodeGenUtil.normalize(fkey.getRefTableName()));
                 sourceBuf.append("\t\t\tif (this.loadAllFKeys || this.load" + refObj + ")\n");
-                sourceBuf.append("\t\t\t\tobj.set" + refObj + "(" + refClass + DBClass.DB_CLASSSUFFIX + ".ALIAS_ROW_MAPPER.mapRow(rs, rowNum)" + ");\n");
+                sourceBuf.append("\t\t\t\tobj.set" + refObj + "(" + refClass + MapperXmlClass.DB_CLASSSUFFIX + ".ALIAS_ROW_MAPPER.mapRow(rs, rowNum)" + ");\n");
             }
         }
         this.printRelations();
@@ -349,7 +383,7 @@ public class DBClass extends BaseClass {
                     case ONE_TO_ONE:
                         String child = CodeGenUtil.normalize(relation.getChild());
                         sourceBuf.append("\t\t\tif (this.loadAllRelations || this.load" + WordUtils.capitalize(child) + ")\n");
-                        sourceBuf.append("\t\t\t\tobj.set" + WordUtils.capitalize(child) + "(" + WordUtils.capitalize(child) + DBClass.DB_CLASSSUFFIX + ".ALIAS_ROW_MAPPER.mapRow(rs, rowNum)" + ");\n");
+                        sourceBuf.append("\t\t\t\tobj.set" + WordUtils.capitalize(child) + "(" + WordUtils.capitalize(child) + MapperXmlClass.DB_CLASSSUFFIX + ".ALIAS_ROW_MAPPER.mapRow(rs, rowNum)" + ");\n");
                         break;
                     case ONE_TO_MANY:
                     case UNKNOWN:
@@ -428,50 +462,8 @@ public class DBClass extends BaseClass {
 
     public void generateSource() {
         // generate the default stuff from the super class
-        super.printPackage();
-
-        super.printImports();
-
-        super.printClassComments();
-
-        super.printClassDefn();
-
-        super.printClassImplements();
-
-        this.printOpenBrace(0, 2);
-
-        this.printDBTableInfo();
-
-        this.printNamedInsertSql();
-
-        this.printNamedUpdateByPkSql();
-
-        this.printNamedSelectByPkSql();
-
-        this.printNamedDeleteByPkSql();
-
-        this.printSelectByPkSql();
-
-        this.printDeleteByPkSql();
-
-        this.printSelectAllColumns();
-
-        this.printColumnsEnum();
-
-        this.printCtor();
-
-        this.printRowMapper();
-
-        this.printRowUnMapper();
-
-        this.printAliasRowMapper();
-
-        this.printAllAliasesMethod();
-
-        super.printUserSourceCode();
-
-        this.printCloseBrace(0, 0); // end of class
-        //logger.debug ("Printing Class file content:\n" + sourceBuf.toString ());
+        this.printDocType();
+        this.printResultMap();
     }
 
 }

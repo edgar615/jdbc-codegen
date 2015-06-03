@@ -328,7 +328,14 @@ public class CodeGenerator
 		dbClass.setPackageName (dbPackageName);
 		dbClass.setFields (dbFields);
         dbClass.setDontPluralizeWords (dontPluralizeWords);
-		
+
+        //mapper xml
+        MapperXmlClass mapperXmlClass = new MapperXmlClass ();
+        mapperXmlClass.setName(tableName);
+        dbClass.setRootFolderPath (rootFolderPath);
+        dbClass.setPackageName (dbPackageName);
+        mapperXmlClass.setFields(dbFields);
+
 		// create the repo class
 		RepositoryClass repoClass = new RepositoryClass ();
 		repoClass.setDontPluralizeWords (dontPluralizeWords);
@@ -338,6 +345,16 @@ public class CodeGenerator
 		repoClass.setName (tableName);
 		repoClass.setRootFolderPath (rootFolderPath);
 		repoClass.setPackageName (repositoryPackageName);
+        //创建MyBatis的Mapper
+        // create the repo class
+        MapperClass mapperClass = new MapperClass ();
+        mapperClass.setDontPluralizeWords (dontPluralizeWords);
+        mapperClass.createLogger ();
+        mapperClass.getImports ().add (dbPackageName + "." + WordUtils.capitalize (CodeGenUtil.normalize (dbClass.getName ())) + DBClass.DB_CLASSSUFFIX);
+        mapperClass.getImports ().add (domainPackageName + "." + WordUtils.capitalize (CodeGenUtil.normalize (domainClass.getName ())));
+        mapperClass.setName (tableName);
+        mapperClass.setRootFolderPath (rootFolderPath);
+        mapperClass.setPackageName (repositoryPackageName);
         //主键
 		ResultSet pkSet = metaData.getPrimaryKeys (null, null, tableName);
 		while (pkSet.next ())
@@ -350,7 +367,9 @@ public class CodeGenerator
 		}
 
 		repoClass.setPkeys (domainClass.getPkeys ());
+        mapperClass.setPkeys(domainClass.getPkeys());
 		dbClass.setPkeys (domainClass.getPkeys ());
+        mapperXmlClass.setPkeys(domainClass.getPkeys());
         //外键
 		String generateFKeyRefsStr = this.properties.getProperty ("generate.fkey.references");
 		boolean generateFKeyRefs = Boolean.parseBoolean (generateFKeyRefsStr);
@@ -385,9 +404,12 @@ public class CodeGenerator
 					domainClass.getFkeys ().put (fkColName, fkey);
 					dbClass.getFkeys ().put (fkColName, fkey);
 					repoClass.getFkeys ().put (fkColName, fkey);
+                    mapperClass.getFkeys().put(fkColName, fkey);
+                    mapperXmlClass.getFkeys().put(fkColName, fkey);
 					
 					if (!repoClass.getImports ().contains ("java.util.List"))
 						repoClass.getImports ().add ("java.util.List");
+                        mapperClass.getImports ().add ("java.util.List");
 
 				}
 			}
@@ -583,6 +605,8 @@ public class CodeGenerator
 		domainClass.createFile ();
 		dbClass.createFile ();
 		repoClass.createFile ();
+        mapperClass.createFile();
+        mapperXmlClass.createFile();
 	}
 
 	public Connection getConnection () throws SQLException
