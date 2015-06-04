@@ -51,6 +51,8 @@ public class CodeGenerator
 	final static Logger logger = LoggerFactory.getLogger (CodeGenerator.class);
 	private Properties properties;
 	private List<String> ignoreColumnList = new ArrayList<String> ();
+    private List<String> ignoreUpdatedColumnList = new ArrayList<String> ();
+    private List<String> optimisticLockColumnList  = new ArrayList<String>();
 	private List<String> ignoreTableList = new ArrayList<String> ();
 	private List<String> ignoreTableStartsWithPattern = new ArrayList<String> ();
 	private List<String> ignoreTableEndsWithPattern = new ArrayList<String> ();
@@ -142,6 +144,30 @@ public class CodeGenerator
 				}
 				logger.info ("Ignore column list:{}", this.ignoreColumnList);
 			}
+
+            // 更新和插入忽略的字段
+            String ignoreUpdatedColumnListStr = this.properties.getProperty ("ignore.updated.columnlist");
+            if (StringUtils.isNotBlank (ignoreUpdatedColumnListStr))
+            {
+                StringTokenizer strTok = new StringTokenizer (ignoreUpdatedColumnListStr, ",");
+                while (strTok.hasMoreTokens ())
+                {
+                    this.ignoreUpdatedColumnList.add (strTok.nextToken ().toLowerCase ().trim ());
+                }
+                logger.info ("Ignore updated column list:{}", this.ignoreUpdatedColumnList);
+            }
+
+            // 乐观锁字段
+            String optimisticLockColumnListStr = this.properties.getProperty ("optimistic.lock.columnlist");
+            if (StringUtils.isNotBlank (optimisticLockColumnListStr))
+            {
+                StringTokenizer strTok = new StringTokenizer (optimisticLockColumnListStr, ",");
+                while (strTok.hasMoreTokens ())
+                {
+                    this.optimisticLockColumnList.add (strTok.nextToken ().toLowerCase ().trim ());
+                }
+                logger.info ("OptimisticLock updated column list:{}", this.optimisticLockColumnList);
+            }
 
             //get the ignore table list
 			String ignoreTableListStr = this.properties.getProperty ("ignore.tablelist");
@@ -332,9 +358,11 @@ public class CodeGenerator
         //mapper xml
         MapperXmlClass mapperXmlClass = new MapperXmlClass ();
         mapperXmlClass.setName(tableName);
-        dbClass.setRootFolderPath (rootFolderPath);
-        dbClass.setPackageName (dbPackageName);
+        mapperXmlClass.setRootFolderPath (rootFolderPath);
+        mapperXmlClass.setPackageName (dbPackageName);
         mapperXmlClass.setFields(dbFields);
+        mapperXmlClass.setRepositoryPackageName(repositoryPackageName);
+        mapperXmlClass.setIgnoreUpdatedColumnListStr(ignoreUpdatedColumnList);
 
 		// create the repo class
 		RepositoryClass repoClass = new RepositoryClass ();
@@ -350,7 +378,7 @@ public class CodeGenerator
         MapperClass mapperClass = new MapperClass ();
         mapperClass.setDontPluralizeWords (dontPluralizeWords);
         mapperClass.createLogger ();
-        mapperClass.getImports ().add (dbPackageName + "." + WordUtils.capitalize (CodeGenUtil.normalize (dbClass.getName ())) + DBClass.DB_CLASSSUFFIX);
+//        mapperClass.getImports ().add (dbPackageName + "." + WordUtils.capitalize (CodeGenUtil.normalize (dbClass.getName ())) + DBClass.DB_CLASSSUFFIX);
         mapperClass.getImports ().add (domainPackageName + "." + WordUtils.capitalize (CodeGenUtil.normalize (domainClass.getName ())));
         mapperClass.setName (tableName);
         mapperClass.setRootFolderPath (rootFolderPath);
@@ -595,6 +623,10 @@ public class CodeGenerator
 					logger.debug ("Found pk col:{} , type:{}", colName, fieldType.getName ());
 
 				}
+                //判断mapperXmlClass的乐观锁字段
+                if (optimisticLockColumnList.contains(colName)) {
+                    mapperXmlClass.addOptimisticLockColumn(colName);
+                }
 			}
 			else
 			{
@@ -603,8 +635,8 @@ public class CodeGenerator
 		}
 		
 		domainClass.createFile ();
-		dbClass.createFile ();
-		repoClass.createFile ();
+//		dbClass.createFile ();
+//		repoClass.createFile ();
         mapperClass.createFile();
         mapperXmlClass.createFile();
 	}

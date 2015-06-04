@@ -293,7 +293,7 @@ public abstract class BaseClass
 		{
 			this.sourceBuf.append ("\t" + userSource);
 		}
-		
+
 	}
 
 	public Map<String, List<Relation>> getRelations ()

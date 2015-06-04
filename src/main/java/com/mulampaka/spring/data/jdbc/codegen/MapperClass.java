@@ -63,7 +63,7 @@ public class MapperClass extends BaseClass {
             } else if (pkeys.size() == 1) {
                 sourceBuf.append(this.pkeys.values().iterator().next().getName());
             } else {
-                sourceBuf.append(this.name + ".PKey");
+                sourceBuf.append("Map<String, Object>");
             }
             sourceBuf.append(">");
 
@@ -74,6 +74,9 @@ public class MapperClass extends BaseClass {
         if (this.pkeys.size() != 1) {
             if (!this.imports.contains(TBL_DESC_CLASS))
                 this.imports.add(TBL_DESC_CLASS);
+            if (this.pkeys.size() > 1) {
+                this.imports.add("java.util.Map");
+            }
         } else {
             if (!this.imports.contains("org.springframework.jdbc.core.RowMapper"))
                 this.imports.add("org.springframework.jdbc.core.RowMapper");

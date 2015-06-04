@@ -19,11 +19,13 @@
 package com.mulampaka.spring.data.jdbc.codegen;
 
 import com.mulampaka.spring.data.jdbc.codegen.util.CodeGenUtil;
+import org.apache.commons.io.FileUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.lang3.text.WordUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import java.io.File;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -37,24 +39,47 @@ public class MapperXmlClass extends BaseClass {
     final static Logger logger = LoggerFactory.getLogger(MapperXmlClass.class);
     public static String DB_CLASSSUFFIX = "Mapper";
 
+    private String repositoryPackageName;
+
+    private String resultMap;
+
+    private List<String> ignoreUpdatedColumnListStr;
+
+    private List<String> optimisticLockColumnList = new ArrayList<>();
+
+    private String comment_start = "<!-- START 写在START和END中间的代码不会被替换 -->";
+    private String comment_end = "<!-- END 写在START和END中间的代码不会被替换-->";
+
+    private String is_comment_start = "<!-- START";
+    private String is_comment_end = "<!-- END";
+
     public MapperXmlClass() {
         this.addImports();
         this.classSuffix = DB_CLASSSUFFIX;
     }
 
-    protected String getSourceFileName ()
-    {
+    public void addOptimisticLockColumn(String optimisticLockColumn) {
+        this.optimisticLockColumnList.add(optimisticLockColumn);
+    }
+
+    public void setIgnoreUpdatedColumnListStr(List<String> ignoreUpdatedColumnListStr) {
+        this.ignoreUpdatedColumnListStr = ignoreUpdatedColumnListStr;
+    }
+
+    public void setRepositoryPackageName(String repositoryPackageName) {
+        this.repositoryPackageName = repositoryPackageName;
+    }
+
+    protected String getSourceFileName() {
         String path = "";
-        if (StringUtils.isNotBlank (this.packageName))
-        {
-            path = StringUtils.replace (this.packageName, ".", "/") + "/";
+        if (StringUtils.isNotBlank(this.packageName)) {
+            path = StringUtils.replace(this.packageName, ".", "/") + "/";
         }
-        if (StringUtils.isNotBlank (this.rootFolderPath))
-        {
+        if (StringUtils.isNotBlank(this.rootFolderPath)) {
             path = this.rootFolderPath + "/" + path;
         }
 
-        String fileName = path + WordUtils.capitalize (CodeGenUtil.normalize (name)) + classSuffix + ".xml";
+        String fileName = path + WordUtils.capitalize(CodeGenUtil.normalize(name)) + classSuffix + ".xml";
         return fileName;
     }
 
@@ -65,152 +90,278 @@ public class MapperXmlClass extends BaseClass {
                 "        \"http://mybatis.org/dtd/mybatis-3-mapper.dtd\">\n");
     }
 
+    protected void printRootMapper() {
+        sourceBuf.append("<mapper namespace=\"" + repositoryPackageName + "." + WordUtils.capitalize(CodeGenUtil.normalize(name)) + classSuffix + "\">\n");
+        printResultMap();
+        printInsertSql();
+        printDeleteByPkSql();
+        printDeleteByPkSqlLock();
+        printUpdateByPkSql();
+        printUpdateByPkSqlLock();
+        printSelectByPkSql();
+
+        printUserSourceCode();
+
+        sourceBuf.append("</mapper>");
+    }
+
+    protected void printUserSourceCode() {
+        String userSource = this.userSourceBuf.toString();
+        if (StringUtils.isBlank(userSource)) {
+            this.sourceBuf.append(cusgenerateUserSourceCodeTags());
+        } else {
+            this.sourceBuf.append("\t" + userSource);
+        }
+
+    }
+
+    public String cusgenerateUserSourceCodeTags() {
+        return "\t" + comment_start + "\n\n\t" + comment_end + "\n\n";
+    }
+
+    protected void readUserSourceCode(File file) {
+        try {
+            logger.debug("Reading file :{}", file.getName());
+            String contents = FileUtils.readFileToString(file);
+            //logger.trace ("File contents:{}", contents);
+
+            int startIndex = StringUtils.indexOf(contents, is_comment_start);
+            int endIndex = StringUtils.indexOf(contents, is_comment_end);
+            logger.debug("Start index:{} End index:{}", startIndex, endIndex);
+            if (startIndex != -1 && endIndex != -1) {
+                userSourceBuf.append(contents.substring(startIndex, endIndex));
+                userSourceBuf.append(comment_end + "\n\n");
+            }
+            // save the imports
+            List<String> lines = FileUtils.readLines(file);
+            for (String line : lines) {
+                if (StringUtils.startsWith(line, "import")) {
+                    String[] tokens = StringUtils.split(line, " ");
+                    if (tokens.length > 2) {
+                        String iClass = tokens[1] + " " + tokens[2].substring(0, tokens[2].length() - 1);
+                        logger.debug("iClass:{}", iClass);
+                        if (!this.imports.contains(iClass)) {
+                            this.imports.add(iClass);
+                        }
+                    } else {
+                        String iClass = tokens[1].substring(0, tokens[1].length() - 1);
+                        if (!this.imports.contains(iClass)) {
+                            this.imports.add(iClass);
+                        }
+                    }
+                }
+            }
+
+        } catch (Exception e) {
+            logger.error(e.getMessage());
+        } finally {
+
+        }
+
+    }
+
     protected void printResultMap() {
-        sourceBuf.append("<resultMap id=\"" + WordUtils.capitalize (CodeGenUtil.normalize (name)) + this.classSuffix + "\" type=\"" +
-                WordUtils.capitalize (CodeGenUtil.normalize (name))+"\">\n");
+        sourceBuf.append("\t<resultMap id=\"" + resultMap + "\" type=\"" +
+                WordUtils.capitalize(CodeGenUtil.normalize(name)) + "\">\n");
         for (Field field : this.fields) {
             if (field.isPersistable()) {
                 sourceBuf.append("\t\t<result column=\"" + field.getName() + "\" property=\"" + CodeGenUtil.normalize(field.getName()) + "\" />\n");
             }
         }
-        sourceBuf.append("</resultMap>");
-    }
-
-    @Override
-    protected void addImports() {
-        this.imports.add("java.sql.SQLException");
-        this.imports.add("org.springframework.jdbc.core.RowMapper");
-        this.imports.add("java.sql.ResultSet");
-        this.imports.add("java.util.LinkedHashMap");
-        this.imports.add("java.util.Map");
-        this.imports.add("java.util.Collections");
-        this.imports.add("com.edgar.core.jdbc.RowUnmapper");
-    }
-
-    protected void printDBTableInfo() {
-        // add the table name
-        sourceBuf.append("\tprivate static String TABLE_NAME = \"" + this.name.toUpperCase() + "\";\n\n");
-
-        // add the table name
-        sourceBuf.append("\tprivate static String TABLE_ALIAS = \"" + CodeGenUtil.createTableAlias(this.name.toLowerCase()) + "\";\n\n");
-
-        sourceBuf.append("\tpublic static String getTableName()\n\t{\n\t\treturn TABLE_NAME;\n\t}\n\n");
-
-        sourceBuf.append("\tpublic static String getTableAlias()\n\t{\n\t\treturn TABLE_NAME + \" as \" + TABLE_ALIAS;\n\t}\n\n");
-
-        sourceBuf.append("\tpublic static String getAlias()\n\t{\n\t\treturn TABLE_ALIAS;\n\t}\n\n");
-    }
-
-    protected void printSelectAllColumns() {
-        sourceBuf.append("\tpublic static String selectAllColumns(boolean ... useAlias)\n\t{\n\t\treturn (useAlias[0] ? TABLE_ALIAS : TABLE_NAME) + \".*\";\n\t}\n\n");
+        sourceBuf.append("\t</resultMap>\n\n");
     }
 
     /**
      * 生成insert的sql语句
      */
-    protected void printNamedInsertSql() {
+    protected void printInsertSql() {
+
+        sourceBuf.append("\t<insert id=\"insert\" parameterType=\"" + WordUtils.capitalize(CodeGenUtil.normalize(name)) + "\">\n");
+        sourceBuf.append("\t\tinsert into \n\t\t").append(name).append("(");
         List<String> columns = new ArrayList<>();
         List<String> args = new ArrayList<>();
         for (Field field : this.fields) {
-            if (field.isPersistable()) {
+            if (!this.ignoreUpdatedColumnListStr.contains(field.getName().toLowerCase()) && field.isPersistable()) {
                 columns.add(field.getName());
-                args.add(":" + field.getName());
+                args.add("${" + CodeGenUtil.normalize(field.getName().toLowerCase()) + "}");
             }
         }
-        sourceBuf.append("\tpublic static final String NAMED_INSERT_SQL = \"insert into ")
-                .append(name).append("(").append(StringUtils.join(columns, ", "))
-                .append(") values(").append(StringUtils.join(args, ", ")).append(")\";\n\n");
-    }
-
-    /**
-     * 生成根据主键删除的sql
-     */
-    protected void printNamedDeleteByPkSql() {
-        sourceBuf.append("\tpublic static final String NAMED_DELETE_BY_PK_SQL = \"delete from ")
-                .append(name);
-        if (!pkeys.isEmpty()) {
-            sourceBuf.append(" where ");
-            for (String key : pkeys.keySet()) {
-                sourceBuf.append(key).append(" = ");
-                sourceBuf.append(":" + key + " ");
-            }
-        }
-        sourceBuf.append("\";\n\n");
+        sourceBuf.append(StringUtils.join(columns, ", "))
+                .append(") \n\t\tvalues(").append(StringUtils.join(args, ", ")).append(")");
+        sourceBuf.append("\n\t</insert>");
+        sourceBuf.append("\n\n");
     }
 
     /**
      * 生成根据主键删除的sql
      */
     protected void printDeleteByPkSql() {
-        sourceBuf.append("\tpublic static final String DELETE_BY_PK_SQL = \"delete from ")
+        if (pkeys.isEmpty()) {
+            return;
+        }
+        sourceBuf.append("\t<delete id=\"deleteByPrimaryKey\" parameterType=\"");
+        if (pkeys.size() == 1) {
+            sourceBuf.append(pkeys.entrySet().iterator().next().getValue().getPrimitiveName());
+        } else {
+            sourceBuf.append("map");
+        }
+        sourceBuf.append("\">\n");
+        sourceBuf.append("\t\tdelete from ")
                 .append(name);
-        if (!pkeys.isEmpty()) {
-            sourceBuf.append(" where ");
+        if (pkeys.size() == 1) {
+            sourceBuf.append(" \n\t\twhere ");
+            String key = pkeys.entrySet().iterator().next().getKey();
+            sourceBuf.append(key).append(" = #{id}");
+        } else if (pkeys.size() > 1) {
+            sourceBuf.append(" \n\t\twhere ");
+            int i = pkeys.size();
             for (String key : pkeys.keySet()) {
                 sourceBuf.append(key).append(" = ");
-                sourceBuf.append("?");
-            }
-        }
-        sourceBuf.append("\";\n\n");
-    }
-
-    /**
-     * 生成根据主键更新的sql
-     */
-    protected void printNamedUpdateByPkSql() {
-        sourceBuf.append("\tpublic static final String NAMED_UPDATE_BY_PK_SQL = \"update ")
-                .append(name).append(" set ");
-        int i = this.fields.size();
-        for (Field field : this.fields) {
-            if (field.isPersistable()) {
-                sourceBuf.append(" ").append(field.getName()).append(" = ");
-                sourceBuf.append(":" + field.getName());
+                sourceBuf.append("#{" + key + "}");
                 if (--i > 0) {
-                    sourceBuf.append(",");
+                    sourceBuf.append(" and ");
                 }
             }
         }
-        if (!pkeys.isEmpty()) {
-            sourceBuf.append(" where ");
-            for (String key : pkeys.keySet()) {
-                sourceBuf.append(key).append(" = ");
-                sourceBuf.append(":" + key + " ");
-            }
-        }
-        sourceBuf.append("\";\n\n");
+        sourceBuf.append("\n\t</delete>");
+        sourceBuf.append("\n\n");
     }
 
     /**
      * 生成根据主键删除的sql
      */
-    protected void printNamedSelectByPkSql() {
-        sourceBuf.append("\tpublic static final String NAMED_SELECT_BY_PK_SQL = \"select");
-        int i = this.fields.size();
-        for (Field field : this.fields) {
-            if (field.isPersistable()) {
-                sourceBuf.append(" ").append(field.getName());
+    protected void printDeleteByPkSqlLock() {
+        if (pkeys.isEmpty() || optimisticLockColumnList.isEmpty()) {
+            return;
+        }
+        sourceBuf.append("\t<delete id=\"deleteByPrimaryKeyWithLock\" parameterType=\"");
+        if (pkeys.size() == 1) {
+            sourceBuf.append(pkeys.entrySet().iterator().next().getValue().getPrimitiveName());
+        } else {
+            sourceBuf.append("map");
+        }
+        sourceBuf.append("\">\n");
+        sourceBuf.append("\t\tdelete from ")
+                .append(name);
+        if (pkeys.size() == 1) {
+            sourceBuf.append(" \n\t\twhere ");
+            String key = pkeys.entrySet().iterator().next().getKey();
+            sourceBuf.append(key).append(" = #{id}");
+        } else if (pkeys.size() > 1) {
+            sourceBuf.append(" \n\t\twhere ");
+            int i = pkeys.size();
+            for (String key : pkeys.keySet()) {
+                sourceBuf.append(key).append(" = ");
+                sourceBuf.append("#{" + key + "}");
                 if (--i > 0) {
-                    sourceBuf.append(",");
+                    sourceBuf.append(" \n\t\tand ");
                 }
             }
         }
-        sourceBuf.append(" from ")
-                .append(name);
-        if (!pkeys.isEmpty()) {
-            sourceBuf.append(" where ");
-            for (String key : pkeys.keySet()) {
-                sourceBuf.append(key).append(" = ");
-                sourceBuf.append(":" + key + " ");
-            }
+        for (String o : optimisticLockColumnList) {
+            sourceBuf.append(" \nt\tand ").append(o).append(" = ");
+            sourceBuf.append("#{" + o + "}");
         }
-        sourceBuf.append("\";\n\n");
+        sourceBuf.append("\n\t</delete>");
+        sourceBuf.append("\n\n");
     }
 
     /**
      * 生成根据主键更新的sql
      */
+    protected void printUpdateByPkSql() {
+        if (pkeys.isEmpty()) {
+            return;
+        }
+        sourceBuf.append("\t<update id=\"updateByPrimaryKey\" parameterType=\"" + WordUtils.capitalize(CodeGenUtil.normalize(name)) + "\">\n");
+        sourceBuf.append("\t\tupdate ").append(name).append(" set ");
+        int i = this.fields.size();
+        for (Field field : this.fields) {
+            if (!this.ignoreUpdatedColumnListStr.contains(field.getName().toLowerCase()) && field.isPersistable()) {
+                sourceBuf.append(" \n\t\t").append(field.getName()).append(" = ");
+                sourceBuf.append("${" + CodeGenUtil.normalize(field.getName().toLowerCase()) + "}");
+                if (--i > 0) {
+                    sourceBuf.append(",");
+                }
+            }
+        }
+
+        if (pkeys.size() == 1) {
+            sourceBuf.append(" \n\t\twhere ");
+            String key = pkeys.entrySet().iterator().next().getKey();
+            sourceBuf.append(key).append(" = #{" + CodeGenUtil.normalize(key) + "}");
+        } else if (pkeys.size() > 1) {
+            sourceBuf.append(" \n\t\twhere ");
+            i = pkeys.size();
+            for (String key : pkeys.keySet()) {
+                sourceBuf.append(key).append(" = ");
+                sourceBuf.append(key).append(" = #{" + CodeGenUtil.normalize(key) + "}");
+                if (--i > 0) {
+                    sourceBuf.append(" and ");
+                }
+            }
+        }
+        sourceBuf.append("\n\t</update>");
+        sourceBuf.append("\n\n");
+    }
+
+    /**
+     * 生成根据主键更新的sql
+     */
+    protected void printUpdateByPkSqlLock() {
+        if (pkeys.isEmpty()) {
+            return;
+        }
+        sourceBuf.append("\t<update id=\"updateByPrimaryKeyWithLock\" parameterType=\"" + WordUtils.capitalize(CodeGenUtil.normalize(name)) + "\">\n");
+        sourceBuf.append("\t\tupdate ").append(name).append(" set ");
+        int i = this.fields.size();
+        for (Field field : this.fields) {
+            if (!this.ignoreUpdatedColumnListStr.contains(field.getName().toLowerCase()) && field.isPersistable()) {
+                sourceBuf.append(" \n\t\t").append(field.getName()).append(" = ");
+                sourceBuf.append("${" + CodeGenUtil.normalize(field.getName().toLowerCase()) + "}");
+                if (--i > 0) {
+                    sourceBuf.append(",");
+                }
+            }
+        }
+
+        if (pkeys.size() == 1) {
+            sourceBuf.append(" \n\t\twhere ");
+            String key = pkeys.entrySet().iterator().next().getKey();
+            sourceBuf.append(key).append(" = #{" + CodeGenUtil.normalize(key) + "}");
+        } else if (pkeys.size() > 1) {
+            sourceBuf.append(" \n\t\twhere ");
+            i = pkeys.size();
+            for (String key : pkeys.keySet()) {
+                sourceBuf.append(key).append(" = ");
+                sourceBuf.append(key).append(" = #{" + CodeGenUtil.normalize(key) + "}");
+                if (--i > 0) {
+                    sourceBuf.append(" \nt\tand ");
+                }
+            }
+        }
+        for (String o : optimisticLockColumnList) {
+            sourceBuf.append(" \nt\tand ").append(o).append(" = #{" + CodeGenUtil.normalize(o) + "}");
+        }
+        sourceBuf.append("\n\t</update>");
+        sourceBuf.append("\n\n");
+    }
+
+    /**
+     * 生成根据主键删除的sql
+     */
     protected void printSelectByPkSql() {
-        sourceBuf.append("\tpublic static final String SELECT_BY_PK_SQL = \"select");
+        if (pkeys.isEmpty()) {
+            return;
+        }
+        sourceBuf.append("\t<select id=\"selectByPrimaryKey\" resultMap=\"" + resultMap + "\" parameterType=\"");
+        if (pkeys.size() == 1) {
+            sourceBuf.append(pkeys.entrySet().iterator().next().getValue().getPrimitiveName());
+        } else {
+            sourceBuf.append("map");
+        }
+        sourceBuf.append("\">\n");
+        sourceBuf.append("\t\tselect");
         int i = this.fields.size();
         for (Field field : this.fields) {
             if (field.isPersistable()) {
@@ -220,250 +371,42 @@ public class MapperXmlClass extends BaseClass {
                 }
             }
         }
-        sourceBuf.append(" from ")
+        sourceBuf.append(" \n\t\tfrom ")
                 .append(name);
-        if (!pkeys.isEmpty()) {
-            sourceBuf.append(" where ");
+        if (pkeys.size() == 1) {
+            sourceBuf.append(" \n\t\twhere ");
+            String key = pkeys.entrySet().iterator().next().getKey();
+            sourceBuf.append(key).append(" = #{id}");
+        } else if (pkeys.size() > 1) {
+            sourceBuf.append(" \n\t\twhere ");
+            i = pkeys.size();
             for (String key : pkeys.keySet()) {
                 sourceBuf.append(key).append(" = ");
-                sourceBuf.append("?");
-            }
-        }
-        sourceBuf.append("\";\n\n");
-    }
-
-    protected void printRowMapper() {
-        String name = WordUtils.capitalize(CodeGenUtil.normalize(this.name));
-        // create mapper
-        sourceBuf.append("\tpublic static final RowMapper<" + name + "> ROW_MAPPER = new " + name + "RowMapper ();\n");
-
-        sourceBuf.append("\tpublic static final class  " + name + "RowMapper implements RowMapper<" + name + ">\n");
-        this.printOpenBrace(1, 1);
-
-        sourceBuf.append("\t\tpublic " + name + " mapRow(ResultSet rs, int rowNum) throws SQLException \n");
-        this.printOpenBrace(2, 1);
-        sourceBuf.append("\t\t\t" + name + " obj = new " + name + "();\n");
-        for (Field field : this.fields) {
-            if (field.isPersistable()) {
-                String typeName = field.getType().getName();
-                if (field.getType() == ParameterType.INTEGER) {
-                    typeName = "Int";
-                } else if (field.getType() == ParameterType.DATE) {
-                    typeName = "Timestamp";
-                }
-                sourceBuf.append("\t\t\tobj.set" + WordUtils.capitalize(CodeGenUtil.normalize(field.getName())) + "(rs.get" + typeName + "(COLUMNS." + field.getName().toUpperCase() + ".getColumnName()));\n");
-            }
-        }
-
-//        if (this.pkeys.size() > 1) {
-//            sourceBuf.append("\t\t\tobj.setPersisted(true);\n");
-//        }
-        sourceBuf.append("\t\t\treturn obj;\n");
-        this.printCloseBrace(2, 1);// end of method
-        this.printCloseBrace(1, 2); // end of inner mapper class
-    }
-
-    protected void printRowUnMapper() {
-        String name = WordUtils.capitalize(CodeGenUtil.normalize(this.name));
-        // create unmapper
-        sourceBuf.append("\tpublic static final RowUnmapper<" + name + "> ROW_UNMAPPER = new " + name + "RowUnmapper ();\n");
-        sourceBuf.append("\tpublic static final class " + name + "RowUnmapper implements RowUnmapper<" + name + ">\n");
-        this.printOpenBrace(1, 1);
-        String objName = name.toLowerCase();
-        sourceBuf.append("\t\tpublic Map<String, Object> mapColumns(" + name + " " + objName + ")\n");
-        this.printOpenBrace(2, 1);
-        sourceBuf.append("\t\t\tMap<String, Object> mapping = new LinkedHashMap<String, Object>();\n");
-        for (Field field : this.fields) {
-            if (field.isPersistable()) {
-                if (field.getType() == ParameterType.DATE) {
-                    sourceBuf.append("\t\t\tif (" + objName + ".get" + WordUtils.capitalize(CodeGenUtil.normalize(field.getName())) + "() != null)\n");
-                    sourceBuf.append("\t\t\t\tmapping.put(COLUMNS." + field.getName().toUpperCase() + ".getColumnName(), new Timestamp (" + objName + ".get" + WordUtils.capitalize(CodeGenUtil.normalize(field.getName())) + "().getTime()));\n");
-                } else {
-                    sourceBuf.append("\t\t\tmapping.put(COLUMNS." + field.getName().toUpperCase() + ".getColumnName(), " + objName + ".get" + WordUtils.capitalize(CodeGenUtil.normalize(field.getName())) + "());\n");
+                sourceBuf.append("#{" + key + "}");
+                if (--i > 0) {
+                    sourceBuf.append(" and ");
                 }
             }
         }
-        sourceBuf.append("\t\t\treturn Collections.unmodifiableMap(mapping);\n");
-        this.printCloseBrace(2, 1);
-        this.printCloseBrace(1, 2);// end of inner unmapper class
+        sourceBuf.append("\n\t</select>");
+        sourceBuf.append("\n\n");
     }
 
-    protected void printAliasRowMapper() {
-        String name = WordUtils.capitalize(CodeGenUtil.normalize(this.name));
-        // create alias mapper
-        sourceBuf.append("\tpublic static final RowMapper<" + name + "> ALIAS_ROW_MAPPER = new " + name + "AliasRowMapper ();\n");
-
-        sourceBuf.append("\tpublic static final class  " + name + "AliasRowMapper implements RowMapper<" + name + ">\n");
-        this.printOpenBrace(1, 1);
-        List<Relation> relations = this.relations.get(this.name);
-
-        if (relations != null && !relations.isEmpty()) {
-            boolean loadAllRelations = false;
-
-            for (Relation relation : relations) {
-                switch (relation.getType()) {
-                    case ONE_TO_ONE:
-                        loadAllRelations = true;
-                        String child = CodeGenUtil.normalize(relation.getChild());
-                        sourceBuf.append("\t\tprivate boolean load" + WordUtils.capitalize(child) + " = false;\n");
-                        sourceBuf.append("\t\tpublic void setLoad" + WordUtils.capitalize(child) + " (boolean load" + WordUtils.capitalize(child) + ")\n");
-                        this.printOpenBrace(2, 1);
-                        sourceBuf.append("\t\t\tthis.load" + WordUtils.capitalize(child) + " = load" + WordUtils.capitalize(child) + ";\n");
-                        this.printCloseBrace(2, 2);
-                        break;
-                    case ONE_TO_MANY:
-                    case UNKNOWN:
-                        break;
-                }
-            }
-            if (loadAllRelations) {
-                sourceBuf.append("\t\tprivate boolean loadAllRelations = false;\n");
-                sourceBuf.append("\t\tpublic void setLoadAllRelations (boolean loadAllRelations)\n");
-                this.printOpenBrace(2, 1);
-                sourceBuf.append("\t\t\tthis.loadAllRelations = loadAllRelations;\n");
-                this.printCloseBrace(2, 2);
-            }
-        }
-
-        if (!this.fkeys.isEmpty()) {
-            sourceBuf.append("\t\tprivate boolean loadAllFKeys = false;\n");
-            sourceBuf.append("\t\tpublic void setLoadAllFKeys (boolean loadAllFKeys)\n");
-            this.printOpenBrace(2, 1);
-            sourceBuf.append("\t\t\tthis.loadAllFKeys = loadAllFKeys;\n");
-            this.printCloseBrace(2, 2);
-
-            for (String fkColName : this.fkeys.keySet()) {
-                ForeignKey fkey = this.fkeys.get(fkColName);
-                String refObj = WordUtils.capitalize(CodeGenUtil.normalize(fkey.getFieldName()));
-                sourceBuf.append("\t\tprivate boolean load" + refObj + " = false;\n");
-                sourceBuf.append("\t\tpublic void setLoad" + refObj + " (boolean load" + refObj + ")\n");
-                this.printOpenBrace(2, 1);
-                sourceBuf.append("\t\t\tthis.load" + refObj + " = load" + refObj + ";\n");
-                this.printCloseBrace(2, 2);
-            }
-        }
-
-        sourceBuf.append("\t\tpublic " + name + " mapRow(ResultSet rs, int rowNum) throws SQLException \n");
-        this.printOpenBrace(2, 1);
-        sourceBuf.append("\t\t\t" + name + " obj = new " + name + "();\n");
-        for (Field field : this.fields) {
-            if (field.isPersistable()) {
-                String typeName = field.getType().getName();
-                if (field.getType() == ParameterType.INTEGER) {
-                    typeName = "Int";
-                } else if (field.getType() == ParameterType.DATE) {
-                    typeName = "Timestamp";
-                }
-                sourceBuf.append("\t\t\tobj.set" + WordUtils.capitalize(CodeGenUtil.normalize(field.getName())) + "(rs.get" + typeName + "(COLUMNS." + field.getName().toUpperCase() + ".getColumnAliasName()));\n");
-            }
-        }
-//        if (this.pkeys.size() > 1) {
-//            sourceBuf.append("\t\t\tobj.setPersisted(true);\n");
-//        }
-        if (!this.fkeys.isEmpty()) {
-            for (String fkColName : this.fkeys.keySet()) {
-                ForeignKey fkey = this.fkeys.get(fkColName);
-                String refObj = WordUtils.capitalize(CodeGenUtil.normalize(fkey.getFieldName()));
-                String refClass = WordUtils.capitalize(CodeGenUtil.normalize(fkey.getRefTableName()));
-                sourceBuf.append("\t\t\tif (this.loadAllFKeys || this.load" + refObj + ")\n");
-                sourceBuf.append("\t\t\t\tobj.set" + refObj + "(" + refClass + MapperXmlClass.DB_CLASSSUFFIX + ".ALIAS_ROW_MAPPER.mapRow(rs, rowNum)" + ");\n");
-            }
-        }
-        this.printRelations();
-        sourceBuf.append("\t\t\treturn obj;\n");
-        this.printCloseBrace(2, 1); // end of method
-        this.printCloseBrace(1, 2); // end of inner alias mapper class
-    }
-
-    protected void printRelations() {
-        List<Relation> relations = this.relations.get(this.name);
-        if (relations != null && !relations.isEmpty()) {
-            for (Relation relation : relations) {
-                switch (relation.getType()) {
-                    case ONE_TO_ONE:
-                        String child = CodeGenUtil.normalize(relation.getChild());
-                        sourceBuf.append("\t\t\tif (this.loadAllRelations || this.load" + WordUtils.capitalize(child) + ")\n");
-                        sourceBuf.append("\t\t\t\tobj.set" + WordUtils.capitalize(child) + "(" + WordUtils.capitalize(child) + MapperXmlClass.DB_CLASSSUFFIX + ".ALIAS_ROW_MAPPER.mapRow(rs, rowNum)" + ");\n");
-                        break;
-                    case ONE_TO_MANY:
-                    case UNKNOWN:
-                        break;
-                }
-            }
-        }
-    }
-
-    protected void printAllAliasesMethod() {
-        // create all aliases
-        sourceBuf.append("\tpublic static StringBuffer getAllColumnAliases ()\n");
-        this.printOpenBrace(1, 1);
-        sourceBuf.append("\t\tStringBuffer strBuf = new StringBuffer ();\n");
-        sourceBuf.append("\t\tint i = COLUMNS.values ().length;\n");
-        sourceBuf.append("\t\tfor (COLUMNS c : COLUMNS.values ())\n");
-        this.printOpenBrace(2, 1);
-        sourceBuf.append("\t\t\tstrBuf.append (c.getColumnAliasAsName ());\n");
-        sourceBuf.append("\t\t\tif (--i > 0)\n");
-        sourceBuf.append("\t\t\t\tstrBuf.append (\", \");\n");
-        this.printCloseBrace(2, 1);
-        sourceBuf.append("\t\treturn strBuf;\n");
-        this.printCloseBrace(1, 2);
-    }
-
-
-    private void printColumnsEnum() {
-        sourceBuf.append("\tpublic enum COLUMNS\n");
-        this.printOpenBrace(1, 1);
-
-        for (Field field : this.fields) {
-            if (field.isPersistable()) {
-                sourceBuf.append("\t\t" + field.getName().toUpperCase() + "(\"" + field.getName() + "\"),\n");
-            }
-        }
-        sourceBuf.append("\t\t;\n");
-        sourceBuf.append("\n");
-        sourceBuf.append("\t\tprivate String columnName;\n\n");
-        // create the constructor
-        sourceBuf.append("\t\tprivate COLUMNS (String columnName)\n");
-        this.printOpenBrace(2, 1);
-        sourceBuf.append("\t\t\tthis.columnName = columnName;\n");
-        this.printCloseBrace(2, 2);
-        //create setters/getters
-        sourceBuf.append("\t\tpublic void setColumnName (String columnName)\n");
-        this.printOpenBrace(2, 1);
-        sourceBuf.append("\t\t\tthis.columnName = columnName;\n");
-        this.printCloseBrace(2, 2);
-
-        sourceBuf.append("\t\tpublic String getColumnName ()\n");
-        this.printOpenBrace(2, 1);
-        sourceBuf.append("\t\t\treturn this.columnName;\n");
-        this.printCloseBrace(2, 2);
-
-        sourceBuf.append("\t\tpublic String getColumnAlias ()\n");
-        this.printOpenBrace(2, 1);
-        sourceBuf.append("\t\t\treturn TABLE_ALIAS + \".\" + this.columnName;\n");
-        this.printCloseBrace(2, 2);
-
-        sourceBuf.append("\t\tpublic String getColumnAliasAsName ()\n");
-        this.printOpenBrace(2, 1);
-        sourceBuf.append("\t\t\treturn TABLE_ALIAS  + \".\" + this.columnName + \" as \" + TABLE_ALIAS + \"_\" + this.columnName;\n");
-        this.printCloseBrace(2, 2);
-
-        sourceBuf.append("\t\tpublic String getColumnAliasName ()\n");
-        this.printOpenBrace(2, 1);
-        sourceBuf.append("\t\t\treturn TABLE_ALIAS + \"_\" + this.columnName;\n");
-        this.printCloseBrace(2, 2);
-
-        this.printCloseBrace(1, 2);
-    }
 
     protected void preprocess() {
 
     }
 
+    @Override
+    protected void addImports() {
+
+    }
+
     public void generateSource() {
         // generate the default stuff from the super class
+        this.resultMap = WordUtils.capitalize(CodeGenUtil.normalize(name)) + "ResultMap";
         this.printDocType();
-        this.printResultMap();
+        this.printRootMapper();
     }
 
 }

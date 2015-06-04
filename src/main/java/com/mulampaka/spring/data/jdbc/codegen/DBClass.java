@@ -164,9 +164,13 @@ public class DBClass extends BaseClass {
                 .append(name);
         if (!pkeys.isEmpty()) {
             sourceBuf.append(" where ");
+            i = pkeys.size();
             for (String key : pkeys.keySet()) {
                 sourceBuf.append(key).append(" = ");
                 sourceBuf.append(":" + key + " ");
+                if (--i > 0) {
+                    sourceBuf.append(" and ");
+                }
             }
         }
         sourceBuf.append("\";\n\n");
@@ -190,9 +194,13 @@ public class DBClass extends BaseClass {
                 .append(name);
         if (!pkeys.isEmpty()) {
             sourceBuf.append(" where ");
+            i = pkeys.size();
             for (String key : pkeys.keySet()) {
                 sourceBuf.append(key).append(" = ");
                 sourceBuf.append("?");
+                if (--i > 0) {
+                    sourceBuf.append(" and ");
+                }
             }
         }
         sourceBuf.append("\";\n\n");

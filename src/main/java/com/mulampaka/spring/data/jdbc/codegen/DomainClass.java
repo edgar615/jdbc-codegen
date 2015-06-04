@@ -95,7 +95,7 @@ public class DomainClass extends BaseClass {
             } else if (pkeys.size() == 1) {
                 sourceBuf.append("<" + this.pkeys.values().iterator().next().getName() + ">");
             } else {
-                sourceBuf.append("<" + WordUtils.capitalize(CodeGenUtil.normalize(name)) + this.classSuffix + ".PKey>");
+                sourceBuf.append("<Map<String, Object>>");
             }
         }
         sourceBuf.append("\n");
@@ -321,17 +321,13 @@ public class DomainClass extends BaseClass {
         // add the interface impl methods
 
         if (this.pkeys.size() > 1) {
-            sourceBuf.append("\tpublic PKey getId()\n");
+            sourceBuf.append("\tpublic Map<String, Object> getId()\n");
             super.printOpenBrace(1, 1);
-            sourceBuf.append("\t\treturn new " + WordUtils.capitalize(CodeGenUtil.normalize(name)) + this.classSuffix + ".PKey(");
-            int i = this.pkeys.size();
+            sourceBuf.append("\t\tMap<String, Object> mapping = new HashMap<String, Object>();\n");
             for (String key : this.pkeys.keySet()) {
-                sourceBuf.append("this." + CodeGenUtil.normalize(key));
-                if (--i > 0) {
-                    sourceBuf.append(", ");
-                }
+                sourceBuf.append("\t\tmapping.put(\"" + key + "\","  + CodeGenUtil.normalize(key) + ");\n");
             }
-            sourceBuf.append(");\n");
+            sourceBuf.append("\t\treturn Collections.unmodifiableMap(mapping);\n");
             super.printCloseBrace(1, 2);
 
 //			sourceBuf.append ("\tpublic boolean isNew ()\n");
@@ -498,11 +494,11 @@ public class DomainClass extends BaseClass {
             if (this.pkeys.size() > 1) {
                 if (!this.imports.contains(PK_CLASS))
                     this.imports.add(PK_CLASS);
-                this.imports.add("java.util.LinkedHashMap");
+                this.imports.add("java.util.HashMap");
                 this.imports.add("java.util.Map");
                 this.imports.add("java.util.Collections");
-                this.imports.add("java.io.Serializable");
-                this.imports.add("com.edgar.core.jdbc.IPKey");
+//                this.imports.add("java.io.Serializable");
+//                this.imports.add("com.edgar.core.jdbc.IPKey");
 
             }
 //			Field persistedField = new Field ();
@@ -545,9 +541,9 @@ public class DomainClass extends BaseClass {
 
         super.printToString();
 
-        if (this.pkeys.size() > 1) {
-            this.printPkeyInnerClass();
-        }
+//        if (this.pkeys.size() > 1) {
+//            this.printPkeyInnerClass();
+//        }
 
         super.printUserSourceCode();
 
