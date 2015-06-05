@@ -183,7 +183,7 @@ public class MapperXmlClass extends BaseClass {
         for (Field field : this.fields) {
             if (!this.ignoreUpdatedColumnListStr.contains(field.getName().toLowerCase()) && field.isPersistable()) {
                 columns.add(field.getName());
-                args.add("${" + CodeGenUtil.normalize(field.getName().toLowerCase()) + "}");
+                args.add("#{" + CodeGenUtil.normalize(field.getName().toLowerCase()) + "}");
             }
         }
         sourceBuf.append(StringUtils.join(columns, ", "))
@@ -275,16 +275,13 @@ public class MapperXmlClass extends BaseClass {
         }
         sourceBuf.append("\t<update id=\"updateByPrimaryKey\" parameterType=\"" + WordUtils.capitalize(CodeGenUtil.normalize(name)) + "\">\n");
         sourceBuf.append("\t\tupdate ").append(name).append(" set ");
-        int i = this.fields.size();
+        List<String> sets = new ArrayList<>();
         for (Field field : this.fields) {
             if (!this.ignoreUpdatedColumnListStr.contains(field.getName().toLowerCase()) && field.isPersistable()) {
-                sourceBuf.append(" \n\t\t").append(field.getName()).append(" = ");
-                sourceBuf.append("${" + CodeGenUtil.normalize(field.getName().toLowerCase()) + "}");
-                if (--i > 0) {
-                    sourceBuf.append(",");
-                }
+                sets.add(" \n\t\t" + field.getName() + " = #{" + CodeGenUtil.normalize(field.getName().toLowerCase()) + "}");
             }
         }
+        sourceBuf.append(StringUtils.join(sets, ","));
 
         if (pkeys.size() == 1) {
             sourceBuf.append(" \n\t\twhere ");
@@ -292,12 +289,11 @@ public class MapperXmlClass extends BaseClass {
             sourceBuf.append(key).append(" = #{" + CodeGenUtil.normalize(key) + "}");
         } else if (pkeys.size() > 1) {
             sourceBuf.append(" \n\t\twhere ");
-            i = pkeys.size();
+            int i = pkeys.size();
             for (String key : pkeys.keySet()) {
-                sourceBuf.append(key).append(" = ");
-                sourceBuf.append(key).append(" = #{" + CodeGenUtil.normalize(key) + "}");
+                sourceBuf.append(key).append(" = ").append(" #{" + CodeGenUtil.normalize(key) + "}");
                 if (--i > 0) {
-                    sourceBuf.append(" and ");
+                    sourceBuf.append(" \n\t\tand ");
                 }
             }
         }
@@ -309,21 +305,18 @@ public class MapperXmlClass extends BaseClass {
      * 生成根据主键更新的sql
      */
     protected void printUpdateByPkSqlLock() {
-        if (pkeys.isEmpty()) {
+        if (pkeys.isEmpty() || optimisticLockColumnList.isEmpty()) {
             return;
         }
         sourceBuf.append("\t<update id=\"updateByPrimaryKeyWithLock\" parameterType=\"" + WordUtils.capitalize(CodeGenUtil.normalize(name)) + "\">\n");
         sourceBuf.append("\t\tupdate ").append(name).append(" set ");
-        int i = this.fields.size();
+        List<String> sets = new ArrayList<>();
         for (Field field : this.fields) {
             if (!this.ignoreUpdatedColumnListStr.contains(field.getName().toLowerCase()) && field.isPersistable()) {
-                sourceBuf.append(" \n\t\t").append(field.getName()).append(" = ");
-                sourceBuf.append("${" + CodeGenUtil.normalize(field.getName().toLowerCase()) + "}");
-                if (--i > 0) {
-                    sourceBuf.append(",");
-                }
+                sets.add(" \n\t\t" + field.getName() + " = #{" + CodeGenUtil.normalize(field.getName().toLowerCase()) + "}");
             }
         }
+        sourceBuf.append(StringUtils.join(sets, ","));
 
         if (pkeys.size() == 1) {
             sourceBuf.append(" \n\t\twhere ");
@@ -331,10 +324,9 @@ public class MapperXmlClass extends BaseClass {
             sourceBuf.append(key).append(" = #{" + CodeGenUtil.normalize(key) + "}");
         } else if (pkeys.size() > 1) {
             sourceBuf.append(" \n\t\twhere ");
-            i = pkeys.size();
+            int i = pkeys.size();
             for (String key : pkeys.keySet()) {
-                sourceBuf.append(key).append(" = ");
-                sourceBuf.append(key).append(" = #{" + CodeGenUtil.normalize(key) + "}");
+                sourceBuf.append(key).append(" = ").append(" #{" + CodeGenUtil.normalize(key) + "}");
                 if (--i > 0) {
                     sourceBuf.append(" \nt\tand ");
                 }
@@ -384,7 +376,7 @@ public class MapperXmlClass extends BaseClass {
                 sourceBuf.append(key).append(" = ");
                 sourceBuf.append("#{" + key + "}");
                 if (--i > 0) {
-                    sourceBuf.append(" and ");
+                    sourceBuf.append(" \n\t\tand ");
                 }
             }
         }

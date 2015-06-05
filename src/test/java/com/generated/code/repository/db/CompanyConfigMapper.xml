@@ -14,7 +14,7 @@
 	<insert id="insert" parameterType="CompanyConfig">
 		insert into 
 		company_config(config_id, company_id, config_key, config_value, description) 
-		values(${configId}, ${companyId}, ${configKey}, ${configValue}, ${description})
+		values(#{configId}, #{companyId}, #{configKey}, #{configValue}, #{description})
 	</insert>
 
 	<delete id="deleteByPrimaryKey" parameterType="int">
@@ -24,21 +24,11 @@
 
 	<update id="updateByPrimaryKey" parameterType="CompanyConfig">
 		update company_config set  
-		config_id = ${configId}, 
-		company_id = ${companyId}, 
-		config_key = ${configKey}, 
-		config_value = ${configValue}, 
-		description = ${description} 
-		where config_id = #{configId}
-	</update>
-
-	<update id="updateByPrimaryKeyWithLock" parameterType="CompanyConfig">
-		update company_config set  
-		config_id = ${configId}, 
-		company_id = ${companyId}, 
-		config_key = ${configKey}, 
-		config_value = ${configValue}, 
-		description = ${description} 
+		config_id = #{configId}, 
+		company_id = #{companyId}, 
+		config_key = #{configKey}, 
+		config_value = #{configValue}, 
+		description = #{description} 
 		where config_id = #{configId}
 	</update>
 

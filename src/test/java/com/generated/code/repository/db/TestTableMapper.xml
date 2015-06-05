@@ -13,7 +13,7 @@
 	<insert id="insert" parameterType="TestTable">
 		insert into 
 		test_table(test_code, dict_name, sorted) 
-		values(${testCode}, ${dictName}, ${sorted})
+		values(#{testCode}, #{dictName}, #{sorted})
 	</insert>
 
 	<!-- START 写在START和END中间的代码不会被替换 -->

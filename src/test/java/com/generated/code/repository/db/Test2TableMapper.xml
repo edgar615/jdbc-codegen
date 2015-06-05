@@ -14,7 +14,7 @@
 	<insert id="insert" parameterType="Test2Table">
 		insert into 
 		test2_table(test_id, test_code2, dict_name, sorted) 
-		values(${testId}, ${testCode2}, ${dictName}, ${sorted})
+		values(#{testId}, #{testCode2}, #{dictName}, #{sorted})
 	</insert>
 
 	<delete id="deleteByPrimaryKey" parameterType="map">
@@ -24,27 +24,19 @@
 
 	<update id="updateByPrimaryKey" parameterType="Test2Table">
 		update test2_table set  
-		test_id = ${testId}, 
-		test_code2 = ${testCode2}, 
-		dict_name = ${dictName}, 
-		sorted = ${sorted}, 
-		where test_code2 = test_code2 = #{testCode2} and test_id = test_id = #{testId}
-	</update>
-
-	<update id="updateByPrimaryKeyWithLock" parameterType="Test2Table">
-		update test2_table set  
-		test_id = ${testId}, 
-		test_code2 = ${testCode2}, 
-		dict_name = ${dictName}, 
-		sorted = ${sorted}, 
-		where test_code2 = test_code2 = #{testCode2} 
-t	and test_id = test_id = #{testId}
+		test_id = #{testId}, 
+		test_code2 = #{testCode2}, 
+		dict_name = #{dictName}, 
+		sorted = #{sorted} 
+		where test_code2 =  #{testCode2} 
+		and test_id =  #{testId}
 	</update>
 
 	<select id="selectByPrimaryKey" resultMap="Test2TableResultMap" parameterType="map">
 		select test_id, test_code2, dict_name, parent_code, sorted 
 		from test2_table 
-		where test_code2 = #{test_code2} and test_id = #{test_id}
+		where test_code2 = #{test_code2} 
+		and test_id = #{test_id}
 	</select>
 
 	<!-- START 写在START和END中间的代码不会被替换 -->
