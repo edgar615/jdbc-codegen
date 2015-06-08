@@ -10,6 +10,20 @@
 		<result column="sorted" property="sorted" />
 	</resultMap>
 
+	<sql id="all_column">
+		test_code, dict_name, parent_code, sorted
+	</sql>
+
+	<sql id="limit">
+		<if test="limit != null">
+			limit
+			<if test="offset != null">
+			#{offset},
+			</if>
+			#{limit}
+		</if>
+	</sql>
+
 	<insert id="insert" parameterType="TestTable">
 		insert into 
 		test_table(test_code, dict_name, sorted) 

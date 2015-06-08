@@ -93,6 +93,8 @@ public class MapperXmlClass extends BaseClass {
     protected void printRootMapper() {
         sourceBuf.append("<mapper namespace=\"" + repositoryPackageName + "." + WordUtils.capitalize(CodeGenUtil.normalize(name)) + classSuffix + "\">\n");
         printResultMap();
+        printAllColumn();
+        printLimitSql();
         printInsertSql();
         printDeleteByPkSql();
         printDeleteByPkSqlLock();
@@ -169,6 +171,32 @@ public class MapperXmlClass extends BaseClass {
             }
         }
         sourceBuf.append("\t</resultMap>\n\n");
+    }
+
+    protected void printAllColumn() {
+        sourceBuf.append("\t<sql id=\"all_column\">\n\t\t");
+        int i = this.fields.size();
+        for (Field field : this.fields) {
+            sourceBuf.append(field.getName());
+            if (-- i > 0) {
+                sourceBuf.append(", ");
+            }
+        }
+        sourceBuf.append("\n");
+        sourceBuf.append("\t</sql>\n\n");
+    }
+
+    protected void printLimitSql() {
+
+        sourceBuf.append("\t<sql id=\"limit\">\n");
+        sourceBuf.append("\t\t<if test=\"limit != null\">\n");
+        sourceBuf.append("\t\t\tlimit\n");
+        sourceBuf.append("\t\t\t<if test=\"offset != null\">\n");
+        sourceBuf.append("\t\t\t#{offset},\n");
+        sourceBuf.append("\t\t\t</if>\n");
+        sourceBuf.append("\t\t\t#{limit}\n");
+        sourceBuf.append("\t\t</if>\n");
+        sourceBuf.append("\t</sql>\n\n");
     }
 
     /**
@@ -274,14 +302,67 @@ public class MapperXmlClass extends BaseClass {
             return;
         }
         sourceBuf.append("\t<update id=\"updateByPrimaryKey\" parameterType=\"" + WordUtils.capitalize(CodeGenUtil.normalize(name)) + "\">\n");
-        sourceBuf.append("\t\tupdate ").append(name).append(" set ");
+        sourceBuf.append("\t\tupdate ").append(name).append("\n\t\t<set>\n ");
         List<String> sets = new ArrayList<>();
         for (Field field : this.fields) {
             if (!this.ignoreUpdatedColumnListStr.contains(field.getName().toLowerCase()) && field.isPersistable()) {
-                sets.add(" \n\t\t" + field.getName() + " = #{" + CodeGenUtil.normalize(field.getName().toLowerCase()) + "}");
+//                sets.add(" \n\t\t" + field.getName() + " = #{" + CodeGenUtil.normalize(field.getName().toLowerCase()) + "}");
+                StringBuffer set = new StringBuffer();
+                set.append("\t\t\t<if test=\"" + CodeGenUtil.normalize(field.getName().toLowerCase()) + " != null\">")
+                        .append(" \n\t\t\t\t" + field.getName() + " = #{" + CodeGenUtil.normalize(field.getName().toLowerCase()) + "},")
+                        .append("\n\t\t\t</if>\n");
+                sets.add(set.toString());
             }
         }
-        sourceBuf.append(StringUtils.join(sets, ","));
+        sourceBuf.append(StringUtils.join(sets, ""));
+//        sourceBuf.append(StringUtils.join(sets, ","));
+
+        sourceBuf.append("\t\t</set>");
+        if (pkeys.size() == 1) {
+            sourceBuf.append(" \n\t\twhere ");
+            String key = pkeys.entrySet().iterator().next().getKey();
+            sourceBuf.append(key).append(" = #{" + CodeGenUtil.normalize(key) + "}");
+        } else if (pkeys.size() > 1) {
+            sourceBuf.append(" \n\t\twhere ");
+            int i = pkeys.size();
+            for (String key : pkeys.keySet()) {
+                sourceBuf.append(key).append(" = ").append(" #{" + CodeGenUtil.normalize(key) + "}");
+                if (--i > 0) {
+                    sourceBuf.append(" \n\t\tand ");
+                }
+            }
+        }
+        sourceBuf.append("\n\t</update>");
+        sourceBuf.append("\n\n");
+    }
+
+    protected void printUpdateByPkSqlNotNull() {
+        if (pkeys.isEmpty()) {
+            return;
+        }
+        sourceBuf.append("\t<update id=\"updateByPrimaryKey\" parameterType=\"" + WordUtils.capitalize(CodeGenUtil.normalize(name)) + "\">\n");
+        sourceBuf.append("\t\tupdate ").append(name).append("\n\t\t<set>\n ");
+        List<String> sets = new ArrayList<>();
+        for (Field field : this.fields) {
+            if (!this.ignoreUpdatedColumnListStr.contains(field.getName().toLowerCase()) && field.isPersistable()) {
+                StringBuffer set = new StringBuffer();
+                set.append("\t\t\t<if test=\"" + CodeGenUtil.normalize(field.getName().toLowerCase()) + " != null\">")
+                        .append(" \n\t\t\t\t" + field.getName() + " = #{" + CodeGenUtil.normalize(field.getName().toLowerCase()) + "},")
+                        .append("\n\t\t\t</if>\n");
+                sets.add(set.toString());
+            }
+        }
+        sourceBuf.append(StringUtils.join(sets, ""));
+
+        sourceBuf.append("\t\t</set>");
+//        sourceBuf.append("\t\tupdate ").append(name).append(" set ");
+//        List<String> sets = new ArrayList<>();
+//        for (Field field : this.fields) {
+//            if (!this.ignoreUpdatedColumnListStr.contains(field.getName().toLowerCase()) && field.isPersistable()) {
+//                sets.add(" \n\t\t" + field.getName() + " = #{" + CodeGenUtil.normalize(field.getName().toLowerCase()) + "}");
+//            }
+//        }
+//        sourceBuf.append(StringUtils.join(sets, ","));
 
         if (pkeys.size() == 1) {
             sourceBuf.append(" \n\t\twhere ");

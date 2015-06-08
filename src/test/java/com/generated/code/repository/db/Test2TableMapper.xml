@@ -11,6 +11,20 @@
 		<result column="sorted" property="sorted" />
 	</resultMap>
 
+	<sql id="all_column">
+		test_id, test_code2, dict_name, parent_code, sorted
+	</sql>
+
+	<sql id="limit">
+		<if test="limit != null">
+			limit
+			<if test="offset != null">
+			#{offset},
+			</if>
+			#{limit}
+		</if>
+	</sql>
+
 	<insert id="insert" parameterType="Test2Table">
 		insert into 
 		test2_table(test_id, test_code2, dict_name, sorted) 
@@ -23,11 +37,21 @@
 	</delete>
 
 	<update id="updateByPrimaryKey" parameterType="Test2Table">
-		update test2_table set  
-		test_id = #{testId}, 
-		test_code2 = #{testCode2}, 
-		dict_name = #{dictName}, 
-		sorted = #{sorted} 
+		update test2_table
+		<set>
+ 			<if test="testId != null"> 
+				test_id = #{testId},
+			</if>
+			<if test="testCode2 != null"> 
+				test_code2 = #{testCode2},
+			</if>
+			<if test="dictName != null"> 
+				dict_name = #{dictName},
+			</if>
+			<if test="sorted != null"> 
+				sorted = #{sorted},
+			</if>
+		</set> 
 		where test_code2 =  #{testCode2} 
 		and test_id =  #{testId}
 	</update>
