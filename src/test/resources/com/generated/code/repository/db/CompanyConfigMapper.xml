@@ -64,45 +64,8 @@
 		where config_id = #{id}
 	</select>
 
-	<!-- START 写在START和END中间的代码不会被替换 -->
-    <select id="count" resultType="int" parameterType="map">
-        select count(*) from company_config
-        <where>
-            <if test="configKey != null">
-                config_key = #{configKey}
-            </if>
-            <if test="configValue != null">
-                AND config_value = #{configValue}
-            </if>
-        </where>
-        <include refid="limit" />
-    </select>
-    <select id="query" resultMap="CompanyConfigResultMap" parameterType="map">
-        select config_id, company_id, config_key, config_value, description
-        from company_config
-        <where>
-            <if test="configKey != null">
-                config_key = #{configKey}
-            </if>
-            <if test="configValue != null">
-                AND config_value = #{configValue}
-            </if>
-        </where>
-        <include refid="limit" />
-    </select>
-    <update id="createTable">
-        create table `company_config` (
-        `config_id` int(11) not null,
-        `company_id` int(11) default null,
-        `config_key` varchar(16) not null,
-        `config_value` varchar(16) not null,
-        `description` varchar(128) default null,
-        primary key (`config_id`)
-        ) engine=innodb default charset=utf8 comment='如果company_id=-1,则表示是全局配置项';
-    </update>
-    <update id="dropTable">
-        drop table if exists `company_config`;
-    </update>
-	<!-- END 写在START和END中间的代码不会被替换-->
+	<!-- START д��START��END�м�Ĵ��벻�ᱻ�滻 -->
+
+	<!-- END д��START��END�м�Ĵ��벻�ᱻ�滻-->
 
 </mapper>

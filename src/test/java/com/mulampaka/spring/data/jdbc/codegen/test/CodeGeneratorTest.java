@@ -18,16 +18,25 @@
  */
 package com.mulampaka.spring.data.jdbc.codegen.test;
 
+import com.mulampaka.spring.data.jdbc.codegen.CodeGenerator;
+import org.junit.Test;
+import org.junit.runner.RunWith;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.testng.annotations.Test;
-import com.mulampaka.spring.data.jdbc.codegen.CodeGenerator;
-import com.mulampaka.spring.data.jdbc.codegen.test.config.SpringJdbcBaseTest;
+import org.springframework.test.context.ContextConfiguration;
+import org.springframework.test.context.TestExecutionListeners;
+import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
+import org.springframework.test.context.support.DependencyInjectionTestExecutionListener;
+import org.springframework.test.context.transaction.TransactionConfiguration;
+import org.springframework.test.context.transaction.TransactionalTestExecutionListener;
 
-import java.util.ArrayList;
-import java.util.List;
-
-public class CodeGeneratorTest extends SpringJdbcBaseTest
+//@RunWith(SpringJUnit4ClassRunner.class)
+//@ContextConfiguration(locations = {"classpath:dao.xml"})
+////@TestExecutionListeners({DependencyInjectionTestExecutionListener.class})
+//@TransactionConfiguration(defaultRollback = true)
+//@TestExecutionListeners({DependencyInjectionTestExecutionListener.class,
+//        TransactionalTestExecutionListener.class})
+public class CodeGeneratorTest
 {
 
 	final static Logger logger = LoggerFactory.getLogger(CodeGeneratorTest.class);

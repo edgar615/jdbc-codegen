@@ -1,6 +1,6 @@
 package com.generated.code.domain;
 
-import com.edgar.core.jdbc.Persistable;
+import com.edgar.core.repository.Persistable;
 import org.apache.commons.lang3.builder.ToStringBuilder;
 import javax.validation.constraints.Null;
 import javax.validation.constraints.NotNull;

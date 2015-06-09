@@ -1,16 +1,12 @@
 package com.generated.code.domain;
 
-import com.edgar.core.jdbc.Persistable;
+import com.edgar.core.repository.Persistable;
 import org.apache.commons.lang3.builder.ToStringBuilder;
 import javax.validation.constraints.Null;
 import javax.validation.constraints.NotNull;
 import javax.validation.constraints.Size;
 import org.hibernate.validator.constraints.NotEmpty;
 import javax.validation.groups.Default;
-import static com.nurkiewicz.jdbcrepository.JdbcRepository.pk;
-import java.util.HashMap;
-import java.util.Map;
-import java.util.Collections;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.Collections;

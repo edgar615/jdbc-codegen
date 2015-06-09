@@ -1,12 +1,10 @@
 package com.generated.code.repository;
 
-import com.edgar.core.jdbc.BaseMapper;
+import com.edgar.core.repository.BaseMapper;
 import org.springframework.stereotype.Repository;
 import org.slf4j.LoggerFactory;
 import org.slf4j.Logger;
 import com.generated.code.domain.Test2Table;
-import com.nurkiewicz.jdbcrepository.TableDescription;
-import java.util.Map;
 import java.util.Map;
 
 /**

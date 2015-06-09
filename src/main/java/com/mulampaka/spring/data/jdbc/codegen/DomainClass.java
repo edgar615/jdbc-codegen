@@ -22,7 +22,6 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 
-import bsh.Primitive;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.lang3.text.WordUtils;
 import org.slf4j.Logger;
@@ -39,14 +38,13 @@ import com.mulampaka.spring.data.jdbc.codegen.util.CodeGenUtil;
 public class DomainClass extends BaseClass {
 
     final static Logger logger = LoggerFactory.getLogger(DomainClass.class);
-    private static String PK_CLASS = "static com.nurkiewicz.jdbcrepository.JdbcRepository.pk";
 
     private boolean generateJsr303Annotations = false;
     private List<String> jsr303InsertGroups = new ArrayList<String>();
     private List<String> jsr303UpdateGroups = new ArrayList<String>();
 
     public DomainClass() {
-        super.setInterfaceName("com.edgar.core.jdbc.Persistable");
+        super.setInterfaceName("com.edgar.core.repository.Persistable");
         this.addImports();
     }
 
@@ -492,8 +490,6 @@ public class DomainClass extends BaseClass {
     protected void preprocess() {
         if (this.pkeys.size() > 0) {
             if (this.pkeys.size() > 1) {
-                if (!this.imports.contains(PK_CLASS))
-                    this.imports.add(PK_CLASS);
                 this.imports.add("java.util.HashMap");
                 this.imports.add("java.util.Map");
                 this.imports.add("java.util.Collections");

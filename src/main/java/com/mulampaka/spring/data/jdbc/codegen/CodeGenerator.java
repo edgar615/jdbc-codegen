@@ -129,6 +129,8 @@ public class CodeGenerator
 			String domainPackageName = this.properties.getProperty ("domain.package.name");
 			String dbPackageName = this.properties.getProperty ("repository.db.package.name");
 			String repositoryPackageName = this.properties.getProperty ("repository.package.name");
+            String rootResourceFolderPath = this.properties.getProperty ("resource.folder.path");
+            String mapperXmlPackgeName = this.properties.getProperty ("mapper.xml.package.name");
 
 			conn = this.getConnection ();
 			DatabaseMetaData metaData = conn.getMetaData ();
@@ -207,8 +209,9 @@ public class CodeGenerator
 
                 //创建包
 				CodeGenUtil.createPackage (srcFolderPath, domainPackageName);
-				CodeGenUtil.createPackage (srcFolderPath, dbPackageName);
+//				CodeGenUtil.createPackage (srcFolderPath, dbPackageName);
 				CodeGenUtil.createPackage (srcFolderPath, repositoryPackageName);
+                CodeGenUtil.createPackage (rootResourceFolderPath, mapperXmlPackgeName);
 
                 //读取table
                 ResultSet rset = metaData.getTables (null, null, null, new String[] { "TABLE" });
@@ -285,6 +288,8 @@ public class CodeGenerator
 		String domainPackageName = this.properties.getProperty ("domain.package.name");
 		String dbPackageName = this.properties.getProperty ("repository.db.package.name");
 		String repositoryPackageName = this.properties.getProperty ("repository.package.name");
+        String rootResourceFolderPath = this.properties.getProperty ("resource.folder.path");
+        String mapperXmlPackgeName = this.properties.getProperty ("mapper.xml.package.name");
 
 		String generateJsr303AnnotationsStr = this.properties.getProperty ("generate.jsr303.annotations");
 		boolean generateJsr303Annotations = false;
@@ -358,8 +363,8 @@ public class CodeGenerator
         //mapper xml
         MapperXmlClass mapperXmlClass = new MapperXmlClass ();
         mapperXmlClass.setName(tableName);
-        mapperXmlClass.setRootFolderPath (rootFolderPath);
-        mapperXmlClass.setPackageName (dbPackageName);
+        mapperXmlClass.setRootFolderPath (rootResourceFolderPath);
+        mapperXmlClass.setPackageName (mapperXmlPackgeName);
         mapperXmlClass.setFields(dbFields);
         mapperXmlClass.setRepositoryPackageName(repositoryPackageName);
         mapperXmlClass.setIgnoreUpdatedColumnListStr(ignoreUpdatedColumnList);

@@ -29,11 +29,9 @@ public class MapperClass extends BaseClass {
     final static Logger logger = LoggerFactory.getLogger(RepositoryClass2.class);
     private static String CLASS_SUFFIX = "Mapper";
 
-    private static String TBL_DESC_CLASS = "com.nurkiewicz.jdbcrepository.TableDescription";
-
     public MapperClass() {
         this.classSuffix = CLASS_SUFFIX;
-        super.setExtendsClassName("com.edgar.core.jdbc.BaseMapper");
+        super.setExtendsClassName("com.edgar.core.repository.BaseMapper");
         this.addImports();
     }
 
@@ -46,9 +44,8 @@ public class MapperClass extends BaseClass {
         sourceBuf.append("@Repository\n");
     }
 
-    protected void printClassDefn ()
-    {
-        sourceBuf.append ("public interface " + WordUtils.capitalize (CodeGenUtil.normalize (name)) + this.classSuffix);
+    protected void printClassDefn() {
+        sourceBuf.append("public interface " + WordUtils.capitalize(CodeGenUtil.normalize(name)) + this.classSuffix);
     }
 
     @Override
@@ -72,16 +69,9 @@ public class MapperClass extends BaseClass {
 
     protected void preprocess() {
         if (this.pkeys.size() != 1) {
-            if (!this.imports.contains(TBL_DESC_CLASS))
-                this.imports.add(TBL_DESC_CLASS);
             if (this.pkeys.size() > 1) {
                 this.imports.add("java.util.Map");
             }
-        } else {
-            if (!this.imports.contains("org.springframework.jdbc.core.RowMapper"))
-                this.imports.add("org.springframework.jdbc.core.RowMapper");
-            if (!this.imports.contains("com.edgar.core.jdbc.RowUnmapper"))
-                this.imports.add("com.edgar.core.jdbc.RowUnmapper");
         }
     }
 

@@ -1,4 +1,4 @@
-package com.edgar.core.jdbc;
+package com.edgar.core.repository;
 
 import java.io.Serializable;
 
