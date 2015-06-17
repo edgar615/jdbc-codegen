@@ -45,7 +45,12 @@ public class CompanyConfig implements Persistable<Integer>
 		return this.configId;
 	}
 
-	public void setConfigId (Integer configId)
+    @Override
+    public void setId(Integer integer) {
+
+    }
+
+    public void setConfigId (Integer configId)
 	{
 		this.configId = configId;
 	}

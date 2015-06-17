@@ -54,7 +54,12 @@ public class Test2Table implements Persistable<Map<String, Object>>
 		return Collections.unmodifiableMap(mapping);
 	}
 
-	public void setTestId (String testId)
+    @Override
+    public void setId(Map<String, Object> stringObjectMap) {
+
+    }
+
+    public void setTestId (String testId)
 	{
 		this.testId = testId;
 	}

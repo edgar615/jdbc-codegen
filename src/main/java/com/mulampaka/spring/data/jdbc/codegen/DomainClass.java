@@ -66,7 +66,6 @@ public class DomainClass extends BaseClass {
 
     @Override
     protected void addImports() {
-        this.imports.add("org.apache.commons.lang3.builder.ToStringBuilder");
     }
 
     public boolean isGenerateJsr303Annotations() {
@@ -186,7 +185,14 @@ public class DomainClass extends BaseClass {
                     String val = field.getDefaultValue();
                     switch (t) {
                         case BOOLEAN:
-                            sourceBuf.append(" = " + val + ";\n\n");
+                            if ("0".equals(val)) {
+                                sourceBuf.append(" = " + false + ";\n\n");
+                            } else if ("1".equals(val)) {
+                                sourceBuf.append(" = " + true + ";\n\n");
+                            } else {
+                                sourceBuf.append(";\n\n");
+                            }
+
                             break;
                         case INTEGER:
                             // postgres default values for int columns are stored as floats. e.g 100.0
@@ -319,6 +325,7 @@ public class DomainClass extends BaseClass {
         // add the interface impl methods
 
         if (this.pkeys.size() > 1) {
+            sourceBuf.append("@Override\n");
             sourceBuf.append("\tpublic Map<String, Object> getId()\n");
             super.printOpenBrace(1, 1);
             sourceBuf.append("\t\tMap<String, Object> mapping = new HashMap<String, Object>();\n");
@@ -328,6 +335,14 @@ public class DomainClass extends BaseClass {
             sourceBuf.append("\t\treturn Collections.unmodifiableMap(mapping);\n");
             super.printCloseBrace(1, 2);
 
+            sourceBuf.append("\t@Override\n");
+            sourceBuf.append("\tpublic void setId(Map<String, Object> map)\n");
+            sourceBuf.append("\t{\n");
+            for (String key : this.pkeys.keySet()) {
+                sourceBuf.append("\t\tthis." + CodeGenUtil.normalize(key.toLowerCase()) + " = map.get(" + CodeGenUtil.normalize(key.toLowerCase()) + ");\n");
+            }
+            super.printCloseBrace(1, 2);
+
 //			sourceBuf.append ("\tpublic boolean isNew ()\n");
 //			super.printOpenBrace (1, 1);
 //			sourceBuf.append ("\t\treturn !persisted;\n");
@@ -335,6 +350,7 @@ public class DomainClass extends BaseClass {
         } else if (this.pkeys.size() == 1) {
             String key = this.pkeys.keySet().iterator().next();
             ParameterType keyType = this.pkeys.get(key);
+            sourceBuf.append("\t@Override\n");
             sourceBuf.append("\tpublic " + keyType.getName() + " getId ()\n");
             super.printOpenBrace(1, 1);
             sourceBuf.append("\t\treturn this." + CodeGenUtil.normalize(key.toLowerCase()) + ";\n");
@@ -344,16 +360,28 @@ public class DomainClass extends BaseClass {
 //			sourceBuf.append ("\t{\n");
 //			sourceBuf.append ("\t\treturn this." + CodeGenUtil.normalize (key.toLowerCase()) + " == null;\n");
 //			super.printCloseBrace (1, 2);
-            if ("id".equalsIgnoreCase(key)) {
-                sourceBuf.append("\tpublic void setId(" + keyType.getName() + " id)\n");
-                sourceBuf.append("\t{\n");
-                sourceBuf.append("\t\tthis.id = id;\n");
-                super.printCloseBrace(1, 2);
-            }
+//            if ("id".equalsIgnoreCase(key)) {
+//                sourceBuf.append("\tpublic void setId(" + keyType.getName() + " id)\n");
+//                sourceBuf.append("\t{\n");
+//                sourceBuf.append("\t\tthis.id = id;\n");
+//                super.printCloseBrace(1, 2);
+//            }
+            sourceBuf.append("\t@Override\n");
+            sourceBuf.append("\tpublic void setId(" + keyType.getName() + " id)\n");
+            sourceBuf.append("\t{\n");
+            sourceBuf.append("\t\tthis." + CodeGenUtil.normalize(key.toLowerCase()) + " = id;\n");
+            super.printCloseBrace(1, 2);
 
         } else {
+            sourceBuf.append("\t@Override\n");
             sourceBuf.append("\tpublic String getId()\n");
             super.printOpenBrace(1, 1);
+            sourceBuf.append("\t\tthrow new UnsupportedOperationException(\"There is no primary key\");\n");
+            super.printCloseBrace(1, 2);
+
+            sourceBuf.append("\t@Override\n");
+            sourceBuf.append("\tpublic void setId(String id)\n");
+            sourceBuf.append("\t{\n");
             sourceBuf.append("\t\tthrow new UnsupportedOperationException(\"There is no primary key\");\n");
             super.printCloseBrace(1, 2);
 //			sourceBuf.append ("\tpublic boolean isNew ()\n");
@@ -535,7 +563,7 @@ public class DomainClass extends BaseClass {
 
         this.printMethods();
 
-        super.printToString();
+//        super.printToString();
 
 //        if (this.pkeys.size() > 1) {
 //            this.printPkeyInnerClass();

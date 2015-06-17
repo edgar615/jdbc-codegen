@@ -43,7 +43,12 @@ public class TestTable implements Persistable<String>
 		throw new UnsupportedOperationException("There is no primary key");
 	}
 
-	public void setTestCode (String testCode)
+    @Override
+    public void setId(String s) {
+
+    }
+
+    public void setTestCode (String testCode)
 	{
 		this.testCode = testCode;
 	}
