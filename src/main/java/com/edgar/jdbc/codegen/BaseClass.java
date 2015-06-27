@@ -153,7 +153,7 @@ public abstract class BaseClass {
     protected void printCtor() {
         // no args constructor
         sourceBuf.append("\tpublic " + WordUtils.capitalize(CodeGenUtil.normalize(name)) + this.classSuffix + " () ");
-        this.printOpenBrace(1, 2);
+        this.printOpenBrace(0, 2);
         this.printCloseBrace(1, 2);
     }
 

@@ -69,7 +69,7 @@ public class RepositoryClass extends BaseClass {
     protected void printCtor() {
         // add ctor
         sourceBuf.append("\tpublic " + this.name + this.classSuffix + "() ");
-        super.printOpenBrace(1, 1);
+        super.printOpenBrace(0, 1);
         sourceBuf.append("\t\tsuper (" + this.name + DBClass.DB_CLASSSUFFIX + ".ROW_MAPPER, " + this.name + DBClass.DB_CLASSSUFFIX + ".ROW_UNMAPPER);\n");
         super.printCloseBrace(1, 2);
 //        if (this.pkeys.size () == 0)
@@ -125,7 +125,7 @@ public class RepositoryClass extends BaseClass {
                 String refObj = WordUtils.capitalize(CodeGenUtil.normalize(fkey.getFkTableName()));
                 String methodClassName = CodeGenUtil.pluralizeName(refObj, this.getDontPluralizeWords());
                 sourceBuf.append("\tpublic List<" + refObj + "> get" + methodClassName + "By" + WordUtils.capitalize(CodeGenUtil.normalize(fkColName)) + " (Long " + CodeGenUtil.normalize(fkColName) + ") ");
-                this.printOpenBrace(1, 1);
+                this.printOpenBrace(0, 1);
                 sourceBuf.append("\t\tString sql = \"select * from \" + " + refObj + DBClass.DB_CLASSSUFFIX + ".getTableName() + " + "\" where \" + " + refObj + DBClass.DB_CLASSSUFFIX + ".COLUMNS." + fkColName.toUpperCase() + ".getColumnName() + \" = ? \";\n");
                 sourceBuf.append("\t\treturn this.getJdbcOperations ().query (sql, new Object[] { " + CodeGenUtil.normalize(fkColName) + " }, " + refObj + DBClass.DB_CLASSSUFFIX + ".ROW_MAPPER);\n");
                 this.printCloseBrace(1, 2);
@@ -137,7 +137,7 @@ public class RepositoryClass extends BaseClass {
     protected void printInterfaceImpl() {
         if (this.pkeys.size() == 0) {
             sourceBuf.append("\tpublic " + this.name + " selectByPrimaryKey(String id) ");
-            super.printOpenBrace(1, 1);
+            super.printOpenBrace(0, 1);
             sourceBuf.append("\t\tthrow new UnsupportedOperationException(\"There is no primary key\");\n");
             super.printCloseBrace(1, 2);
         }

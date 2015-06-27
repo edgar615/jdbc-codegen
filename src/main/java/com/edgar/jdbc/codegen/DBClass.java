@@ -212,7 +212,7 @@ public class DBClass extends BaseClass {
         sourceBuf.append("\tpublic static final RowMapper<" + name + "> ROW_MAPPER = new " + name + "RowMapper ();\n");
 
         sourceBuf.append("\tpublic static final class  " + name + "RowMapper implements RowMapper<" + name + "> ");
-        this.printOpenBrace(1, 1);
+        this.printOpenBrace(0, 1);
 
         sourceBuf.append("\t\tpublic " + name + " mapRow(ResultSet rs, int rowNum) throws SQLException ");
         this.printOpenBrace(2, 1);
@@ -242,7 +242,7 @@ public class DBClass extends BaseClass {
         // create unmapper
         sourceBuf.append("\tpublic static final RowUnmapper<" + name + "> ROW_UNMAPPER = new " + name + "RowUnmapper ();\n");
         sourceBuf.append("\tpublic static final class " + name + "RowUnmapper implements RowUnmapper<" + name + "> ");
-        this.printOpenBrace(1, 1);
+        this.printOpenBrace(0, 1);
         String objName = name.toLowerCase();
         sourceBuf.append("\t\tpublic Map<String, Object> mapColumns(" + name + " " + objName + ") ");
         this.printOpenBrace(2, 1);
@@ -268,7 +268,7 @@ public class DBClass extends BaseClass {
         sourceBuf.append("\tpublic static final RowMapper<" + name + "> ALIAS_ROW_MAPPER = new " + name + "AliasRowMapper ();\n");
 
         sourceBuf.append("\tpublic static final class  " + name + "AliasRowMapper implements RowMapper<" + name + "> ");
-        this.printOpenBrace(1, 1);
+        this.printOpenBrace(0, 1);
         List<Relation> relations = this.relations.get(this.name);
 
         if (relations != null && !relations.isEmpty()) {
@@ -370,7 +370,7 @@ public class DBClass extends BaseClass {
     protected void printAllAliasesMethod() {
         // create all aliases
         sourceBuf.append("\tpublic static StringBuffer getAllColumnAliases () ");
-        this.printOpenBrace(1, 1);
+        this.printOpenBrace(0, 1);
         sourceBuf.append("\t\tStringBuffer strBuf = new StringBuffer ();\n");
         sourceBuf.append("\t\tint i = COLUMNS.values ().length;\n");
         sourceBuf.append("\t\tfor (COLUMNS c : COLUMNS.values ()) ");
@@ -386,7 +386,7 @@ public class DBClass extends BaseClass {
 
     private void printColumnsEnum() {
         sourceBuf.append("\tpublic enum COLUMNS ");
-        this.printOpenBrace(1, 1);
+        this.printOpenBrace(0, 1);
 
         for (Field field : this.fields) {
             if (field.isPersistable()) {
