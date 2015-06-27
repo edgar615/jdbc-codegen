@@ -16,9 +16,9 @@
  *
  * @author Kalyan Mulampaka
  */
-package com.mulampaka.spring.data.jdbc.codegen;
+package com.edgar.jdbc.codegen;
 
-import com.mulampaka.spring.data.jdbc.codegen.util.CodeGenUtil;
+import com.edgar.jdbc.codegen.util.CodeGenUtil;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.lang3.text.WordUtils;
 import org.slf4j.Logger;
@@ -68,7 +68,7 @@ public class RepositoryClass extends BaseClass {
     @Override
     protected void printCtor() {
         // add ctor
-        sourceBuf.append("\tpublic " + this.name + this.classSuffix + "()\n");
+        sourceBuf.append("\tpublic " + this.name + this.classSuffix + "() ");
         super.printOpenBrace(1, 1);
         sourceBuf.append("\t\tsuper (" + this.name + DBClass.DB_CLASSSUFFIX + ".ROW_MAPPER, " + this.name + DBClass.DB_CLASSSUFFIX + ".ROW_UNMAPPER);\n");
         super.printCloseBrace(1, 2);
@@ -124,7 +124,7 @@ public class RepositoryClass extends BaseClass {
                 ForeignKey fkey = this.fkeys.get(fkColName);
                 String refObj = WordUtils.capitalize(CodeGenUtil.normalize(fkey.getFkTableName()));
                 String methodClassName = CodeGenUtil.pluralizeName(refObj, this.getDontPluralizeWords());
-                sourceBuf.append("\tpublic List<" + refObj + "> get" + methodClassName + "By" + WordUtils.capitalize(CodeGenUtil.normalize(fkColName)) + " (Long " + CodeGenUtil.normalize(fkColName) + ")\n");
+                sourceBuf.append("\tpublic List<" + refObj + "> get" + methodClassName + "By" + WordUtils.capitalize(CodeGenUtil.normalize(fkColName)) + " (Long " + CodeGenUtil.normalize(fkColName) + ") ");
                 this.printOpenBrace(1, 1);
                 sourceBuf.append("\t\tString sql = \"select * from \" + " + refObj + DBClass.DB_CLASSSUFFIX + ".getTableName() + " + "\" where \" + " + refObj + DBClass.DB_CLASSSUFFIX + ".COLUMNS." + fkColName.toUpperCase() + ".getColumnName() + \" = ? \";\n");
                 sourceBuf.append("\t\treturn this.getJdbcOperations ().query (sql, new Object[] { " + CodeGenUtil.normalize(fkColName) + " }, " + refObj + DBClass.DB_CLASSSUFFIX + ".ROW_MAPPER);\n");
@@ -136,7 +136,7 @@ public class RepositoryClass extends BaseClass {
 
     protected void printInterfaceImpl() {
         if (this.pkeys.size() == 0) {
-            sourceBuf.append("\tpublic " + this.name + " selectByPrimaryKey(String id)\n");
+            sourceBuf.append("\tpublic " + this.name + " selectByPrimaryKey(String id) ");
             super.printOpenBrace(1, 1);
             sourceBuf.append("\t\tthrow new UnsupportedOperationException(\"There is no primary key\");\n");
             super.printCloseBrace(1, 2);

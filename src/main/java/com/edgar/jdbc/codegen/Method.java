@@ -16,7 +16,7 @@
  * 
  * @author Kalyan Mulampaka
  */
-package com.mulampaka.spring.data.jdbc.codegen;
+package com.edgar.jdbc.codegen;
 
 /**
  * Class to represent a method in the class

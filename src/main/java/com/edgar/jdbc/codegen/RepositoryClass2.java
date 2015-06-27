@@ -16,9 +16,9 @@
  * 
  * @author Kalyan Mulampaka
  */
-package com.mulampaka.spring.data.jdbc.codegen;
+package com.edgar.jdbc.codegen;
 
-import com.mulampaka.spring.data.jdbc.codegen.util.CodeGenUtil;
+import com.edgar.jdbc.codegen.util.CodeGenUtil;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.lang3.text.WordUtils;
 import org.slf4j.Logger;
@@ -82,7 +82,7 @@ public class RepositoryClass2 extends BaseClass
 		if (this.pkeys.size () == 0)
 		{
 			// add ctor
-			sourceBuf.append ("\tpublic " + this.name + this.classSuffix + "()\n");
+			sourceBuf.append ("\tpublic " + this.name + this.classSuffix + "() ");
 			super.printOpenBrace (1, 1);
 			sourceBuf.append ("\t\tsuper (" + this.name + DBClass.DB_CLASSSUFFIX + ".ROW_MAPPER, " + this.name + DBClass.DB_CLASSSUFFIX + ".ROW_UNMAPPER, "
 					+ this.name + DBClass.DB_CLASSSUFFIX + ".getTableName (),");
@@ -92,7 +92,7 @@ public class RepositoryClass2 extends BaseClass
 			
 			// add postcreate
 			sourceBuf.append ("\t@Override\n");
-			sourceBuf.append ("\tprotected " + this.name + " postCreate(" + this.name + " entity, Number generatedId)\n");
+			sourceBuf.append ("\tprotected " + this.name + " postCreate(" + this.name + " entity, Number generatedId) ");
 			super.printOpenBrace (1, 1);
 			sourceBuf.append ("\t\tentity.setId(generatedId.intValue());\n");
 			sourceBuf.append ("\t\tentity.setPersisted(true);\n");
@@ -102,7 +102,7 @@ public class RepositoryClass2 extends BaseClass
 		else if (this.pkeys.size () == 1)
 		{
 			// add ctor
-			sourceBuf.append ("\tpublic " + this.name + this.classSuffix + "()\n");
+			sourceBuf.append ("\tpublic " + this.name + this.classSuffix + "() ");
 			super.printOpenBrace (1, 1);
 			sourceBuf.append ("\t\tsuper (" + this.name + DBClass.DB_CLASSSUFFIX + ".ROW_MAPPER, " + this.name + DBClass.DB_CLASSSUFFIX + ".ROW_UNMAPPER, "
 					+ this.name + DBClass.DB_CLASSSUFFIX + ".getTableName ());\n");
@@ -111,7 +111,7 @@ public class RepositoryClass2 extends BaseClass
 			// add ctor2
 			sourceBuf.append ("\tpublic " + this.name + this.classSuffix + "(");
 
-			sourceBuf.append ("RowMapper<" + this.name + "> rowMapper, RowUnmapper<" + this.name + "> rowUnmapper, String idColumn)\n");
+			sourceBuf.append ("RowMapper<" + this.name + "> rowMapper, RowUnmapper<" + this.name + "> rowUnmapper, String idColumn) ");
 			super.printOpenBrace (1, 1);
 
 			sourceBuf.append ("\t\tsuper (" + this.name + DBClass.DB_CLASSSUFFIX + ".ROW_MAPPER, " + this.name + DBClass.DB_CLASSSUFFIX + ".ROW_UNMAPPER, " + this.name + DBClass.DB_CLASSSUFFIX + ".getTableName (), idColumn);\n");
@@ -119,7 +119,7 @@ public class RepositoryClass2 extends BaseClass
 			
 			// add postcreate
 			sourceBuf.append ("\t@Override\n");
-			sourceBuf.append ("\tprotected " + this.name + " postCreate(" + this.name + " entity, Number generatedId)\n");
+			sourceBuf.append ("\tprotected " + this.name + " postCreate(" + this.name + " entity, Number generatedId) ");
 			super.printOpenBrace (1, 1);
 			String key = this.pkeys.keySet ().iterator ().next ();
 			ParameterType keyType = this.pkeys.values ().iterator ().next ();
@@ -149,7 +149,7 @@ public class RepositoryClass2 extends BaseClass
 		else
 		{
 			// add ctor
-			sourceBuf.append ("\tpublic " + this.name + this.classSuffix + "()\n");
+			sourceBuf.append ("\tpublic " + this.name + this.classSuffix + "() ");
 			super.printOpenBrace (1, 1);
 			sourceBuf.append ("\t\tsuper (" + this.name + DBClass.DB_CLASSSUFFIX + ".ROW_MAPPER, " + this.name + DBClass.DB_CLASSSUFFIX + ".ROW_UNMAPPER, "
 					+ "new TableDescription(" + this.name + DBClass.DB_CLASSSUFFIX + ".getTableName (), null,");
@@ -166,7 +166,7 @@ public class RepositoryClass2 extends BaseClass
 			
 			// add postcreate
 			sourceBuf.append ("\t@Override\n");
-			sourceBuf.append ("\tprotected " + this.name + " postCreate(" + this.name + " entity, Number generatedId)\n");
+			sourceBuf.append ("\tprotected " + this.name + " postCreate(" + this.name + " entity, Number generatedId) ");
 			super.printOpenBrace (1, 1);
 			sourceBuf.append ("\t\tentity.setPersisted(true);\n");
 			sourceBuf.append ("\t\treturn entity;\n");
@@ -186,9 +186,9 @@ public class RepositoryClass2 extends BaseClass
 			for (String fkColName : this.fkeys.keySet ())
 			{
 				ForeignKey fkey = this.fkeys.get (fkColName);
-				String refObj = WordUtils.capitalize (CodeGenUtil.normalize (fkey.getFkTableName ()));
+				String refObj = WordUtils.capitalize (CodeGenUtil.normalize(fkey.getFkTableName()));
 				String methodClassName = CodeGenUtil.pluralizeName (refObj, this.getDontPluralizeWords ());
-				sourceBuf.append ("\tpublic List<" + refObj + "> get" + methodClassName + "By" + WordUtils.capitalize (CodeGenUtil.normalize (fkColName)) + " (Long " + CodeGenUtil.normalize (fkColName) + ")\n");
+				sourceBuf.append ("\tpublic List<" + refObj + "> get" + methodClassName + "By" + WordUtils.capitalize (CodeGenUtil.normalize (fkColName)) + " (Long " + CodeGenUtil.normalize (fkColName) + ") ");
 				this.printOpenBrace (1, 1);
 				sourceBuf.append ("\t\tString sql = \"select * from \" + " + refObj + DBClass.DB_CLASSSUFFIX + ".getTableName() + " + "\" where \" + " + refObj + DBClass.DB_CLASSSUFFIX + ".COLUMNS." + fkColName.toUpperCase () + ".getColumnName() + \" = ? \";\n");
 				sourceBuf.append ("\t\treturn this.getJdbcOperations ().query (sql, new Object[] { " + CodeGenUtil.normalize (fkColName) + " }, " + refObj + DBClass.DB_CLASSSUFFIX + ".ROW_MAPPER);\n");

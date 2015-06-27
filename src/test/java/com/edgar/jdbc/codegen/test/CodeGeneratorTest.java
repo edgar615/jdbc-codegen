@@ -16,19 +16,12 @@
  * 
  * @author Kalyan Mulampaka
  */
-package com.mulampaka.spring.data.jdbc.codegen.test;
+package com.edgar.jdbc.codegen.test;
 
-import com.mulampaka.spring.data.jdbc.codegen.CodeGenerator;
+import com.edgar.jdbc.codegen.CodeGenerator;
 import org.junit.Test;
-import org.junit.runner.RunWith;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.springframework.test.context.ContextConfiguration;
-import org.springframework.test.context.TestExecutionListeners;
-import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
-import org.springframework.test.context.support.DependencyInjectionTestExecutionListener;
-import org.springframework.test.context.transaction.TransactionConfiguration;
-import org.springframework.test.context.transaction.TransactionalTestExecutionListener;
 
 //@RunWith(SpringJUnit4ClassRunner.class)
 //@ContextConfiguration(locations = {"classpath:dao.xml"})

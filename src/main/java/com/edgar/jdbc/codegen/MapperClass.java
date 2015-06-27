@@ -16,9 +16,9 @@
  *
  * @author Kalyan Mulampaka
  */
-package com.mulampaka.spring.data.jdbc.codegen;
+package com.edgar.jdbc.codegen;
 
-import com.mulampaka.spring.data.jdbc.codegen.util.CodeGenUtil;
+import com.edgar.jdbc.codegen.util.CodeGenUtil;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.lang3.text.WordUtils;
 import org.slf4j.Logger;

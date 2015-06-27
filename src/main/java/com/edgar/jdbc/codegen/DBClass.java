@@ -16,16 +16,16 @@
  *
  * @author Kalyan Mulampaka
  */
-package com.mulampaka.spring.data.jdbc.codegen;
+package com.edgar.jdbc.codegen;
 
 import java.util.ArrayList;
 import java.util.List;
 
+import com.edgar.jdbc.codegen.util.CodeGenUtil;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.lang3.text.WordUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import com.mulampaka.spring.data.jdbc.codegen.util.CodeGenUtil;
 
 /**
  * Class to represent the db metadata, row mappers and unmappers
@@ -211,10 +211,10 @@ public class DBClass extends BaseClass {
         // create mapper
         sourceBuf.append("\tpublic static final RowMapper<" + name + "> ROW_MAPPER = new " + name + "RowMapper ();\n");
 
-        sourceBuf.append("\tpublic static final class  " + name + "RowMapper implements RowMapper<" + name + ">\n");
+        sourceBuf.append("\tpublic static final class  " + name + "RowMapper implements RowMapper<" + name + "> ");
         this.printOpenBrace(1, 1);
 
-        sourceBuf.append("\t\tpublic " + name + " mapRow(ResultSet rs, int rowNum) throws SQLException \n");
+        sourceBuf.append("\t\tpublic " + name + " mapRow(ResultSet rs, int rowNum) throws SQLException ");
         this.printOpenBrace(2, 1);
         sourceBuf.append("\t\t\t" + name + " obj = new " + name + "();\n");
         for (Field field : this.fields) {
@@ -241,10 +241,10 @@ public class DBClass extends BaseClass {
         String name = WordUtils.capitalize(CodeGenUtil.normalize(this.name));
         // create unmapper
         sourceBuf.append("\tpublic static final RowUnmapper<" + name + "> ROW_UNMAPPER = new " + name + "RowUnmapper ();\n");
-        sourceBuf.append("\tpublic static final class " + name + "RowUnmapper implements RowUnmapper<" + name + ">\n");
+        sourceBuf.append("\tpublic static final class " + name + "RowUnmapper implements RowUnmapper<" + name + "> ");
         this.printOpenBrace(1, 1);
         String objName = name.toLowerCase();
-        sourceBuf.append("\t\tpublic Map<String, Object> mapColumns(" + name + " " + objName + ")\n");
+        sourceBuf.append("\t\tpublic Map<String, Object> mapColumns(" + name + " " + objName + ") ");
         this.printOpenBrace(2, 1);
         sourceBuf.append("\t\t\tMap<String, Object> mapping = new LinkedHashMap<String, Object>();\n");
         for (Field field : this.fields) {
@@ -267,7 +267,7 @@ public class DBClass extends BaseClass {
         // create alias mapper
         sourceBuf.append("\tpublic static final RowMapper<" + name + "> ALIAS_ROW_MAPPER = new " + name + "AliasRowMapper ();\n");
 
-        sourceBuf.append("\tpublic static final class  " + name + "AliasRowMapper implements RowMapper<" + name + ">\n");
+        sourceBuf.append("\tpublic static final class  " + name + "AliasRowMapper implements RowMapper<" + name + "> ");
         this.printOpenBrace(1, 1);
         List<Relation> relations = this.relations.get(this.name);
 
@@ -280,7 +280,7 @@ public class DBClass extends BaseClass {
                         loadAllRelations = true;
                         String child = CodeGenUtil.normalize(relation.getChild());
                         sourceBuf.append("\t\tprivate boolean load" + WordUtils.capitalize(child) + " = false;\n");
-                        sourceBuf.append("\t\tpublic void setLoad" + WordUtils.capitalize(child) + " (boolean load" + WordUtils.capitalize(child) + ")\n");
+                        sourceBuf.append("\t\tpublic void setLoad" + WordUtils.capitalize(child) + " (boolean load" + WordUtils.capitalize(child) + ") ");
                         this.printOpenBrace(2, 1);
                         sourceBuf.append("\t\t\tthis.load" + WordUtils.capitalize(child) + " = load" + WordUtils.capitalize(child) + ";\n");
                         this.printCloseBrace(2, 2);
@@ -292,7 +292,7 @@ public class DBClass extends BaseClass {
             }
             if (loadAllRelations) {
                 sourceBuf.append("\t\tprivate boolean loadAllRelations = false;\n");
-                sourceBuf.append("\t\tpublic void setLoadAllRelations (boolean loadAllRelations)\n");
+                sourceBuf.append("\t\tpublic void setLoadAllRelations (boolean loadAllRelations) ");
                 this.printOpenBrace(2, 1);
                 sourceBuf.append("\t\t\tthis.loadAllRelations = loadAllRelations;\n");
                 this.printCloseBrace(2, 2);
@@ -301,7 +301,7 @@ public class DBClass extends BaseClass {
 
         if (!this.fkeys.isEmpty()) {
             sourceBuf.append("\t\tprivate boolean loadAllFKeys = false;\n");
-            sourceBuf.append("\t\tpublic void setLoadAllFKeys (boolean loadAllFKeys)\n");
+            sourceBuf.append("\t\tpublic void setLoadAllFKeys (boolean loadAllFKeys) ");
             this.printOpenBrace(2, 1);
             sourceBuf.append("\t\t\tthis.loadAllFKeys = loadAllFKeys;\n");
             this.printCloseBrace(2, 2);
@@ -310,14 +310,14 @@ public class DBClass extends BaseClass {
                 ForeignKey fkey = this.fkeys.get(fkColName);
                 String refObj = WordUtils.capitalize(CodeGenUtil.normalize(fkey.getFieldName()));
                 sourceBuf.append("\t\tprivate boolean load" + refObj + " = false;\n");
-                sourceBuf.append("\t\tpublic void setLoad" + refObj + " (boolean load" + refObj + ")\n");
+                sourceBuf.append("\t\tpublic void setLoad" + refObj + " (boolean load" + refObj + ") ");
                 this.printOpenBrace(2, 1);
                 sourceBuf.append("\t\t\tthis.load" + refObj + " = load" + refObj + ";\n");
                 this.printCloseBrace(2, 2);
             }
         }
 
-        sourceBuf.append("\t\tpublic " + name + " mapRow(ResultSet rs, int rowNum) throws SQLException \n");
+        sourceBuf.append("\t\tpublic " + name + " mapRow(ResultSet rs, int rowNum) throws SQLException ");
         this.printOpenBrace(2, 1);
         sourceBuf.append("\t\t\t" + name + " obj = new " + name + "();\n");
         for (Field field : this.fields) {
@@ -369,11 +369,11 @@ public class DBClass extends BaseClass {
 
     protected void printAllAliasesMethod() {
         // create all aliases
-        sourceBuf.append("\tpublic static StringBuffer getAllColumnAliases ()\n");
+        sourceBuf.append("\tpublic static StringBuffer getAllColumnAliases () ");
         this.printOpenBrace(1, 1);
         sourceBuf.append("\t\tStringBuffer strBuf = new StringBuffer ();\n");
         sourceBuf.append("\t\tint i = COLUMNS.values ().length;\n");
-        sourceBuf.append("\t\tfor (COLUMNS c : COLUMNS.values ())\n");
+        sourceBuf.append("\t\tfor (COLUMNS c : COLUMNS.values ()) ");
         this.printOpenBrace(2, 1);
         sourceBuf.append("\t\t\tstrBuf.append (c.getColumnAliasAsName ());\n");
         sourceBuf.append("\t\t\tif (--i > 0)\n");
@@ -385,7 +385,7 @@ public class DBClass extends BaseClass {
 
 
     private void printColumnsEnum() {
-        sourceBuf.append("\tpublic enum COLUMNS\n");
+        sourceBuf.append("\tpublic enum COLUMNS ");
         this.printOpenBrace(1, 1);
 
         for (Field field : this.fields) {
@@ -397,32 +397,32 @@ public class DBClass extends BaseClass {
         sourceBuf.append("\n");
         sourceBuf.append("\t\tprivate String columnName;\n\n");
         // create the constructor
-        sourceBuf.append("\t\tprivate COLUMNS (String columnName)\n");
+        sourceBuf.append("\t\tprivate COLUMNS (String columnName) ");
         this.printOpenBrace(2, 1);
         sourceBuf.append("\t\t\tthis.columnName = columnName;\n");
         this.printCloseBrace(2, 2);
         //create setters/getters
-        sourceBuf.append("\t\tpublic void setColumnName (String columnName)\n");
+        sourceBuf.append("\t\tpublic void setColumnName (String columnName) ");
         this.printOpenBrace(2, 1);
         sourceBuf.append("\t\t\tthis.columnName = columnName;\n");
         this.printCloseBrace(2, 2);
 
-        sourceBuf.append("\t\tpublic String getColumnName ()\n");
+        sourceBuf.append("\t\tpublic String getColumnName () ");
         this.printOpenBrace(2, 1);
         sourceBuf.append("\t\t\treturn this.columnName;\n");
         this.printCloseBrace(2, 2);
 
-        sourceBuf.append("\t\tpublic String getColumnAlias ()\n");
+        sourceBuf.append("\t\tpublic String getColumnAlias () ");
         this.printOpenBrace(2, 1);
         sourceBuf.append("\t\t\treturn TABLE_ALIAS + \".\" + this.columnName;\n");
         this.printCloseBrace(2, 2);
 
-        sourceBuf.append("\t\tpublic String getColumnAliasAsName ()\n");
+        sourceBuf.append("\t\tpublic String getColumnAliasAsName () ");
         this.printOpenBrace(2, 1);
         sourceBuf.append("\t\t\treturn TABLE_ALIAS  + \".\" + this.columnName + \" as \" + TABLE_ALIAS + \"_\" + this.columnName;\n");
         this.printCloseBrace(2, 2);
 
-        sourceBuf.append("\t\tpublic String getColumnAliasName ()\n");
+        sourceBuf.append("\t\tpublic String getColumnAliasName () ");
         this.printOpenBrace(2, 1);
         sourceBuf.append("\t\t\treturn TABLE_ALIAS + \"_\" + this.columnName;\n");
         this.printCloseBrace(2, 2);

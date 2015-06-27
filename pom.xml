@@ -21,6 +21,8 @@
 		<commons.lang.version>3.4</commons.lang.version>
 		<commons.io.version>2.4</commons.io.version>
 		<commons.logging.version>1.1.1</commons.logging.version>
+        <guava.version>18.0</guava.version>
+        <mybatis.version>3.3.0</mybatis.version>
 	</properties>
 	<dependencies>		       	
 		<dependency>
@@ -129,7 +131,12 @@
         <dependency>
             <groupId>org.mybatis</groupId>
             <artifactId>mybatis</artifactId>
-            <version>3.3.0</version>
+            <version>${mybatis.version}</version>
+        </dependency>
+        <dependency>
+            <groupId>com.google.guava</groupId>
+            <artifactId>guava</artifactId>
+            <version>${guava.version}</version>
         </dependency>
 	</dependencies>
 	<build>

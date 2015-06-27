@@ -16,7 +16,7 @@
  * 
  * @author Kalyan Mulampaka
  */
-package com.mulampaka.spring.data.jdbc.codegen;
+package com.edgar.jdbc.codegen;
 
 public class Relation
 {

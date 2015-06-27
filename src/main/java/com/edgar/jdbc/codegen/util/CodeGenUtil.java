@@ -16,7 +16,7 @@
  * 
  * @author Kalyan Mulampaka
  */
-package com.mulampaka.spring.data.jdbc.codegen.util;
+package com.edgar.jdbc.codegen.util;
 
 import java.io.File;
 import org.apache.commons.io.FileUtils;
