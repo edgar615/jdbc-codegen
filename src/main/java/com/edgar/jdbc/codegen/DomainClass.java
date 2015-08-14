@@ -386,7 +386,7 @@ public class DomainClass extends BaseClass {
             super.printCloseBrace(1, 2);
 //			sourceBuf.append ("\tpublic boolean isNew ()\n");
 //			super.printOpenBrace (1, 1);
-//			sourceBuf.append ("\t\treturn !persisted;\n");
+//            sourceBuf.append("\t\tthrow new UnsupportedOperationException(\"There is no primary key\");\n");
 //			super.printCloseBrace (1, 2);
         }
     }

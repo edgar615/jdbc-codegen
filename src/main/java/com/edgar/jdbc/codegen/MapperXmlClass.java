@@ -263,11 +263,7 @@ public class MapperXmlClass extends BaseClass {
             return;
         }
         sourceBuf.append("\t<delete id=\"deleteByPrimaryKeyWithLock\" parameterType=\"");
-        if (pkeys.size() == 1) {
-            sourceBuf.append(pkeys.entrySet().iterator().next().getValue().getPrimitiveName());
-        } else {
-            sourceBuf.append("map");
-        }
+        sourceBuf.append("map");
         sourceBuf.append("\">\n");
         sourceBuf.append("\t\tdelete from ")
                 .append(name);
@@ -287,8 +283,8 @@ public class MapperXmlClass extends BaseClass {
             }
         }
         for (String o : optimisticLockColumnList) {
-            sourceBuf.append(" \nt\tand ").append(o).append(" = ");
-            sourceBuf.append("#{" + o + "}");
+            sourceBuf.append(" \n\t\tand ").append(o).append(" = ");
+            sourceBuf.append("#{" + CodeGenUtil.normalize(o.toLowerCase()) + "}");
         }
         sourceBuf.append("\n\t</delete>");
         sourceBuf.append("\n\n");
@@ -390,14 +386,21 @@ public class MapperXmlClass extends BaseClass {
             return;
         }
         sourceBuf.append("\t<update id=\"updateByPrimaryKeyWithLock\" parameterType=\"" + WordUtils.capitalize(CodeGenUtil.normalize(name)) + "\">\n");
-        sourceBuf.append("\t\tupdate ").append(name).append(" set ");
+
+        sourceBuf.append("\t\tupdate ").append(name).append("\n\t\t<set>\n ");
         List<String> sets = new ArrayList<>();
         for (Field field : this.fields) {
             if (!this.ignoreUpdatedColumnListStr.contains(field.getName().toLowerCase()) && field.isPersistable()) {
-                sets.add(" \n\t\t" + field.getName() + " = #{" + CodeGenUtil.normalize(field.getName().toLowerCase()) + "}");
+                StringBuffer set = new StringBuffer();
+                set.append("\t\t\t<if test=\"" + CodeGenUtil.normalize(field.getName().toLowerCase()) + " != null\">")
+                        .append(" \n\t\t\t\t" + field.getName() + " = #{" + CodeGenUtil.normalize(field.getName().toLowerCase()) + "},")
+                        .append("\n\t\t\t</if>\n");
+                sets.add(set.toString());
             }
         }
-        sourceBuf.append(StringUtils.join(sets, ","));
+        sourceBuf.append(StringUtils.join(sets, ""));
+
+        sourceBuf.append("\t\t</set>");
 
         if (pkeys.size() == 1) {
             sourceBuf.append(" \n\t\twhere ");
@@ -414,7 +417,7 @@ public class MapperXmlClass extends BaseClass {
             }
         }
         for (String o : optimisticLockColumnList) {
-            sourceBuf.append(" \nt\tand ").append(o).append(" = #{" + CodeGenUtil.normalize(o) + "}");
+            sourceBuf.append(" \n\t\tand ").append(o).append(" = #{" + CodeGenUtil.normalize(o) + "}");
         }
         sourceBuf.append("\n\t</update>");
         sourceBuf.append("\n\n");
