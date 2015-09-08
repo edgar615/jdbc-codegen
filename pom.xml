@@ -6,7 +6,7 @@
 	<artifactId>jdbc-codegen</artifactId>
 	<packaging>jar</packaging>
 	<version>1.0.3</version>
-	<name>Spring Data Jdbc Code Generator</name>
+	<name>Jdbc Code Generator</name>
 	<url>https://github.com/kalyanmulampaka</url>
 	<properties>
 		<project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
@@ -19,7 +19,6 @@
         <tomcat.jdbc.version>7.0.55</tomcat.jdbc.version>
         <junit.version>4.11</junit.version>
 		<commons.io.version>2.4</commons.io.version>
-		<commons.logging.version>1.1.1</commons.logging.version>
         <guava.version>18.0</guava.version>
         <mybatis.version>3.3.0</mybatis.version>
 	</properties>
@@ -55,12 +54,6 @@
 			<groupId>commons-io</groupId>
 			<artifactId>commons-io</artifactId>
 			<version>${commons.io.version}</version>
-		</dependency>
-		<dependency>
-			<groupId>commons-logging</groupId>
-			<artifactId>commons-logging</artifactId>
-			<version>${commons.logging.version}</version>
-			<scope>provided</scope>
 		</dependency>
 		<dependency>
 			<groupId>org.slf4j</groupId>
@@ -104,7 +97,6 @@
         </dependency>
 	</dependencies>
 	<build>
-		<finalName>jdbc-codegen</finalName>
 		<plugins>
 			<plugin>
                 <groupId>org.apache.maven.plugins</groupId>

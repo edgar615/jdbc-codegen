@@ -331,15 +331,6 @@ public class CodeGenerator {
         mapperXmlClass.setRepositoryPackageName(repositoryPackageName);
         mapperXmlClass.setIgnoreUpdatedColumnListStr(ignoreUpdatedColumnList);
 
-        // create the repo class
-        RepositoryClass repoClass = new RepositoryClass();
-        repoClass.setDontPluralizeWords(dontPluralizeWords);
-        repoClass.createLogger();
-        repoClass.getImports().add(dbPackageName + "." + WordUtils.capitalize(CodeGenUtil.normalize(dbClass.getName())) + DBClass.DB_CLASSSUFFIX);
-        repoClass.getImports().add(domainPackageName + "." + WordUtils.capitalize(CodeGenUtil.normalize(domainClass.getName())));
-        repoClass.setName(tableName);
-        repoClass.setRootFolderPath(rootFolderPath);
-        repoClass.setPackageName(repositoryPackageName);
         //创建MyBatis的Mapper
         MapperClass mapperClass = new MapperClass();
         mapperClass.setDontPluralizeWords(dontPluralizeWords);
@@ -358,7 +349,6 @@ public class CodeGenerator {
             logger.debug("PK:ColName:{}, PKName:{}, Key Seq:{}", new Object[]{pkColName, pkName, keySeq});
         }
 
-        repoClass.setPkeys(domainClass.getPkeys());
         mapperClass.setPkeys(domainClass.getPkeys());
         dbClass.setPkeys(domainClass.getPkeys());
         mapperXmlClass.setPkeys(domainClass.getPkeys());
@@ -390,7 +380,6 @@ public class CodeGenerator {
 
                     domainClass.getFkeys().put(fkColName, fkey);
                     dbClass.getFkeys().put(fkColName, fkey);
-                    repoClass.getFkeys().put(fkColName, fkey);
                     mapperClass.getFkeys().put(fkColName, fkey);
                     mapperXmlClass.getFkeys().put(fkColName, fkey);
 
@@ -414,9 +403,6 @@ public class CodeGenerator {
             String fkColumnName = childRset.getString("FKCOLUMN_NAME");
             logger.debug("Child :FK Column Name:{}", fkColumnName);
         }
-
-        //关系
-        createRelation(domainClass, dbClass, repoClass);
 
         //字段
         ResultSet cset = metaData.getColumns(null, null, tableName, null);

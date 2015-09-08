@@ -346,10 +346,6 @@ public class DomainClass extends BaseClass {
             }
             super.printCloseBrace(1, 2);
 
-//			sourceBuf.append ("\tpublic boolean isNew ()\n");
-//			super.printOpenBrace (1, 1);
-//			sourceBuf.append ("\t\treturn !persisted;\n");
-//			super.printCloseBrace (1, 2);
         } else if (this.pkeys.size() == 1) {
             String key = this.pkeys.keySet().iterator().next();
             ParameterType keyType = this.pkeys.get(key);
@@ -359,16 +355,6 @@ public class DomainClass extends BaseClass {
             sourceBuf.append("\t\treturn this." + CodeGenUtil.normalize(key.toLowerCase()) + ";\n");
             super.printCloseBrace(1, 2);
 
-//			sourceBuf.append ("\tpublic boolean isNew ()\n");
-//			sourceBuf.append ("\t{\n");
-//			sourceBuf.append ("\t\treturn this." + CodeGenUtil.normalize (key.toLowerCase()) + " == null;\n");
-//			super.printCloseBrace (1, 2);
-//            if ("id".equalsIgnoreCase(key)) {
-//                sourceBuf.append("\tpublic void setId(" + keyType.getName() + " id)\n");
-//                sourceBuf.append("\t{\n");
-//                sourceBuf.append("\t\tthis.id = id;\n");
-//                super.printCloseBrace(1, 2);
-//            }
             sourceBuf.append("\t@Override\n");
             sourceBuf.append("\tpublic void setId(" + keyType.getName() + " id) ");
             super.printOpenBrace(0, 1);
@@ -387,10 +373,6 @@ public class DomainClass extends BaseClass {
             super.printOpenBrace(0, 1);
             sourceBuf.append("\t\tthrow new UnsupportedOperationException(\"There is no primary key\");\n");
             super.printCloseBrace(1, 2);
-//			sourceBuf.append ("\tpublic boolean isNew ()\n");
-//			super.printOpenBrace (1, 1);
-//            sourceBuf.append("\t\tthrow new UnsupportedOperationException(\"There is no primary key\");\n");
-//			super.printCloseBrace (1, 2);
         }
     }
 
@@ -406,7 +388,7 @@ public class DomainClass extends BaseClass {
                     name = method.getParameter().getName();
                 paramType = WordUtils.capitalize(CodeGenUtil.normalize(name));
             } else {
-                paramType = pType.getName();
+                paramType = pType.getPrimitiveName();
             }
             String fieldName = method.getParameter().getName();
 
@@ -422,7 +404,7 @@ public class DomainClass extends BaseClass {
                 if (pType == ParameterType.LIST) {
                     String mName = CodeGenUtil.pluralizeName(methodName, this.getDontPluralizeWords());
                     logger.debug("Pluralized Method name:{}", mName);
-                    sourceBuf.append("\tpublic void set" + mName + " (");
+                    sourceBuf.append("\tpublic void set" + mName + "(");
                     sourceBuf.append("List<" + methodName + "> " + paramName);
                     sourceBuf.append(") ");
 
@@ -431,7 +413,7 @@ public class DomainClass extends BaseClass {
                     sourceBuf.append("\t\tthis." + paramName + " = " + paramName + ";\n");
                     super.printCloseBrace(1, 2);
                 } else {
-                    sourceBuf.append("\tpublic void set" + methodName + " (");
+                    sourceBuf.append("\tpublic void set" + methodName + "(");
                     sourceBuf.append(paramType + " " + paramName);
                     sourceBuf.append(") ");
 
@@ -446,31 +428,18 @@ public class DomainClass extends BaseClass {
             if (method.isGenerateGetter()) {
                 if (pType == ParameterType.LIST) {
                     String mName = CodeGenUtil.pluralizeName(methodName, this.getDontPluralizeWords());
-                    sourceBuf.append("\tpublic List<" + methodName + "> get" + mName + " () ");
+                    sourceBuf.append("\tpublic List<" + methodName + "> get" + mName + "() ");
                     super.printOpenBrace(0, 1);
                     sourceBuf.append("\t\treturn this." + paramName + ";\n");
                     super.printCloseBrace(1, 2);
                 } else {
-                    sourceBuf.append("\tpublic " + paramType + " get" + methodName + " () ");
+                    sourceBuf.append("\tpublic " + paramType + " get" + methodName + "() ");
                     super.printOpenBrace(0, 1);
                     sourceBuf.append("\t\treturn this." + paramName + ";\n");
                     super.printCloseBrace(1, 2);
                 }
             }
         }
-    }
-
-    /**
-     * 如果主键超过一个，声明一个主键内部类
-     */
-    protected void printPkeyInnerClass() {
-        sourceBuf.append("\tpublic static class PKey implements Serializable, IPKey ");
-        super.printOpenBrace(0, 1);
-        sourceBuf.append("\t\tprivate static final long serialVersionUID = 1L;\n\n");
-        this.printPkeyInnerClassFields();
-        this.printPkeyInnerCtor();
-        this.printPkeyInnerClassImplementMethods();
-        super.printCloseBrace(1, 2);
     }
 
     protected void printPkeyInnerCtor() {
@@ -490,37 +459,9 @@ public class DomainClass extends BaseClass {
         this.printCloseBrace(2, 2);
     }
 
-    protected void printPkeyInnerClassFields() {
-        for (Map.Entry<String, ParameterType> entry : pkeys.entrySet()) {
-            sourceBuf.append("\t\tprivate final " + entry.getValue().getName() + " " + entry.getKey() + ";\n");
-        }
-    }
-
-    protected void printPkeyInnerClassMehtods() {
-        for (Map.Entry<String, ParameterType> entry : pkeys.entrySet()) {
-            sourceBuf.append("\t\tprivate " + entry.getValue().getName() + " " + entry.getKey() + ";\n");
-        }
-    }
-
-    protected void printPkeyInnerClassImplementMethods() {
-        sourceBuf.append("\t\t@Override\n");
-        sourceBuf.append("\t\tpublic Map<String, Object> toMap() ");
-        this.printOpenBrace(2, 1);
-        sourceBuf.append("\t\t\tMap<String, Object> mapping = new LinkedHashMap<String, Object>();\n");
-        for (Map.Entry<String, ParameterType> entry : pkeys.entrySet()) {
-            if (entry.getValue() == ParameterType.DATE) {
-                sourceBuf.append("\t\t\tif (" + entry.getKey() + " != null)\n");
-                sourceBuf.append("\t\t\t\tmapping.put(\"" + entry.getKey() + "\", new Timestamp (" + entry.getKey() + "().getTime()));\n");
-            }
-            sourceBuf.append("\t\t\tmapping.put(\"" + entry.getKey() + "\", " + entry.getKey() + ");\n");
-        }
-        sourceBuf.append("\t\t\treturn Collections.unmodifiableMap(mapping);\n");
-        this.printCloseBrace(2, 2);
-    }
-
     protected void printToString() {
         //override toString()
-        sourceBuf.append("\t@Override\n\tpublic String toString () ");
+        sourceBuf.append("\t@Override\n\tpublic String toString() ");
         this.printOpenBrace(0, 1);
         sourceBuf.append("\t\treturn MoreObjects.toStringHelper(\"" + WordUtils.capitalize(CodeGenUtil.normalize(name)) + "\")\n");
         for (Field field : fields) {
@@ -538,7 +479,6 @@ public class DomainClass extends BaseClass {
                 this.imports.add("java.util.Map");
                 this.imports.add("java.util.Collections");
 //                this.imports.add("java.io.Serializable");
-//                this.imports.add("com.edgar.core.jdbc.IPKey");
 
             }
             this.imports.add("com.google.common.base.MoreObjects");
@@ -581,10 +521,6 @@ public class DomainClass extends BaseClass {
         this.printMethods();
 
         this.printToString();
-
-//        if (this.pkeys.size() > 1) {
-//            this.printPkeyInnerClass();
-//        }
 
         super.printUserSourceCode();
 
