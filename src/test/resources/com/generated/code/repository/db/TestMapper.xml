@@ -24,8 +24,8 @@
 
 	<insert id="insert" parameterType="Test">
 		insert into 
-		test(java.util.ArrayList$Itr@5e25a92e, ) 
-		values(java.util.ArrayList$Itr@4df828d7, )
+		test(java.util.ArrayList$Itr@517cd4b, ) 
+		values(java.util.ArrayList$Itr@6cc7b4de, )
 	</insert>
 
 	<delete id="deleteByPrimaryKey" parameterType="int">
@@ -36,7 +36,7 @@
 	<update id="updateByPrimaryKey" parameterType="Test">
 		update test
 		<set>
- java.util.ArrayList$Itr@b59d31		</set> 
+ java.util.ArrayList$Itr@32cf48b7		</set> 
 		where id = #{id}
 	</update>
 
@@ -46,7 +46,7 @@
 		where id = #{id}
 	</select>
 
-	<!-- START 鍐欏湪START鍜孍ND涓棿鐨勪唬鐮佷笉浼氳鏇挎崲 -->
+	<!-- START 写在START和END中间的代码不会被替换 -->
 
 	<!-- END 写在START和END中间的代码不会被替换-->
 

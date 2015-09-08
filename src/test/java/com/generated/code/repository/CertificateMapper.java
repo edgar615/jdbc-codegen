@@ -16,7 +16,7 @@ public interface CertificateMapper extends BaseMapper<Certificate, Integer> {
 
 	final static Logger logger = LoggerFactory.getLogger (CertificateMapper.class);
 
-	/* START 鍐欏湪START鍜孍ND涓棿鐨勪唬鐮佷笉浼氳鏇挎崲*/
+	/* START 写在START和END中间的代码不会被替换*/
 
 	/* END 写在START和END中间的代码不会被替换*/
 

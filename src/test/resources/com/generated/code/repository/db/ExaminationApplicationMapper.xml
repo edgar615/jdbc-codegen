@@ -36,8 +36,8 @@
 
 	<insert id="insert" parameterType="ExaminationApplication">
 		insert into 
-		examination_application(java.util.ArrayList$Itr@4ae82894, ) 
-		values(java.util.ArrayList$Itr@543788f3, )
+		examination_application(java.util.ArrayList$Itr@5c18298f, ) 
+		values(java.util.ArrayList$Itr@31f924f5, )
 	</insert>
 
 	<delete id="deleteByPrimaryKey" parameterType="int">
@@ -48,7 +48,7 @@
 	<update id="updateByPrimaryKey" parameterType="ExaminationApplication">
 		update examination_application
 		<set>
- java.util.ArrayList$Itr@6d3af739		</set> 
+ java.util.ArrayList$Itr@5579bb86		</set> 
 		where examination_application_id = #{examinationApplicationId}
 	</update>
 
@@ -58,7 +58,7 @@
 		where examination_application_id = #{id}
 	</select>
 
-	<!-- START 鍐欏湪START鍜孍ND涓棿鐨勪唬鐮佷笉浼氳鏇挎崲 -->
+	<!-- START 写在START和END中间的代码不会被替换 -->
 
 	<!-- END 写在START和END中间的代码不会被替换-->
 

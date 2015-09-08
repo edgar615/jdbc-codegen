@@ -34,8 +34,8 @@
 
 	<insert id="insert" parameterType="Certificate">
 		insert into 
-		certificate(java.util.ArrayList$Itr@5c072e3f, ) 
-		values(java.util.ArrayList$Itr@4d1b0d2a, )
+		certificate(java.util.ArrayList$Itr@365185bd, ) 
+		values(java.util.ArrayList$Itr@18bf3d14, )
 	</insert>
 
 	<delete id="deleteByPrimaryKey" parameterType="int">
@@ -46,7 +46,7 @@
 	<update id="updateByPrimaryKey" parameterType="Certificate">
 		update certificate
 		<set>
- java.util.ArrayList$Itr@954b04f		</set> 
+ java.util.ArrayList$Itr@4fb64261		</set> 
 		where certificate_id = #{certificateId}
 	</update>
 
@@ -56,7 +56,7 @@
 		where certificate_id = #{id}
 	</select>
 
-	<!-- START 鍐欏湪START鍜孍ND涓棿鐨勪唬鐮佷笉浼氳鏇挎崲 -->
+	<!-- START 写在START和END中间的代码不会被替换 -->
 
 	<!-- END 写在START和END中间的代码不会被替换-->
 

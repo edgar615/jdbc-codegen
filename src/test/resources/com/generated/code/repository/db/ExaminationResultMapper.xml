@@ -40,8 +40,8 @@
 
 	<insert id="insert" parameterType="ExaminationResult">
 		insert into 
-		examination_result(java.util.ArrayList$Itr@1068e947, ) 
-		values(java.util.ArrayList$Itr@7dc222ae, )
+		examination_result(java.util.ArrayList$Itr@52525845, ) 
+		values(java.util.ArrayList$Itr@3b94d659, )
 	</insert>
 
 	<delete id="deleteByPrimaryKey" parameterType="int">
@@ -52,7 +52,7 @@
 	<update id="updateByPrimaryKey" parameterType="ExaminationResult">
 		update examination_result
 		<set>
- java.util.ArrayList$Itr@aecb35a		</set> 
+ java.util.ArrayList$Itr@24b1d79b		</set> 
 		where examination_id = #{examinationId}
 	</update>
 
@@ -62,7 +62,7 @@
 		where examination_id = #{id}
 	</select>
 
-	<!-- START 鍐欏湪START鍜孍ND涓棿鐨勪唬鐮佷笉浼氳鏇挎崲 -->
+	<!-- START 写在START和END中间的代码不会被替换 -->
 
 	<!-- END 写在START和END中间的代码不会被替换-->
 

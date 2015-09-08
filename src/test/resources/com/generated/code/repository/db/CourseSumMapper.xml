@@ -27,8 +27,8 @@
 
 	<insert id="insert" parameterType="CourseSum">
 		insert into 
-		course_sum(java.util.ArrayList$Itr@b3d7190, ) 
-		values(java.util.ArrayList$Itr@5fdba6f9, )
+		course_sum(java.util.ArrayList$Itr@78186a70, ) 
+		values(java.util.ArrayList$Itr@306279ee, )
 	</insert>
 
 	<delete id="deleteByPrimaryKey" parameterType="int">
@@ -39,7 +39,7 @@
 	<update id="updateByPrimaryKey" parameterType="CourseSum">
 		update course_sum
 		<set>
- java.util.ArrayList$Itr@10d59286		</set> 
+ java.util.ArrayList$Itr@545997b1		</set> 
 		where course_sum_id = #{courseSumId}
 	</update>
 
@@ -49,7 +49,7 @@
 		where course_sum_id = #{id}
 	</select>
 
-	<!-- START 鍐欏湪START鍜孍ND涓棿鐨勪唬鐮佷笉浼氳鏇挎崲 -->
+	<!-- START 写在START和END中间的代码不会被替换 -->
 
 	<!-- END 写在START和END中间的代码不会被替换-->
 

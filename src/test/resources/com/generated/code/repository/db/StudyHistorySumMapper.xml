@@ -36,8 +36,8 @@
 
 	<insert id="insert" parameterType="StudyHistorySum">
 		insert into 
-		study_history_sum(java.util.ArrayList$Itr@6e2c9341, ) 
-		values(java.util.ArrayList$Itr@32464a14, )
+		study_history_sum(java.util.ArrayList$Itr@71d15f18, ) 
+		values(java.util.ArrayList$Itr@17695df3, )
 	</insert>
 
 	<delete id="deleteByPrimaryKey" parameterType="int">
@@ -48,7 +48,7 @@
 	<update id="updateByPrimaryKey" parameterType="StudyHistorySum">
 		update study_history_sum
 		<set>
- java.util.ArrayList$Itr@4e4aea35		</set> 
+ java.util.ArrayList$Itr@6c9f5c0d		</set> 
 		where study_history_sum_id = #{studyHistorySumId}
 	</update>
 
@@ -58,7 +58,7 @@
 		where study_history_sum_id = #{id}
 	</select>
 
-	<!-- START 鍐欏湪START鍜孍ND涓棿鐨勪唬鐮佷笉浼氳鏇挎崲 -->
+	<!-- START 写在START和END中间的代码不会被替换 -->
 
 	<!-- END 写在START和END中间的代码不会被替换-->
 

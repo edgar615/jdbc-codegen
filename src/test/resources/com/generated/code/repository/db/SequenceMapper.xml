@@ -24,8 +24,8 @@
 
 	<insert id="insert" parameterType="Sequence">
 		insert into 
-		sequence(java.util.ArrayList$Itr@5e955596, ) 
-		values(java.util.ArrayList$Itr@50de0926, )
+		sequence(java.util.ArrayList$Itr@382db087, ) 
+		values(java.util.ArrayList$Itr@73d4cc9e, )
 	</insert>
 
 	<delete id="deleteByPrimaryKey" parameterType="long">
@@ -36,7 +36,7 @@
 	<update id="updateByPrimaryKey" parameterType="Sequence">
 		update sequence
 		<set>
- java.util.ArrayList$Itr@2473b9ce		</set> 
+ java.util.ArrayList$Itr@80169cf		</set> 
 		where id = #{id}
 	</update>
 
@@ -46,7 +46,7 @@
 		where id = #{id}
 	</select>
 
-	<!-- START 鍐欏湪START鍜孍ND涓棿鐨勪唬鐮佷笉浼氳鏇挎崲 -->
+	<!-- START 写在START和END中间的代码不会被替换 -->
 
 	<!-- END 写在START和END中间的代码不会被替换-->
 
