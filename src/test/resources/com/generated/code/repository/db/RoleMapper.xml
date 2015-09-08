@@ -24,8 +24,8 @@
 
 	<insert id="insert" parameterType="Role">
 		insert into 
-		role(role_id, role_name) 
-		values(#{roleId}, #{roleName})
+		role(java.util.ArrayList$Itr@2698dc7, ) 
+		values(java.util.ArrayList$Itr@43d7741f, )
 	</insert>
 
 	<delete id="deleteByPrimaryKey" parameterType="int">
@@ -36,13 +36,7 @@
 	<update id="updateByPrimaryKey" parameterType="Role">
 		update role
 		<set>
- 			<if test="roleId != null"> 
-				role_id = #{roleId},
-			</if>
-			<if test="roleName != null"> 
-				role_name = #{roleName},
-			</if>
-		</set> 
+ java.util.ArrayList$Itr@17baae6e		</set> 
 		where role_id = #{roleId}
 	</update>
 
@@ -54,6 +48,6 @@
 
 	<!-- START 鍐欏湪START鍜孍ND涓棿鐨勪唬鐮佷笉浼氳鏇挎崲 -->
 
-	<!-- END 鍐欏湪START鍜孍ND涓棿鐨勪唬鐮佷笉浼氳鏇挎崲-->
+	<!-- END 写在START和END中间的代码不会被替换-->
 
 </mapper>

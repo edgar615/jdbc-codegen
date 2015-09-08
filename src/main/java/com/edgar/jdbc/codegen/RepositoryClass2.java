@@ -19,8 +19,8 @@
 package com.edgar.jdbc.codegen;
 
 import com.edgar.jdbc.codegen.util.CodeGenUtil;
-import org.apache.commons.lang3.StringUtils;
-import org.apache.commons.lang3.text.WordUtils;
+import com.edgar.jdbc.codegen.util.WordUtils;
+import com.google.common.base.Strings;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -55,7 +55,7 @@ public class RepositoryClass2 extends BaseClass
 	{
 		super.printClassExtends ();
 
-		if (StringUtils.isNotBlank (extendsClassName))
+		if (!Strings.isNullOrEmpty(extendsClassName))
 		{
 			sourceBuf.append ("<");
 			sourceBuf.append (this.name + ", ");
@@ -186,7 +186,7 @@ public class RepositoryClass2 extends BaseClass
 			for (String fkColName : this.fkeys.keySet ())
 			{
 				ForeignKey fkey = this.fkeys.get (fkColName);
-				String refObj = WordUtils.capitalize (CodeGenUtil.normalize(fkey.getFkTableName()));
+				String refObj = WordUtils.capitalize(CodeGenUtil.normalize(fkey.getFkTableName()));
 				String methodClassName = CodeGenUtil.pluralizeName (refObj, this.getDontPluralizeWords ());
 				sourceBuf.append ("\tpublic List<" + refObj + "> get" + methodClassName + "By" + WordUtils.capitalize (CodeGenUtil.normalize (fkColName)) + " (Long " + CodeGenUtil.normalize (fkColName) + ") ");
 				this.printOpenBrace (1, 1);

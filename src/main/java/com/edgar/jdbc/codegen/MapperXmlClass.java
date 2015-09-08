@@ -19,9 +19,12 @@
 package com.edgar.jdbc.codegen;
 
 import com.edgar.jdbc.codegen.util.CodeGenUtil;
+import com.edgar.jdbc.codegen.util.StringUtils;
+import com.edgar.jdbc.codegen.util.WordUtils;
+import com.google.common.base.Splitter;
+import com.google.common.base.Strings;
+import com.google.common.collect.Iterables;
 import org.apache.commons.io.FileUtils;
-import org.apache.commons.lang3.StringUtils;
-import org.apache.commons.lang3.text.WordUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -72,10 +75,10 @@ public class MapperXmlClass extends BaseClass {
 
     protected String getSourceFileName() {
         String path = "";
-        if (StringUtils.isNotBlank(this.packageName)) {
+        if (!Strings.isNullOrEmpty(this.packageName)) {
             path = StringUtils.replace(this.packageName, ".", "/") + "/";
         }
-        if (StringUtils.isNotBlank(this.rootFolderPath)) {
+        if (!Strings.isNullOrEmpty(this.rootFolderPath)) {
             path = this.rootFolderPath + "/" + path;
         }
 
@@ -138,7 +141,7 @@ public class MapperXmlClass extends BaseClass {
             List<String> lines = FileUtils.readLines(file);
             for (String line : lines) {
                 if (StringUtils.startsWith(line, "import")) {
-                    String[] tokens = StringUtils.split(line, " ");
+                    String[] tokens = Iterables.toArray(Splitter.on(" ").split(line), String.class);
                     if (tokens.length > 2) {
                         String iClass = tokens[1] + " " + tokens[2].substring(0, tokens[2].length() - 1);
                         logger.debug("iClass:{}", iClass);

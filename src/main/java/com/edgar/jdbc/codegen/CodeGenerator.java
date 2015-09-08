@@ -20,8 +20,11 @@ package com.edgar.jdbc.codegen;
 
 import com.edgar.jdbc.codegen.Relation.RelationType;
 import com.edgar.jdbc.codegen.util.CodeGenUtil;
-import org.apache.commons.lang3.StringUtils;
-import org.apache.commons.lang3.text.WordUtils;
+import com.edgar.jdbc.codegen.util.StringUtils;
+import com.edgar.jdbc.codegen.util.WordUtils;
+import com.google.common.base.Splitter;
+import com.google.common.base.Strings;
+import com.google.common.collect.Iterables;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -121,13 +124,13 @@ public class CodeGenerator {
 
         String generateJsr303AnnotationsStr = this.properties.getProperty("generate.jsr303.annotations");
 
-        if (StringUtils.isNotBlank(generateJsr303AnnotationsStr)) {
+        if (!Strings.isNullOrEmpty(generateJsr303AnnotationsStr)) {
             generateJsr303Annotations = Boolean.parseBoolean(generateJsr303AnnotationsStr);
         }
 
         // 忽略的字段
         String ignoreColumnListStr = this.properties.getProperty("ignore.columnlist");
-        if (StringUtils.isNotBlank(ignoreColumnListStr)) {
+        if (!Strings.isNullOrEmpty(ignoreColumnListStr)) {
             StringTokenizer strTok = new StringTokenizer(ignoreColumnListStr, ",");
             while (strTok.hasMoreTokens()) {
                 this.ignoreColumnList.add(strTok.nextToken().toLowerCase().trim());
@@ -137,7 +140,7 @@ public class CodeGenerator {
 
         // 更新和插入忽略的字段
         String ignoreUpdatedColumnListStr = this.properties.getProperty("ignore.updated.columnlist");
-        if (StringUtils.isNotBlank(ignoreUpdatedColumnListStr)) {
+        if (!Strings.isNullOrEmpty(ignoreUpdatedColumnListStr)) {
             StringTokenizer strTok = new StringTokenizer(ignoreUpdatedColumnListStr, ",");
             while (strTok.hasMoreTokens()) {
                 this.ignoreUpdatedColumnList.add(strTok.nextToken().toLowerCase().trim());
@@ -147,7 +150,7 @@ public class CodeGenerator {
 
         // 乐观锁字段
         String optimisticLockColumnListStr = this.properties.getProperty("optimistic.lock.columnlist");
-        if (StringUtils.isNotBlank(optimisticLockColumnListStr)) {
+        if (!Strings.isNullOrEmpty(optimisticLockColumnListStr)) {
             StringTokenizer strTok = new StringTokenizer(optimisticLockColumnListStr, ",");
             while (strTok.hasMoreTokens()) {
                 this.optimisticLockColumnList.add(strTok.nextToken().toLowerCase().trim());
@@ -157,7 +160,7 @@ public class CodeGenerator {
 
         //忽略的table
         String ignoreTableListStr = this.properties.getProperty("ignore.tablelist");
-        if (StringUtils.isNotBlank(ignoreTableListStr)) {
+        if (!Strings.isNullOrEmpty(ignoreTableListStr)) {
             StringTokenizer strTok = new StringTokenizer(ignoreTableListStr, ",");
             while (strTok.hasMoreTokens()) {
                 String token = strTok.nextToken().toLowerCase().trim();
@@ -176,7 +179,7 @@ public class CodeGenerator {
 
         // 忽略的外键
         String ignoreFKeys = this.properties.getProperty("ignore.fkeys");
-        String[] fkeys = StringUtils.split(ignoreFKeys, ",");
+        String[] fkeys = ignoreFKeys.split(",");
         for (String fkey : fkeys) {
             this.ignoreFKeys.add(fkey.trim());
         }
@@ -255,7 +258,7 @@ public class CodeGenerator {
 
         String generateJsr303AnnotationsStr = this.properties.getProperty("generate.jsr303.annotations");
         boolean generateJsr303Annotations = false;
-        if (StringUtils.isNotBlank(generateJsr303AnnotationsStr)) {
+        if (!Strings.isNullOrEmpty(generateJsr303AnnotationsStr)) {
             generateJsr303Annotations = Boolean.parseBoolean(generateJsr303AnnotationsStr);
         }
 
@@ -263,7 +266,10 @@ public class CodeGenerator {
         String dontPluralizeWordsStr = this.properties.getProperty("dont.pluralize.words");
         logger.debug("Dont pluralize words:{}", dontPluralizeWordsStr);
         dontPluralizeWordsStr = StringUtils.replace(dontPluralizeWordsStr, " ", "");
-        String[] dontPluralizeWords = StringUtils.split(dontPluralizeWordsStr, ",");
+        String[] dontPluralizeWords = new String[] {};
+        if (!Strings.isNullOrEmpty(dontPluralizeWordsStr)) {
+            dontPluralizeWords = Iterables.toArray(Splitter.on(",").trimResults().split(dontPluralizeWordsStr), String.class);
+        }
         logger.debug("Don't Pluralize words:{}", new Object[]{dontPluralizeWords});
         List<Field> fields = new ArrayList<Field>();
         List<Field> dbFields = new ArrayList<Field>();
@@ -283,24 +289,24 @@ public class CodeGenerator {
         if (generateJsr303Annotations) {
             String insertGrpClass = this.properties.getProperty("insert.group.class");
             // TODO
-            if (StringUtils.isNotBlank(insertGrpClass)) {
-                String[] classes = StringUtils.split(insertGrpClass.trim(), ",");
+            if (!Strings.isNullOrEmpty(insertGrpClass)) {
+                String[] classes = Iterables.toArray(Splitter.on(",").trimResults().split(insertGrpClass), String.class);
                 for (String c : classes) {
                     if (!domainClass.getImports().contains(c.trim()))
                         domainClass.getImports().add(c.trim());
-                    String[] classNameTokens = StringUtils.split(c.trim(), ".");
+                    String[] classNameTokens = Iterables.toArray(Splitter.on(".").split(c.trim()), String.class);
                     // add only the class name and the FQ class name since the import is added
                     domainClass.getJsr303InsertGroups().add(classNameTokens[classNameTokens.length - 1]);
                 }
             }
             // TODO
             String updateGrpClass = this.properties.getProperty("update.group.class");
-            if (StringUtils.isNotBlank(updateGrpClass)) {
-                String[] classes = StringUtils.split(updateGrpClass.trim(), ",");
+            if (!Strings.isNullOrEmpty(updateGrpClass)) {
+                String[] classes = Iterables.toArray(Splitter.on(",").trimResults().split(updateGrpClass), String.class);
                 for (String c : classes) {
                     if (!domainClass.getImports().contains(c.trim()))
                         domainClass.getImports().add(c.trim());
-                    String[] classNameTokens = StringUtils.split(c.trim(), ".");
+                    String[] classNameTokens = Iterables.toArray(Splitter.on(".").split(c.trim()), String.class);
                     // add only the class name and the FQ class name since the import is added
                     domainClass.getJsr303UpdateGroups().add(classNameTokens[classNameTokens.length - 1]);
                 }
@@ -482,10 +488,10 @@ public class CodeGenerator {
 
     private void createRelation(DomainClass domainClass, DBClass dbClass, RepositoryClass repoClass) {
         String relationsStr = this.properties.getProperty("parent.child.relations");
-        if (StringUtils.isNotBlank(relationsStr)) {
-            String[] relations = StringUtils.split(relationsStr, ",");
+        if (!Strings.isNullOrEmpty(relationsStr)) {
+            String[] relations = Iterables.toArray(Splitter.on(",").trimResults().split(relationsStr), String.class);
             for (String relationInfo : relations) {
-                String[] relationTokens = StringUtils.split(relationInfo, ":");
+                String[] relationTokens = Iterables.toArray(Splitter.on(":").trimResults().split(relationInfo), String.class);
                 if (domainClass.getName().equals(relationTokens[0])) {
                     Relation relation = new Relation();
                     relation.setParent(relationTokens[0].toLowerCase());

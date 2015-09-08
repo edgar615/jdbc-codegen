@@ -27,8 +27,8 @@
 
 	<insert id="insert" parameterType="CourseSum">
 		insert into 
-		course_sum(course_sum_id, occupation, application_level, course_time, course_count) 
-		values(#{courseSumId}, #{occupation}, #{applicationLevel}, #{courseTime}, #{courseCount})
+		course_sum(java.util.ArrayList$Itr@b3d7190, ) 
+		values(java.util.ArrayList$Itr@5fdba6f9, )
 	</insert>
 
 	<delete id="deleteByPrimaryKey" parameterType="int">
@@ -39,22 +39,7 @@
 	<update id="updateByPrimaryKey" parameterType="CourseSum">
 		update course_sum
 		<set>
- 			<if test="courseSumId != null"> 
-				course_sum_id = #{courseSumId},
-			</if>
-			<if test="occupation != null"> 
-				occupation = #{occupation},
-			</if>
-			<if test="applicationLevel != null"> 
-				application_level = #{applicationLevel},
-			</if>
-			<if test="courseTime != null"> 
-				course_time = #{courseTime},
-			</if>
-			<if test="courseCount != null"> 
-				course_count = #{courseCount},
-			</if>
-		</set> 
+ java.util.ArrayList$Itr@10d59286		</set> 
 		where course_sum_id = #{courseSumId}
 	</update>
 
@@ -66,6 +51,6 @@
 
 	<!-- START 鍐欏湪START鍜孍ND涓棿鐨勪唬鐮佷笉浼氳鏇挎崲 -->
 
-	<!-- END 鍐欏湪START鍜孍ND涓棿鐨勪唬鐮佷笉浼氳鏇挎崲-->
+	<!-- END 写在START和END中间的代码不会被替换-->
 
 </mapper>

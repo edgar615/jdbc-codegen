@@ -34,8 +34,8 @@
 
 	<insert id="insert" parameterType="Certificate">
 		insert into 
-		certificate(certificate_id, applicant_id, certificate_no, certificate_time, certificate_dept, qrcode_path, fullname, gender, identity_type, identity_no, occupation, application_level) 
-		values(#{certificateId}, #{applicantId}, #{certificateNo}, #{certificateTime}, #{certificateDept}, #{qrcodePath}, #{fullname}, #{gender}, #{identityType}, #{identityNo}, #{occupation}, #{applicationLevel})
+		certificate(java.util.ArrayList$Itr@5c072e3f, ) 
+		values(java.util.ArrayList$Itr@4d1b0d2a, )
 	</insert>
 
 	<delete id="deleteByPrimaryKey" parameterType="int">
@@ -46,43 +46,7 @@
 	<update id="updateByPrimaryKey" parameterType="Certificate">
 		update certificate
 		<set>
- 			<if test="certificateId != null"> 
-				certificate_id = #{certificateId},
-			</if>
-			<if test="applicantId != null"> 
-				applicant_id = #{applicantId},
-			</if>
-			<if test="certificateNo != null"> 
-				certificate_no = #{certificateNo},
-			</if>
-			<if test="certificateTime != null"> 
-				certificate_time = #{certificateTime},
-			</if>
-			<if test="certificateDept != null"> 
-				certificate_dept = #{certificateDept},
-			</if>
-			<if test="qrcodePath != null"> 
-				qrcode_path = #{qrcodePath},
-			</if>
-			<if test="fullname != null"> 
-				fullname = #{fullname},
-			</if>
-			<if test="gender != null"> 
-				gender = #{gender},
-			</if>
-			<if test="identityType != null"> 
-				identity_type = #{identityType},
-			</if>
-			<if test="identityNo != null"> 
-				identity_no = #{identityNo},
-			</if>
-			<if test="occupation != null"> 
-				occupation = #{occupation},
-			</if>
-			<if test="applicationLevel != null"> 
-				application_level = #{applicationLevel},
-			</if>
-		</set> 
+ java.util.ArrayList$Itr@954b04f		</set> 
 		where certificate_id = #{certificateId}
 	</update>
 
@@ -94,6 +58,6 @@
 
 	<!-- START 鍐欏湪START鍜孍ND涓棿鐨勪唬鐮佷笉浼氳鏇挎崲 -->
 
-	<!-- END 鍐欏湪START鍜孍ND涓棿鐨勪唬鐮佷笉浼氳鏇挎崲-->
+	<!-- END 写在START和END中间的代码不会被替换-->
 
 </mapper>

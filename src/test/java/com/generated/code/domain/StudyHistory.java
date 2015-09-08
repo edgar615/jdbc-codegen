@@ -27,7 +27,8 @@ public class StudyHistory implements Persistable<Integer> {
 
 	private int courseId;
 
-	private float studyTime;
+	@NotNull
+	private int studyTime = 0;
 
 	@NotNull
 	private int status = 1;
@@ -40,7 +41,7 @@ public class StudyHistory implements Persistable<Integer> {
 	@Size (max = 140)
 	private String description = "-";
 
-	private float courseTime;
+	private int courseTime = 0;
 
 	private int occupation = 1;
 
@@ -103,11 +104,11 @@ public class StudyHistory implements Persistable<Integer> {
 		return this.courseId;
 	}
 
-	public void setStudyTime (Float studyTime) {
+	public void setStudyTime (Integer studyTime) {
 		this.studyTime = studyTime;
 	}
 
-	public Float getStudyTime () {
+	public Integer getStudyTime () {
 		return this.studyTime;
 	}
 
@@ -143,11 +144,11 @@ public class StudyHistory implements Persistable<Integer> {
 		return this.description;
 	}
 
-	public void setCourseTime (Float courseTime) {
+	public void setCourseTime (Integer courseTime) {
 		this.courseTime = courseTime;
 	}
 
-	public Float getCourseTime () {
+	public Integer getCourseTime () {
 		return this.courseTime;
 	}
 
@@ -223,6 +224,6 @@ public class StudyHistory implements Persistable<Integer> {
 
 	/* START 鍐欏湪START鍜孍ND涓棿鐨勪唬鐮佷笉浼氳鏇挎崲*/
 
-	/* END 鍐欏湪START鍜孍ND涓棿鐨勪唬鐮佷笉浼氳鏇挎崲*/
+	/* END 写在START和END中间的代码不会被替换*/
 
 }

@@ -36,8 +36,8 @@
 
 	<insert id="insert" parameterType="StudyHistorySum">
 		insert into 
-		study_history_sum(study_history_sum_id, applicant_id, course_sum_id, study_time, study_count, course_time, course_cout, status, occupation, application_level, fullname, gender, identity_type, identity_no) 
-		values(#{studyHistorySumId}, #{applicantId}, #{courseSumId}, #{studyTime}, #{studyCount}, #{courseTime}, #{courseCout}, #{status}, #{occupation}, #{applicationLevel}, #{fullname}, #{gender}, #{identityType}, #{identityNo})
+		study_history_sum(java.util.ArrayList$Itr@6e2c9341, ) 
+		values(java.util.ArrayList$Itr@32464a14, )
 	</insert>
 
 	<delete id="deleteByPrimaryKey" parameterType="int">
@@ -48,49 +48,7 @@
 	<update id="updateByPrimaryKey" parameterType="StudyHistorySum">
 		update study_history_sum
 		<set>
- 			<if test="studyHistorySumId != null"> 
-				study_history_sum_id = #{studyHistorySumId},
-			</if>
-			<if test="applicantId != null"> 
-				applicant_id = #{applicantId},
-			</if>
-			<if test="courseSumId != null"> 
-				course_sum_id = #{courseSumId},
-			</if>
-			<if test="studyTime != null"> 
-				study_time = #{studyTime},
-			</if>
-			<if test="studyCount != null"> 
-				study_count = #{studyCount},
-			</if>
-			<if test="courseTime != null"> 
-				course_time = #{courseTime},
-			</if>
-			<if test="courseCout != null"> 
-				course_cout = #{courseCout},
-			</if>
-			<if test="status != null"> 
-				status = #{status},
-			</if>
-			<if test="occupation != null"> 
-				occupation = #{occupation},
-			</if>
-			<if test="applicationLevel != null"> 
-				application_level = #{applicationLevel},
-			</if>
-			<if test="fullname != null"> 
-				fullname = #{fullname},
-			</if>
-			<if test="gender != null"> 
-				gender = #{gender},
-			</if>
-			<if test="identityType != null"> 
-				identity_type = #{identityType},
-			</if>
-			<if test="identityNo != null"> 
-				identity_no = #{identityNo},
-			</if>
-		</set> 
+ java.util.ArrayList$Itr@4e4aea35		</set> 
 		where study_history_sum_id = #{studyHistorySumId}
 	</update>
 
@@ -102,6 +60,6 @@
 
 	<!-- START 鍐欏湪START鍜孍ND涓棿鐨勪唬鐮佷笉浼氳鏇挎崲 -->
 
-	<!-- END 鍐欏湪START鍜孍ND涓棿鐨勪唬鐮佷笉浼氳鏇挎崲-->
+	<!-- END 写在START和END中间的代码不会被替换-->
 
 </mapper>

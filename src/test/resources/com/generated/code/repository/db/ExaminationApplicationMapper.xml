@@ -36,8 +36,8 @@
 
 	<insert id="insert" parameterType="ExaminationApplication">
 		insert into 
-		examination_application(examination_application_id, applicant_id, application_type, application_path, apply_time, status, occupation, application_level, fullname, gender, identity_type, identity_no, approval_opinion, approval_time) 
-		values(#{examinationApplicationId}, #{applicantId}, #{applicationType}, #{applicationPath}, #{applyTime}, #{status}, #{occupation}, #{applicationLevel}, #{fullname}, #{gender}, #{identityType}, #{identityNo}, #{approvalOpinion}, #{approvalTime})
+		examination_application(java.util.ArrayList$Itr@4ae82894, ) 
+		values(java.util.ArrayList$Itr@543788f3, )
 	</insert>
 
 	<delete id="deleteByPrimaryKey" parameterType="int">
@@ -48,49 +48,7 @@
 	<update id="updateByPrimaryKey" parameterType="ExaminationApplication">
 		update examination_application
 		<set>
- 			<if test="examinationApplicationId != null"> 
-				examination_application_id = #{examinationApplicationId},
-			</if>
-			<if test="applicantId != null"> 
-				applicant_id = #{applicantId},
-			</if>
-			<if test="applicationType != null"> 
-				application_type = #{applicationType},
-			</if>
-			<if test="applicationPath != null"> 
-				application_path = #{applicationPath},
-			</if>
-			<if test="applyTime != null"> 
-				apply_time = #{applyTime},
-			</if>
-			<if test="status != null"> 
-				status = #{status},
-			</if>
-			<if test="occupation != null"> 
-				occupation = #{occupation},
-			</if>
-			<if test="applicationLevel != null"> 
-				application_level = #{applicationLevel},
-			</if>
-			<if test="fullname != null"> 
-				fullname = #{fullname},
-			</if>
-			<if test="gender != null"> 
-				gender = #{gender},
-			</if>
-			<if test="identityType != null"> 
-				identity_type = #{identityType},
-			</if>
-			<if test="identityNo != null"> 
-				identity_no = #{identityNo},
-			</if>
-			<if test="approvalOpinion != null"> 
-				approval_opinion = #{approvalOpinion},
-			</if>
-			<if test="approvalTime != null"> 
-				approval_time = #{approvalTime},
-			</if>
-		</set> 
+ java.util.ArrayList$Itr@6d3af739		</set> 
 		where examination_application_id = #{examinationApplicationId}
 	</update>
 
@@ -102,6 +60,6 @@
 
 	<!-- START 鍐欏湪START鍜孍ND涓棿鐨勪唬鐮佷笉浼氳鏇挎崲 -->
 
-	<!-- END 鍐欏湪START鍜孍ND涓棿鐨勪唬鐮佷笉浼氳鏇挎崲-->
+	<!-- END 写在START和END中间的代码不会被替换-->
 
 </mapper>

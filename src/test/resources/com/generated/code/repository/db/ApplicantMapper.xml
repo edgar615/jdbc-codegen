@@ -39,8 +39,8 @@
 
 	<insert id="insert" parameterType="Applicant">
 		insert into 
-		applicant(applicant_id, user_id, fullname, gender, phone, identity_type, identity_no, nation, native_place, degree, politics, company, seniority, photo_path, study_addr, occupation, application_level) 
-		values(#{applicantId}, #{userId}, #{fullname}, #{gender}, #{phone}, #{identityType}, #{identityNo}, #{nation}, #{nativePlace}, #{degree}, #{politics}, #{company}, #{seniority}, #{photoPath}, #{studyAddr}, #{occupation}, #{applicationLevel})
+		applicant(java.util.ArrayList$Itr@544a2ea6, ) 
+		values(java.util.ArrayList$Itr@2e3fc542, )
 	</insert>
 
 	<delete id="deleteByPrimaryKey" parameterType="int">
@@ -51,58 +51,7 @@
 	<update id="updateByPrimaryKey" parameterType="Applicant">
 		update applicant
 		<set>
- 			<if test="applicantId != null"> 
-				applicant_id = #{applicantId},
-			</if>
-			<if test="userId != null"> 
-				user_id = #{userId},
-			</if>
-			<if test="fullname != null"> 
-				fullname = #{fullname},
-			</if>
-			<if test="gender != null"> 
-				gender = #{gender},
-			</if>
-			<if test="phone != null"> 
-				phone = #{phone},
-			</if>
-			<if test="identityType != null"> 
-				identity_type = #{identityType},
-			</if>
-			<if test="identityNo != null"> 
-				identity_no = #{identityNo},
-			</if>
-			<if test="nation != null"> 
-				nation = #{nation},
-			</if>
-			<if test="nativePlace != null"> 
-				native_place = #{nativePlace},
-			</if>
-			<if test="degree != null"> 
-				degree = #{degree},
-			</if>
-			<if test="politics != null"> 
-				politics = #{politics},
-			</if>
-			<if test="company != null"> 
-				company = #{company},
-			</if>
-			<if test="seniority != null"> 
-				seniority = #{seniority},
-			</if>
-			<if test="photoPath != null"> 
-				photo_path = #{photoPath},
-			</if>
-			<if test="studyAddr != null"> 
-				study_addr = #{studyAddr},
-			</if>
-			<if test="occupation != null"> 
-				occupation = #{occupation},
-			</if>
-			<if test="applicationLevel != null"> 
-				application_level = #{applicationLevel},
-			</if>
-		</set> 
+ java.util.ArrayList$Itr@150c158		</set> 
 		where applicant_id = #{applicantId}
 	</update>
 
@@ -114,6 +63,6 @@
 
 	<!-- START 鍐欏湪START鍜孍ND涓棿鐨勪唬鐮佷笉浼氳鏇挎崲 -->
 
-	<!-- END 鍐欏湪START鍜孍ND涓棿鐨勪唬鐮佷笉浼氳鏇挎崲-->
+	<!-- END 写在START和END中间的代码不会被替换-->
 
 </mapper>

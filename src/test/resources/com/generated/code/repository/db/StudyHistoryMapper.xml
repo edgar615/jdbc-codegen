@@ -38,8 +38,8 @@
 
 	<insert id="insert" parameterType="StudyHistory">
 		insert into 
-		study_history(study_history_id, applicant_id, study_history_sum_id, course_id, study_time, status, course_name, course_type, description, course_time, occupation, application_level, fullname, gender, identity_type, identity_no) 
-		values(#{studyHistoryId}, #{applicantId}, #{studyHistorySumId}, #{courseId}, #{studyTime}, #{status}, #{courseName}, #{courseType}, #{description}, #{courseTime}, #{occupation}, #{applicationLevel}, #{fullname}, #{gender}, #{identityType}, #{identityNo})
+		study_history(java.util.ArrayList$Itr@f4168b8, ) 
+		values(java.util.ArrayList$Itr@3bd94634, )
 	</insert>
 
 	<delete id="deleteByPrimaryKey" parameterType="int">
@@ -50,55 +50,7 @@
 	<update id="updateByPrimaryKey" parameterType="StudyHistory">
 		update study_history
 		<set>
- 			<if test="studyHistoryId != null"> 
-				study_history_id = #{studyHistoryId},
-			</if>
-			<if test="applicantId != null"> 
-				applicant_id = #{applicantId},
-			</if>
-			<if test="studyHistorySumId != null"> 
-				study_history_sum_id = #{studyHistorySumId},
-			</if>
-			<if test="courseId != null"> 
-				course_id = #{courseId},
-			</if>
-			<if test="studyTime != null"> 
-				study_time = #{studyTime},
-			</if>
-			<if test="status != null"> 
-				status = #{status},
-			</if>
-			<if test="courseName != null"> 
-				course_name = #{courseName},
-			</if>
-			<if test="courseType != null"> 
-				course_type = #{courseType},
-			</if>
-			<if test="description != null"> 
-				description = #{description},
-			</if>
-			<if test="courseTime != null"> 
-				course_time = #{courseTime},
-			</if>
-			<if test="occupation != null"> 
-				occupation = #{occupation},
-			</if>
-			<if test="applicationLevel != null"> 
-				application_level = #{applicationLevel},
-			</if>
-			<if test="fullname != null"> 
-				fullname = #{fullname},
-			</if>
-			<if test="gender != null"> 
-				gender = #{gender},
-			</if>
-			<if test="identityType != null"> 
-				identity_type = #{identityType},
-			</if>
-			<if test="identityNo != null"> 
-				identity_no = #{identityNo},
-			</if>
-		</set> 
+ java.util.ArrayList$Itr@58a90037		</set> 
 		where study_history_id = #{studyHistoryId}
 	</update>
 
@@ -110,6 +62,6 @@
 
 	<!-- START 鍐欏湪START鍜孍ND涓棿鐨勪唬鐮佷笉浼氳鏇挎崲 -->
 
-	<!-- END 鍐欏湪START鍜孍ND涓棿鐨勪唬鐮佷笉浼氳鏇挎崲-->
+	<!-- END 写在START和END中间的代码不会被替换-->
 
 </mapper>

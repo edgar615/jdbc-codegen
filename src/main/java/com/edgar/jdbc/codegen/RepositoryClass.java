@@ -19,8 +19,8 @@
 package com.edgar.jdbc.codegen;
 
 import com.edgar.jdbc.codegen.util.CodeGenUtil;
-import org.apache.commons.lang3.StringUtils;
-import org.apache.commons.lang3.text.WordUtils;
+import com.edgar.jdbc.codegen.util.WordUtils;
+import com.google.common.base.Strings;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -50,7 +50,7 @@ public class RepositoryClass extends BaseClass {
     protected void printClassExtends() {
         super.printClassExtends();
 
-        if (StringUtils.isNotBlank(extendsClassName)) {
+        if (!Strings.isNullOrEmpty(extendsClassName)) {
             sourceBuf.append("<");
             sourceBuf.append(this.name + ", ");
             if (this.pkeys.size() == 0) {

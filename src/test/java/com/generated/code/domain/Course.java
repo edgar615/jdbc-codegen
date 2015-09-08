@@ -31,7 +31,8 @@ public class Course implements Persistable<Integer> {
 	@Size (max = 140)
 	private String description = "-";
 
-	private float courseTime;
+	@NotNull
+	private int courseTime = 0;
 
 	private int courseType = 1;
 
@@ -43,8 +44,6 @@ public class Course implements Persistable<Integer> {
 	private int occupation = 1;
 
 	private int applicationLevel = 1;
-
-	private int sorted;
 
 
 	public Course () {
@@ -93,11 +92,11 @@ public class Course implements Persistable<Integer> {
 		return this.description;
 	}
 
-	public void setCourseTime (Float courseTime) {
+	public void setCourseTime (Integer courseTime) {
 		this.courseTime = courseTime;
 	}
 
-	public Float getCourseTime () {
+	public Integer getCourseTime () {
 		return this.courseTime;
 	}
 
@@ -141,14 +140,6 @@ public class Course implements Persistable<Integer> {
 		return this.applicationLevel;
 	}
 
-	public void setSorted (Integer sorted) {
-		this.sorted = sorted;
-	}
-
-	public Integer getSorted () {
-		return this.sorted;
-	}
-
 	@Override
 	public String toString () {
 		return MoreObjects.toStringHelper("Course")
@@ -162,12 +153,11 @@ public class Course implements Persistable<Integer> {
 			.add("isLocal", isLocal)
 			.add("occupation", occupation)
 			.add("applicationLevel", applicationLevel)
-			.add("sorted", sorted)
 			.toString();
 	}
 
 	/* START 鍐欏湪START鍜孍ND涓棿鐨勪唬鐮佷笉浼氳鏇挎崲*/
 
-	/* END 鍐欏湪START鍜孍ND涓棿鐨勪唬鐮佷笉浼氳鏇挎崲*/
+	/* END 写在START和END中间的代码不会被替换*/
 
 }

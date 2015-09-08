@@ -18,7 +18,7 @@ public interface SysDictMapper extends BaseMapper<SysDict, Integer> {
 
 	/* START 鍐欏湪START鍜孍ND涓棿鐨勪唬鐮佷笉浼氳鏇挎崲*/
 
-	/* END 鍐欏湪START鍜孍ND涓棿鐨勪唬鐮佷笉浼氳鏇挎崲*/
+	/* END 写在START和END中间的代码不会被替换*/
 
 }
 

@@ -2,14 +2,14 @@
 <!DOCTYPE mapper
         PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
         "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
-<mapper namespace="com.generated.code.repository.SequenceMapper">
-	<resultMap id="SequenceResultMap" type="Sequence">
+<mapper namespace="com.generated.code.repository.TestMapper">
+	<resultMap id="TestResultMap" type="Test">
 		<result column="id" property="id" />
-		<result column="stub" property="stub" />
+		<result column="name" property="name" />
 	</resultMap>
 
 	<sql id="all_column">
-		id, stub
+		id, name
 	</sql>
 
 	<sql id="limit">
@@ -22,27 +22,27 @@
 		</if>
 	</sql>
 
-	<insert id="insert" parameterType="Sequence">
+	<insert id="insert" parameterType="Test">
 		insert into 
-		sequence(java.util.ArrayList$Itr@5e955596, ) 
-		values(java.util.ArrayList$Itr@50de0926, )
+		test(java.util.ArrayList$Itr@5e25a92e, ) 
+		values(java.util.ArrayList$Itr@4df828d7, )
 	</insert>
 
-	<delete id="deleteByPrimaryKey" parameterType="long">
-		delete from sequence 
+	<delete id="deleteByPrimaryKey" parameterType="int">
+		delete from test 
 		where id = #{id}
 	</delete>
 
-	<update id="updateByPrimaryKey" parameterType="Sequence">
-		update sequence
+	<update id="updateByPrimaryKey" parameterType="Test">
+		update test
 		<set>
- java.util.ArrayList$Itr@2473b9ce		</set> 
+ java.util.ArrayList$Itr@b59d31		</set> 
 		where id = #{id}
 	</update>
 
-	<select id="selectByPrimaryKey" resultMap="SequenceResultMap" parameterType="long">
-		select id, stub 
-		from sequence 
+	<select id="selectByPrimaryKey" resultMap="TestResultMap" parameterType="int">
+		select id, name 
+		from test 
 		where id = #{id}
 	</select>
 

@@ -14,11 +14,10 @@
 		<result column="is_local" property="isLocal" />
 		<result column="occupation" property="occupation" />
 		<result column="application_level" property="applicationLevel" />
-		<result column="sorted" property="sorted" />
 	</resultMap>
 
 	<sql id="all_column">
-		course_id, course_sum_id, course_name, description, course_time, course_type, course_path, is_local, occupation, application_level, sorted
+		course_id, course_sum_id, course_name, description, course_time, course_type, course_path, is_local, occupation, application_level
 	</sql>
 
 	<sql id="limit">
@@ -33,8 +32,8 @@
 
 	<insert id="insert" parameterType="Course">
 		insert into 
-		course(course_id, course_sum_id, course_name, description, course_time, course_type, course_path, is_local, occupation, application_level, sorted) 
-		values(#{courseId}, #{courseSumId}, #{courseName}, #{description}, #{courseTime}, #{courseType}, #{coursePath}, #{isLocal}, #{occupation}, #{applicationLevel}, #{sorted})
+		course(java.util.ArrayList$Itr@df27fae, ) 
+		values(java.util.ArrayList$Itr@24a35978, )
 	</insert>
 
 	<delete id="deleteByPrimaryKey" parameterType="int">
@@ -45,51 +44,18 @@
 	<update id="updateByPrimaryKey" parameterType="Course">
 		update course
 		<set>
- 			<if test="courseId != null"> 
-				course_id = #{courseId},
-			</if>
-			<if test="courseSumId != null"> 
-				course_sum_id = #{courseSumId},
-			</if>
-			<if test="courseName != null"> 
-				course_name = #{courseName},
-			</if>
-			<if test="description != null"> 
-				description = #{description},
-			</if>
-			<if test="courseTime != null"> 
-				course_time = #{courseTime},
-			</if>
-			<if test="courseType != null"> 
-				course_type = #{courseType},
-			</if>
-			<if test="coursePath != null"> 
-				course_path = #{coursePath},
-			</if>
-			<if test="isLocal != null"> 
-				is_local = #{isLocal},
-			</if>
-			<if test="occupation != null"> 
-				occupation = #{occupation},
-			</if>
-			<if test="applicationLevel != null"> 
-				application_level = #{applicationLevel},
-			</if>
-			<if test="sorted != null"> 
-				sorted = #{sorted},
-			</if>
-		</set> 
+ java.util.ArrayList$Itr@16f7c8c1		</set> 
 		where course_id = #{courseId}
 	</update>
 
 	<select id="selectByPrimaryKey" resultMap="CourseResultMap" parameterType="int">
-		select course_id, course_sum_id, course_name, description, course_time, course_type, course_path, is_local, occupation, application_level, sorted 
+		select course_id, course_sum_id, course_name, description, course_time, course_type, course_path, is_local, occupation, application_level 
 		from course 
 		where course_id = #{id}
 	</select>
 
 	<!-- START 鍐欏湪START鍜孍ND涓棿鐨勪唬鐮佷笉浼氳鏇挎崲 -->
 
-	<!-- END 鍐欏湪START鍜孍ND涓棿鐨勪唬鐮佷笉浼氳鏇挎崲-->
+	<!-- END 写在START和END中间的代码不会被替换-->
 
 </mapper>

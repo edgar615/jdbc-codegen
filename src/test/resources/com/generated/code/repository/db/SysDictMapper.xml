@@ -27,8 +27,8 @@
 
 	<insert id="insert" parameterType="SysDict">
 		insert into 
-		sys_dict(dict_id, parent_id, dict_code, dict_name, sorted) 
-		values(#{dictId}, #{parentId}, #{dictCode}, #{dictName}, #{sorted})
+		sys_dict(java.util.ArrayList$Itr@12028586, ) 
+		values(java.util.ArrayList$Itr@17776a8, )
 	</insert>
 
 	<delete id="deleteByPrimaryKey" parameterType="int">
@@ -39,22 +39,7 @@
 	<update id="updateByPrimaryKey" parameterType="SysDict">
 		update sys_dict
 		<set>
- 			<if test="dictId != null"> 
-				dict_id = #{dictId},
-			</if>
-			<if test="parentId != null"> 
-				parent_id = #{parentId},
-			</if>
-			<if test="dictCode != null"> 
-				dict_code = #{dictCode},
-			</if>
-			<if test="dictName != null"> 
-				dict_name = #{dictName},
-			</if>
-			<if test="sorted != null"> 
-				sorted = #{sorted},
-			</if>
-		</set> 
+ java.util.ArrayList$Itr@69a10787		</set> 
 		where dict_id = #{dictId}
 	</update>
 
@@ -66,6 +51,6 @@
 
 	<!-- START 鍐欏湪START鍜孍ND涓棿鐨勪唬鐮佷笉浼氳鏇挎崲 -->
 
-	<!-- END 鍐欏湪START鍜孍ND涓棿鐨勪唬鐮佷笉浼氳鏇挎崲-->
+	<!-- END 写在START和END中间的代码不会被替换-->
 
 </mapper>

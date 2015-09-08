@@ -31,8 +31,8 @@
 
 	<insert id="insert" parameterType="User">
 		insert into 
-		user(user_id, applicant_id, role_id, username, fullname, password, salt, organization, authority) 
-		values(#{userId}, #{applicantId}, #{roleId}, #{username}, #{fullname}, #{password}, #{salt}, #{organization}, #{authority})
+		user(java.util.ArrayList$Itr@25359ed8, ) 
+		values(java.util.ArrayList$Itr@21a947fe, )
 	</insert>
 
 	<delete id="deleteByPrimaryKey" parameterType="int">
@@ -43,34 +43,7 @@
 	<update id="updateByPrimaryKey" parameterType="User">
 		update user
 		<set>
- 			<if test="userId != null"> 
-				user_id = #{userId},
-			</if>
-			<if test="applicantId != null"> 
-				applicant_id = #{applicantId},
-			</if>
-			<if test="roleId != null"> 
-				role_id = #{roleId},
-			</if>
-			<if test="username != null"> 
-				username = #{username},
-			</if>
-			<if test="fullname != null"> 
-				fullname = #{fullname},
-			</if>
-			<if test="password != null"> 
-				password = #{password},
-			</if>
-			<if test="salt != null"> 
-				salt = #{salt},
-			</if>
-			<if test="organization != null"> 
-				organization = #{organization},
-			</if>
-			<if test="authority != null"> 
-				authority = #{authority},
-			</if>
-		</set> 
+ java.util.ArrayList$Itr@5606c0b		</set> 
 		where user_id = #{userId}
 	</update>
 
@@ -82,6 +55,6 @@
 
 	<!-- START 鍐欏湪START鍜孍ND涓棿鐨勪唬鐮佷笉浼氳鏇挎崲 -->
 
-	<!-- END 鍐欏湪START鍜孍ND涓棿鐨勪唬鐮佷笉浼氳鏇挎崲-->
+	<!-- END 写在START和END中间的代码不会被替换-->
 
 </mapper>

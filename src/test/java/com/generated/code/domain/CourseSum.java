@@ -27,7 +27,8 @@ public class CourseSum implements Persistable<Integer> {
 	@NotNull
 	private int applicationLevel = 1;
 
-	private float courseTime;
+	@NotNull
+	private int courseTime = 0;
 
 	@NotNull
 	private int courseCount = 0;
@@ -71,11 +72,11 @@ public class CourseSum implements Persistable<Integer> {
 		return this.applicationLevel;
 	}
 
-	public void setCourseTime (Float courseTime) {
+	public void setCourseTime (Integer courseTime) {
 		this.courseTime = courseTime;
 	}
 
-	public Float getCourseTime () {
+	public Integer getCourseTime () {
 		return this.courseTime;
 	}
 
@@ -100,6 +101,6 @@ public class CourseSum implements Persistable<Integer> {
 
 	/* START 鍐欏湪START鍜孍ND涓棿鐨勪唬鐮佷笉浼氳鏇挎崲*/
 
-	/* END 鍐欏湪START鍜孍ND涓棿鐨勪唬鐮佷笉浼氳鏇挎崲*/
+	/* END 写在START和END中间的代码不会被替换*/
 
 }

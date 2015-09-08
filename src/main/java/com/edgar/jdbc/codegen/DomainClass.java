@@ -19,8 +19,11 @@
 package com.edgar.jdbc.codegen;
 
 import com.edgar.jdbc.codegen.util.CodeGenUtil;
-import org.apache.commons.lang3.StringUtils;
-import org.apache.commons.lang3.text.WordUtils;
+import com.edgar.jdbc.codegen.util.StringUtils;
+import com.edgar.jdbc.codegen.util.WordUtils;
+import com.google.common.base.Splitter;
+import com.google.common.base.Strings;
+import com.google.common.collect.Iterables;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -84,7 +87,7 @@ public class DomainClass extends BaseClass {
 
     @Override
     protected void printClassImplements() {
-        if (StringUtils.isNotBlank(interfaceName)) {
+        if (!Strings.isNullOrEmpty(interfaceName)) {
             String implementsClass = this.interfaceName.substring(StringUtils.lastIndexOf(this.interfaceName, ".") + 1);
             sourceBuf.append(" implements " + implementsClass);
             if (pkeys.isEmpty()) {
@@ -175,7 +178,7 @@ public class DomainClass extends BaseClass {
 
             }
             sourceBuf.append("\tprivate " + modifiers.toString() + type + " " + fieldName);
-            if (StringUtils.isNotBlank(field.getDefaultValue())) {
+            if (!Strings.isNullOrEmpty(field.getDefaultValue())) {
                 logger.debug("Found default value:{}", field.getDefaultValue());
                 if (this.pkeys.containsKey(field.getName())) {
                     // this is a pk so ignore
@@ -197,7 +200,7 @@ public class DomainClass extends BaseClass {
                         case INTEGER:
                             // postgres default values for int columns are stored as floats. e.g 100.0
                             if (StringUtils.contains(val, ".")) {
-                                String[] tokens = StringUtils.split(val, ".");
+                                String[] tokens = Iterables.toArray(Splitter.on(".").split(val), String.class);
                                 val = tokens[0];
                             }
                             sourceBuf.append(" = " + Integer.parseInt(val) + ";\n\n");
@@ -225,7 +228,7 @@ public class DomainClass extends BaseClass {
                             logger.debug("Database:{}", d);
                             switch (d) {
                                 case POSTGRESQL:
-                                    String[] tokens = StringUtils.split(val, "::"); // usual form 'value' :: character varying
+                                    String[] tokens = Iterables.toArray(Splitter.on("::").split(val), String.class); // usual form 'value' :: character varying
                                     if (tokens != null && tokens.length > 0) {
                                         sourceBuf.append(" = \"" + tokens[0].substring(1, tokens[0].length() - 1) + "\";\n\n");
                                     } else {

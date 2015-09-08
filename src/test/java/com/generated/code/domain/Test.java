@@ -14,46 +14,45 @@ import com.google.common.base.MoreObjects;
  *
  * @author Jdbc Code Generator
  */
-public class Sequence implements Persistable<Long> {
+public class Test implements Persistable<Integer> {
 
 	private static final long serialVersionUID = 1L;
 
 	@NotNull (groups = { Default.class })
 	@Null (groups = { Default.class })
-	private long id;
+	private int id;
 
-	@NotEmpty
-	@Size (max = 1)
-	private String stub;
+	@Size (max = 255)
+	private String name;
 
 
-	public Sequence () {
+	public Test () {
 
 	}
 
 	@Override
-	public Long getId () {
+	public Integer getId () {
 		return this.id;
 	}
 
 	@Override
-	public void setId(Long id) {
+	public void setId(Integer id) {
 		this.id = id;
 	}
 
-	public void setStub (String stub) {
-		this.stub = stub;
+	public void setName (String name) {
+		this.name = name;
 	}
 
-	public String getStub () {
-		return this.stub;
+	public String getName () {
+		return this.name;
 	}
 
 	@Override
 	public String toString () {
-		return MoreObjects.toStringHelper("Sequence")
+		return MoreObjects.toStringHelper("Test")
 			.add("id", id)
-			.add("stub", stub)
+			.add("name", name)
 			.toString();
 	}
 
