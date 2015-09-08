@@ -50,11 +50,9 @@ public abstract class BaseClass {
     protected List<Method> methods;
     protected Map<String, ParameterType> pkeys = new HashMap<String, ParameterType>();
     protected Map<String, ForeignKey> fkeys = new TreeMap<String, ForeignKey>();
-    protected Map<String, List<Relation>> relations = new HashMap<String, List<Relation>>();
     protected StringBuffer userSourceBuf = new StringBuffer("");
     protected StringBuffer sourceBuf = new StringBuffer("");
 
-    protected String[] dontPluralizeWords = null;
     protected int fieldNameCounter = 0;
 
     private static String COMMENT_START = "/* START 写在START和END中间的代码不会被替换*/";
@@ -241,14 +239,6 @@ public abstract class BaseClass {
 
     }
 
-    public Map<String, List<Relation>> getRelations() {
-        return this.relations;
-    }
-
-    public void setRelations(Map<String, List<Relation>> relations) {
-        this.relations = relations;
-    }
-
     public StringBuffer getSourceBuf() {
         return this.sourceBuf;
     }
@@ -369,17 +359,9 @@ public abstract class BaseClass {
     }
 
 
-    public String[] getDontPluralizeWords() {
-        return this.dontPluralizeWords;
-    }
-
-    public void setDontPluralizeWords(String[] dontPluralizeWords) {
-        this.dontPluralizeWords = dontPluralizeWords;
-    }
-
     public boolean containsFieldName(String name) {
         for (Field field : fields) {
-            if (CodeGenUtil.normalize(field.getName()).equals(name))
+            if (CodeGenUtil.normalize(field.getColName()).equals(name))
                 return true;
         }
         return false;

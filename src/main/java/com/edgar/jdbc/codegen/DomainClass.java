@@ -29,14 +29,13 @@ import org.slf4j.LoggerFactory;
 
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Map;
 
 /**
  * Class to represent the generated Java bean Class. Class name is same as the
  * table name in singular form. e.g For employees table , Employee.java is
  * generated
  *
- * @author Kalyan Mulampaka
+ * @author Kalyan Mulampaka, Edgar
  */
 public class DomainClass extends BaseClass {
 
@@ -111,7 +110,7 @@ public class DomainClass extends BaseClass {
                 type = field.getType().getPrimitiveName();
             }
 
-            String fieldName = CodeGenUtil.normalize(field.getName().toLowerCase());
+            String fieldName = field.getHumpName();
             StringBuffer modifiers = new StringBuffer("");
             if (!field.getModifiers().isEmpty()) {
                 for (String modifier : field.getModifiers()) {
@@ -124,7 +123,7 @@ public class DomainClass extends BaseClass {
                 if (!field.isNullable()) {
                     if (field.getType() == ParameterType.STRING) {
                         sourceBuf.append("\t@NotEmpty\n");
-                    } else if (field.getName().equalsIgnoreCase("id")) {
+                    } else if (field.getColName().equalsIgnoreCase("id")) {
                         //update groups
                         sourceBuf.append("\t@NotNull (groups = { ");
                         int i = this.jsr303UpdateGroups.size();
@@ -144,7 +143,7 @@ public class DomainClass extends BaseClass {
                                 sourceBuf.append(", ");
                         }
                         sourceBuf.append(" })\n");
-                    } else if (field.getName().endsWith("id")) {
+                    } else if (field.getColName().endsWith("id")) {
                         //update groups
                         sourceBuf.append("\t@NotNull (groups = { ");
                         int i = this.jsr303UpdateGroups.size();
@@ -180,7 +179,7 @@ public class DomainClass extends BaseClass {
             sourceBuf.append("\tprivate " + modifiers.toString() + type + " " + fieldName);
             if (!Strings.isNullOrEmpty(field.getDefaultValue())) {
                 logger.debug("Found default value:{}", field.getDefaultValue());
-                if (this.pkeys.containsKey(field.getName())) {
+                if (this.pkeys.containsKey(field.getColName())) {
                     // this is a pk so ignore
                     sourceBuf.append(";\n\n");
                 } else {
@@ -253,6 +252,7 @@ public class DomainClass extends BaseClass {
         }
     }
 
+    @Deprecated
     protected void printFKeyClassFields() {
         // add composite classes from foreign pkeys
         if (!this.fkeys.isEmpty()) {
@@ -277,51 +277,6 @@ public class DomainClass extends BaseClass {
             }
         }
         sourceBuf.append("\n");
-    }
-
-    protected void printRelations() {
-        if (!this.relations.isEmpty()) {
-            // get the relations where this table is a parent
-            List<Relation> relations = this.relations.get(this.name.toLowerCase());
-            if (relations != null && !relations.isEmpty()) {
-                for (Relation relation : relations) {
-                    switch (relation.getType()) {
-                        case ONE_TO_ONE:
-                            String child = CodeGenUtil.normalize(relation.getChild());
-                            sourceBuf.append("\tprivate " + WordUtils.capitalize(child));
-                            sourceBuf.append(" " + child + ";\n");
-
-                            Method method = new Method();
-                            methods.add(method);
-                            method.setName(child);
-                            Parameter parameter = new Parameter(child, ParameterType.OBJECT);
-                            method.setParameter(parameter);
-
-                            break;
-                        case ONE_TO_MANY:
-                            child = CodeGenUtil.normalize(relation.getChild());
-                            logger.debug("Child table name:{}", child);
-                            String fieldName = CodeGenUtil.pluralizeName(child, this.getDontPluralizeWords());
-                            logger.debug("Field name:{}", fieldName);
-                            sourceBuf.append("\tprivate List<" + WordUtils.capitalize(child));
-                            sourceBuf.append("> " + fieldName + " = new ArrayList<" + WordUtils.capitalize(child) + "> ();\n");
-
-                            method = new Method();
-                            methods.add(method);
-                            method.setName(child);
-                            parameter = new Parameter(fieldName, ParameterType.LIST);
-                            method.setParameter(parameter);
-
-                            break;
-                        case UNKNOWN:
-                            break;
-                    }
-                }
-                sourceBuf.append("\n");
-            }
-
-        }
-
     }
 
     protected void printInterfaceImpl() {
@@ -402,7 +357,7 @@ public class DomainClass extends BaseClass {
             if (method.isGenerateSetter()) {
                 logger.debug("Method name:{}", methodName);
                 if (pType == ParameterType.LIST) {
-                    String mName = CodeGenUtil.pluralizeName(methodName, this.getDontPluralizeWords());
+                    String mName = CodeGenUtil.pluralizeName(methodName);
                     logger.debug("Pluralized Method name:{}", mName);
                     sourceBuf.append("\tpublic void set" + mName + "(");
                     sourceBuf.append("List<" + methodName + "> " + paramName);
@@ -427,7 +382,7 @@ public class DomainClass extends BaseClass {
             // getter
             if (method.isGenerateGetter()) {
                 if (pType == ParameterType.LIST) {
-                    String mName = CodeGenUtil.pluralizeName(methodName, this.getDontPluralizeWords());
+                    String mName = CodeGenUtil.pluralizeName(methodName);
                     sourceBuf.append("\tpublic List<" + methodName + "> get" + mName + "() ");
                     super.printOpenBrace(0, 1);
                     sourceBuf.append("\t\treturn this." + paramName + ";\n");
@@ -442,30 +397,13 @@ public class DomainClass extends BaseClass {
         }
     }
 
-    protected void printPkeyInnerCtor() {
-        sourceBuf.append("\t\tpublic PKey(");
-        int i = pkeys.size();
-        for (Map.Entry<String, ParameterType> entry : pkeys.entrySet()) {
-            sourceBuf.append(entry.getValue().getName() + " " + entry.getKey());
-            if (--i > 0) {
-                sourceBuf.append(", ");
-            }
-        }
-        sourceBuf.append(") ");
-        this.printOpenBrace(2, 1);
-        for (Map.Entry<String, ParameterType> entry : pkeys.entrySet()) {
-            sourceBuf.append("\t\t\tthis." + entry.getKey() + " = " + entry.getKey() + ";\n");
-        }
-        this.printCloseBrace(2, 2);
-    }
-
     protected void printToString() {
         //override toString()
         sourceBuf.append("\t@Override\n\tpublic String toString() ");
         this.printOpenBrace(0, 1);
         sourceBuf.append("\t\treturn MoreObjects.toStringHelper(\"" + WordUtils.capitalize(CodeGenUtil.normalize(name)) + "\")\n");
         for (Field field : fields) {
-            String fieldName = CodeGenUtil.normalize(field.getName().toLowerCase());
+            String fieldName = field.getHumpName();
             sourceBuf.append("\t\t\t.add(\"" + fieldName + "\", " + fieldName + ")\n");
         }
         sourceBuf.append("\t\t\t.toString();\n");
@@ -478,21 +416,8 @@ public class DomainClass extends BaseClass {
                 this.imports.add("java.util.HashMap");
                 this.imports.add("java.util.Map");
                 this.imports.add("java.util.Collections");
-//                this.imports.add("java.io.Serializable");
-
             }
             this.imports.add("com.google.common.base.MoreObjects");
-//			Field persistedField = new Field ();
-//			persistedField.setName ("persisted");
-//			persistedField.setPrimitive (true);
-//			persistedField.setPersistable (false);// this is not saved in db
-//			persistedField.setType (ParameterType.BOOLEAN);
-//			persistedField.getModifiers ().add ("transient");
-//			fields.add (persistedField);
-//			Method method = new Method ();
-//			method.setName (persistedField.getName ());
-//			method.setParameter (new Parameter (persistedField.getName (), ParameterType.BOOLEAN));
-//			methods.add (method);
         }
 
     }
@@ -511,8 +436,6 @@ public class DomainClass extends BaseClass {
         this.printFields();
 
         this.printFKeyClassFields();
-
-        this.printRelations();
 
         super.printCtor();
 

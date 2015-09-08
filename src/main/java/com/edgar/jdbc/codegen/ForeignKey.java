@@ -24,6 +24,7 @@ package com.edgar.jdbc.codegen;
  * @author kmulampaka
  * 
  */
+@Deprecated
 public class ForeignKey
 {
 	private String fkName;

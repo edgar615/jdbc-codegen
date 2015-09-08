@@ -170,7 +170,7 @@ public class MapperXmlClass extends BaseClass {
                 WordUtils.capitalize(CodeGenUtil.normalize(name)) + "\">\n");
         for (Field field : this.fields) {
             if (field.isPersistable()) {
-                sourceBuf.append("\t\t<result column=\"" + field.getName() + "\" property=\"" + CodeGenUtil.normalize(field.getName()) + "\" />\n");
+                sourceBuf.append("\t\t<result column=\"" + field.getColName() + "\" property=\"" + field.getHumpName() + "\" />\n");
             }
         }
         sourceBuf.append("\t</resultMap>\n\n");
@@ -180,7 +180,7 @@ public class MapperXmlClass extends BaseClass {
         sourceBuf.append("\t<sql id=\"all_column\">\n\t\t");
         int i = this.fields.size();
         for (Field field : this.fields) {
-            sourceBuf.append(field.getName());
+            sourceBuf.append(field.getColName());
             if (-- i > 0) {
                 sourceBuf.append(", ");
             }
@@ -212,9 +212,9 @@ public class MapperXmlClass extends BaseClass {
         List<String> columns = new ArrayList<>();
         List<String> args = new ArrayList<>();
         for (Field field : this.fields) {
-            if (!this.ignoreUpdatedColumnListStr.contains(field.getName().toLowerCase()) && field.isPersistable()) {
-                columns.add(field.getName());
-                args.add("#{" + CodeGenUtil.normalize(field.getName().toLowerCase()) + "}");
+            if (!this.ignoreUpdatedColumnListStr.contains(field.getColName().toLowerCase()) && field.isPersistable()) {
+                columns.add(field.getColName());
+                args.add("#{" + field.getHumpName() + "}");
             }
         }
         sourceBuf.append(StringUtils.join(columns, ", "))
@@ -304,11 +304,11 @@ public class MapperXmlClass extends BaseClass {
         sourceBuf.append("\t\tupdate ").append(name).append("\n\t\t<set>\n ");
         List<String> sets = new ArrayList<>();
         for (Field field : this.fields) {
-            if (!this.ignoreUpdatedColumnListStr.contains(field.getName().toLowerCase()) && field.isPersistable()) {
+            if (!this.ignoreUpdatedColumnListStr.contains(field.getColName().toLowerCase()) && field.isPersistable()) {
 //                sets.add(" \n\t\t" + field.getName() + " = #{" + CodeGenUtil.normalize(field.getName().toLowerCase()) + "}");
                 StringBuffer set = new StringBuffer();
-                set.append("\t\t\t<if test=\"" + CodeGenUtil.normalize(field.getName().toLowerCase()) + " != null\">")
-                        .append(" \n\t\t\t\t" + field.getName() + " = #{" + CodeGenUtil.normalize(field.getName().toLowerCase()) + "},")
+                set.append("\t\t\t<if test=\"" + CodeGenUtil.normalize(field.getColName().toLowerCase()) + " != null\">")
+                        .append(" \n\t\t\t\t" + field.getColName() + " = #{" + field.getHumpName() + "},")
                         .append("\n\t\t\t</if>\n");
                 sets.add(set.toString());
             }
@@ -343,10 +343,10 @@ public class MapperXmlClass extends BaseClass {
         sourceBuf.append("\t\tupdate ").append(name).append("\n\t\t<set>\n ");
         List<String> sets = new ArrayList<>();
         for (Field field : this.fields) {
-            if (!this.ignoreUpdatedColumnListStr.contains(field.getName().toLowerCase()) && field.isPersistable()) {
+            if (!this.ignoreUpdatedColumnListStr.contains(field.getColName().toLowerCase()) && field.isPersistable()) {
                 StringBuffer set = new StringBuffer();
-                set.append("\t\t\t<if test=\"" + CodeGenUtil.normalize(field.getName().toLowerCase()) + " != null\">")
-                        .append(" \n\t\t\t\t" + field.getName() + " = #{" + CodeGenUtil.normalize(field.getName().toLowerCase()) + "},")
+                set.append("\t\t\t<if test=\"" + field.getHumpName() + " != null\">")
+                        .append(" \n\t\t\t\t" + field.getColName() + " = #{" + field.getHumpName() + "},")
                         .append("\n\t\t\t</if>\n");
                 sets.add(set.toString());
             }
@@ -393,10 +393,10 @@ public class MapperXmlClass extends BaseClass {
         sourceBuf.append("\t\tupdate ").append(name).append("\n\t\t<set>\n ");
         List<String> sets = new ArrayList<>();
         for (Field field : this.fields) {
-            if (!this.ignoreUpdatedColumnListStr.contains(field.getName().toLowerCase()) && field.isPersistable()) {
+            if (!this.ignoreUpdatedColumnListStr.contains(field.getColName().toLowerCase()) && field.isPersistable()) {
                 StringBuffer set = new StringBuffer();
-                set.append("\t\t\t<if test=\"" + CodeGenUtil.normalize(field.getName().toLowerCase()) + " != null\">")
-                        .append(" \n\t\t\t\t" + field.getName() + " = #{" + CodeGenUtil.normalize(field.getName().toLowerCase()) + "},")
+                set.append("\t\t\t<if test=\"" + CodeGenUtil.normalize(field.getColName().toLowerCase()) + " != null\">")
+                        .append(" \n\t\t\t\t" + field.getColName() + " = #{" + field.getHumpName() + "},")
                         .append("\n\t\t\t</if>\n");
                 sets.add(set.toString());
             }
@@ -444,7 +444,7 @@ public class MapperXmlClass extends BaseClass {
         int i = this.fields.size();
         for (Field field : this.fields) {
             if (field.isPersistable()) {
-                sourceBuf.append(" ").append(field.getName());
+                sourceBuf.append(" ").append(field.getColName());
                 if (--i > 0) {
                     sourceBuf.append(",");
                 }

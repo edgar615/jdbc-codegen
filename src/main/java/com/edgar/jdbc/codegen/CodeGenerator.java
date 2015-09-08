@@ -18,7 +18,6 @@
  */
 package com.edgar.jdbc.codegen;
 
-import com.edgar.jdbc.codegen.Relation.RelationType;
 import com.edgar.jdbc.codegen.util.CodeGenUtil;
 import com.edgar.jdbc.codegen.util.StringUtils;
 import com.edgar.jdbc.codegen.util.WordUtils;
@@ -262,21 +261,11 @@ public class CodeGenerator {
             generateJsr303Annotations = Boolean.parseBoolean(generateJsr303AnnotationsStr);
         }
 
-        // Get the dont pluralize words
-        String dontPluralizeWordsStr = this.properties.getProperty("dont.pluralize.words");
-        logger.debug("Dont pluralize words:{}", dontPluralizeWordsStr);
-        dontPluralizeWordsStr = StringUtils.replace(dontPluralizeWordsStr, " ", "");
-        String[] dontPluralizeWords = new String[] {};
-        if (!Strings.isNullOrEmpty(dontPluralizeWordsStr)) {
-            dontPluralizeWords = Iterables.toArray(Splitter.on(",").trimResults().split(dontPluralizeWordsStr), String.class);
-        }
-        logger.debug("Don't Pluralize words:{}", new Object[]{dontPluralizeWords});
         List<Field> fields = new ArrayList<Field>();
         List<Field> dbFields = new ArrayList<Field>();
         List<Method> methods = new ArrayList<Method>();
 
         DomainClass domainClass = new DomainClass();
-        domainClass.setDontPluralizeWords(dontPluralizeWords);
         domainClass.setDbProductName(metaData.getDatabaseProductName());
         domainClass.setDbProductVersion(metaData.getDatabaseProductVersion());
         domainClass.setName(tableName);
@@ -320,7 +309,6 @@ public class CodeGenerator {
         dbClass.setRootFolderPath(rootFolderPath);
         dbClass.setPackageName(dbPackageName);
         dbClass.setFields(dbFields);
-        dbClass.setDontPluralizeWords(dontPluralizeWords);
 
         //mapper xml
         MapperXmlClass mapperXmlClass = new MapperXmlClass();
@@ -333,7 +321,6 @@ public class CodeGenerator {
 
         //创建MyBatis的Mapper
         MapperClass mapperClass = new MapperClass();
-        mapperClass.setDontPluralizeWords(dontPluralizeWords);
         mapperClass.createLogger();
         mapperClass.getImports().add(domainPackageName + "." + WordUtils.capitalize(CodeGenUtil.normalize(domainClass.getName())));
         mapperClass.setName(tableName);
@@ -407,7 +394,7 @@ public class CodeGenerator {
         //字段
         ResultSet cset = metaData.getColumns(null, null, tableName, null);
         while (cset.next()) {
-            String colName = cset.getString("COLUMN_NAME");
+            String colName = cset.getString("COLUMN_NAME").toLowerCase();
             logger.debug("Found Column:" + colName);
             int colSize = cset.getInt("COLUMN_SIZE");
             logger.debug("Column size:{}", colSize);
@@ -431,11 +418,12 @@ public class CodeGenerator {
             //add to db fields only
             Field dbField = new Field();
             dbFields.add(dbField);
-            dbField.setName(colName);
+            dbField.setColName(colName);
+            dbField.setHumpName(CodeGenUtil.normalize(colName));
             dbField.setType(parameter.getType());
 
             //属性、方法
-            if (!this.ignoreColumnList.contains(colName.toLowerCase())) {
+            if (!this.ignoreColumnList.contains(colName)) {
                 Method method = new Method();
                 methods.add(method);
                 method.setName(colName);
@@ -445,7 +433,8 @@ public class CodeGenerator {
                 fields.add(field);
                 field.setNullable(isNullable);
                 field.setSize(colSize);
-                field.setName(colName);
+                field.setColName(colName);
+                field.setHumpName(CodeGenUtil.normalize(colName));
                 field.setType(parameter.getType());
                 field.setDefaultValue(defaultValue);
                 field.setPrimitive(parameter.getType().isPrimitive());
@@ -467,53 +456,10 @@ public class CodeGenerator {
 
         domainClass.createFile();
 //		dbClass.createFile ();
-//		repoClass.createFile ();
         mapperClass.createFile();
         mapperXmlClass.createFile();
     }
 
-    private void createRelation(DomainClass domainClass, DBClass dbClass, RepositoryClass repoClass) {
-        String relationsStr = this.properties.getProperty("parent.child.relations");
-        if (!Strings.isNullOrEmpty(relationsStr)) {
-            String[] relations = Iterables.toArray(Splitter.on(",").trimResults().split(relationsStr), String.class);
-            for (String relationInfo : relations) {
-                String[] relationTokens = Iterables.toArray(Splitter.on(":").trimResults().split(relationInfo), String.class);
-                if (domainClass.getName().equals(relationTokens[0])) {
-                    Relation relation = new Relation();
-                    relation.setParent(relationTokens[0].toLowerCase());
-                    relation.setChild(relationTokens[1].toLowerCase());
-                    relation.setType(RelationType.getByName(relationTokens[2]));
-                    List<Relation> domainRelations = domainClass.getRelations().get(relationTokens[0]);
-                    if (domainRelations == null) {
-                        domainRelations = new ArrayList<Relation>();
-                        domainClass.getRelations().put(relationTokens[0], domainRelations);// map key is the parent table name
-                        if (relation.getType() == RelationType.ONE_TO_MANY) {
-                            if (!domainClass.getImports().contains("java.util.List"))
-                                domainClass.getImports().add("java.util.List");
-                            if (!domainClass.getImports().contains("java.util.ArrayList"))
-                                domainClass.getImports().add("java.util.ArrayList");
-                        }
-                    }
-                    domainRelations.add(relation);
-
-                    List<Relation> dbRelations = dbClass.getRelations().get(relationTokens[0]);
-                    if (dbRelations == null) {
-                        dbRelations = new ArrayList<Relation>();
-                        dbClass.getRelations().put(relationTokens[0], dbRelations);// map key is the parent table name
-                    }
-                    dbRelations.add(relation);
-
-                    List<Relation> repoRelations = repoClass.getRelations().get(relationTokens[0]);
-                    if (repoRelations == null) {
-                        repoRelations = new ArrayList<Relation>();
-                        repoClass.getRelations().put(relationTokens[0], repoRelations);// map key is the parent table name
-                    }
-                    repoRelations.add(relation);
-                }
-            }
-
-        }
-    }
 
     private Parameter getParameter(DomainClass domainClass, DBClass dbClass, ResultSet cset, String colName) throws SQLException {
         int type = cset.getInt("DATA_TYPE");

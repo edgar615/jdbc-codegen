@@ -160,17 +160,10 @@ public class CodeGenUtil {
         }
     }
 
-    public static String pluralizeName(String name, String[] dontPluralizeWords) {
-        logger.debug("Pluralizing name:{}, DontPluralize words:{}", new Object[]{name, dontPluralizeWords});
+    public static String pluralizeName(String name) {
+        logger.debug("Pluralizing name:{}, DontPluralize words:{}", new Object[]{name});
         StringBuffer buf = new StringBuffer(name);
 
-        if (dontPluralizeWords != null && dontPluralizeWords.length > 0) {
-            for (String word : dontPluralizeWords) {
-                logger.trace("Checking word:{}", word.trim());
-                if (StringUtils.endsWith(name.toLowerCase(), word.trim()))
-                    return name;
-            }
-        }
         if (StringUtils.endsWith(name, "y")) {
             buf = new StringBuffer(name.substring(0, name.length() - 1));
             buf.append("ies");
