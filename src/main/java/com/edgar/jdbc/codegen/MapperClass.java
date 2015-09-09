@@ -19,14 +19,13 @@
 package com.edgar.jdbc.codegen;
 
 import com.edgar.jdbc.codegen.util.CodeGenUtil;
-import com.edgar.jdbc.codegen.util.WordUtils;
 import com.google.common.base.Strings;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 public class MapperClass extends BaseClass {
 
-    final static Logger logger = LoggerFactory.getLogger(RepositoryClass2.class);
+    final static Logger logger = LoggerFactory.getLogger(MapperClass.class);
     private static String CLASS_SUFFIX = "Mapper";
 
     public MapperClass() {
@@ -45,7 +44,7 @@ public class MapperClass extends BaseClass {
     }
 
     protected void printClassDefn() {
-        sourceBuf.append("public interface " + WordUtils.capitalize(CodeGenUtil.normalize(name)) + this.classSuffix);
+        sourceBuf.append("public interface " + name + this.classSuffix);
     }
 
     @Override
@@ -78,8 +77,6 @@ public class MapperClass extends BaseClass {
     @Override
     public void generateSource() {
         this.preprocess();
-
-        this.name = WordUtils.capitalize(CodeGenUtil.normalize(this.name));
 
         super.printPackage();
         super.printImports();

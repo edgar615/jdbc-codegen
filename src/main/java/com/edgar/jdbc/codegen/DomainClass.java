@@ -19,8 +19,7 @@
 package com.edgar.jdbc.codegen;
 
 import com.edgar.jdbc.codegen.util.CodeGenUtil;
-import com.edgar.jdbc.codegen.util.StringUtils;
-import com.edgar.jdbc.codegen.util.WordUtils;
+import com.google.common.base.CharMatcher;
 import com.google.common.base.Splitter;
 import com.google.common.base.Strings;
 import com.google.common.collect.Iterables;
@@ -87,7 +86,7 @@ public class DomainClass extends BaseClass {
     @Override
     protected void printClassImplements() {
         if (!Strings.isNullOrEmpty(interfaceName)) {
-            String implementsClass = this.interfaceName.substring(StringUtils.lastIndexOf(this.interfaceName, ".") + 1);
+            String implementsClass = this.interfaceName.substring(CharMatcher.anyOf(".").lastIndexIn(this.interfaceName) + 1);
             sourceBuf.append(" implements " + implementsClass);
             if (pkeys.isEmpty()) {
                 sourceBuf.append("<String>");
@@ -125,27 +124,27 @@ public class DomainClass extends BaseClass {
                         sourceBuf.append("\t@NotEmpty\n");
                     } else if (field.getColName().equalsIgnoreCase("id")) {
                         //update groups
-                        sourceBuf.append("\t@NotNull (groups = { ");
+                        sourceBuf.append("\t@NotNull(groups = {");
                         int i = this.jsr303UpdateGroups.size();
                         for (String name : this.jsr303UpdateGroups) {
                             sourceBuf.append(name + ".class");
                             if (--i > 0)
                                 sourceBuf.append(", ");
                         }
-                        sourceBuf.append(" })\n");
+                        sourceBuf.append("})\n");
 
                         // insert groups
-                        sourceBuf.append("\t@Null (groups = { ");
+                        sourceBuf.append("\t@Null(groups = {");
                         i = this.jsr303InsertGroups.size();
                         for (String name : this.jsr303InsertGroups) {
                             sourceBuf.append(name + ".class");
                             if (--i > 0)
                                 sourceBuf.append(", ");
                         }
-                        sourceBuf.append(" })\n");
+                        sourceBuf.append("})\n");
                     } else if (field.getColName().endsWith("id")) {
                         //update groups
-                        sourceBuf.append("\t@NotNull (groups = { ");
+                        sourceBuf.append("\t@NotNull(groups = {");
                         int i = this.jsr303UpdateGroups.size();
                         i = this.jsr303InsertGroups.size();
                         if (i > 0) {
@@ -164,14 +163,14 @@ public class DomainClass extends BaseClass {
                                 sourceBuf.append(", ");
                         }
 
-                        sourceBuf.append(" })\n");
+                        sourceBuf.append("})\n");
                     } else {
                         sourceBuf.append("\t@NotNull\n");
                     }
                 }
                 if (field.getSize() > 0) {
                     if (field.getType() == ParameterType.STRING) {
-                        sourceBuf.append("\t@Size (max = " + field.getSize() + ")\n");
+                        sourceBuf.append("\t@Size(max=" + field.getSize() + ")\n");
                     }
                 }
 
@@ -198,7 +197,7 @@ public class DomainClass extends BaseClass {
                             break;
                         case INTEGER:
                             // postgres default values for int columns are stored as floats. e.g 100.0
-                            if (StringUtils.contains(val, ".")) {
+                            if (CharMatcher.anyOf(".").matchesAnyOf(val)) {
                                 String[] tokens = Iterables.toArray(Splitter.on(".").split(val), String.class);
                                 val = tokens[0];
                             }
@@ -250,33 +249,6 @@ public class DomainClass extends BaseClass {
                 sourceBuf.append(";\n\n");
             }
         }
-    }
-
-    @Deprecated
-    protected void printFKeyClassFields() {
-        // add composite classes from foreign pkeys
-        if (!this.fkeys.isEmpty()) {
-            for (String fkColName : this.fkeys.keySet()) {
-                logger.debug("Adding fk:{}", fkColName);
-                ForeignKey fkey = this.fkeys.get(fkColName);
-                String refObj = WordUtils.capitalize(CodeGenUtil.normalize(fkey.getRefTableName()));
-                String fkFieldName = CodeGenUtil.normalize(fkey.getFieldName());
-                logger.debug("Processing fkey fieldname:{}", fkey.getFieldName());
-                if (this.containsFieldName(fkey.getFieldName())) {
-                    // field name is already used so add
-                    fkFieldName = fkFieldName + ++fieldNameCounter;
-                    logger.debug("FK field name changed to {}", fkFieldName);
-                    fkey.setFieldName(fkFieldName);
-                }
-                sourceBuf.append("\tprivate " + refObj + " " + fkFieldName + ";\n");
-                Method method = new Method();
-                methods.add(method);
-                method.setName(fkFieldName);
-                Parameter parameter = new Parameter(fkFieldName, fkey.getRefTableName(), ParameterType.OBJECT);
-                method.setParameter(parameter);
-            }
-        }
-        sourceBuf.append("\n");
     }
 
     protected void printInterfaceImpl() {
@@ -333,15 +305,15 @@ public class DomainClass extends BaseClass {
 
     protected void printMethods() {
         for (Method method : methods) {
-            String methodName = WordUtils.capitalize(CodeGenUtil.normalize(method.getName().toLowerCase()));
+            String methodName = method.getName();
             String paramName = CodeGenUtil.normalize(method.getParameter().getName().toLowerCase());
             String paramType = "";
             ParameterType pType = method.getParameter().getType();
             if (pType == ParameterType.OBJECT) {
                 String name = method.getParameter().getClassName();
-                if (StringUtils.isBlank(name))
+                if (Strings.isNullOrEmpty(name))
                     name = method.getParameter().getName();
-                paramType = WordUtils.capitalize(CodeGenUtil.normalize(name));
+                paramType = name;
             } else {
                 paramType = pType.getPrimitiveName();
             }
@@ -401,7 +373,7 @@ public class DomainClass extends BaseClass {
         //override toString()
         sourceBuf.append("\t@Override\n\tpublic String toString() ");
         this.printOpenBrace(0, 1);
-        sourceBuf.append("\t\treturn MoreObjects.toStringHelper(\"" + WordUtils.capitalize(CodeGenUtil.normalize(name)) + "\")\n");
+        sourceBuf.append("\t\treturn MoreObjects.toStringHelper(\"" + name + "\")\n");
         for (Field field : fields) {
             String fieldName = field.getHumpName();
             sourceBuf.append("\t\t\t.add(\"" + fieldName + "\", " + fieldName + ")\n");
@@ -434,8 +406,6 @@ public class DomainClass extends BaseClass {
         super.printOpenBrace(0, 2);
 
         this.printFields();
-
-        this.printFKeyClassFields();
 
         super.printCtor();
 

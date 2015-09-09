@@ -19,8 +19,6 @@
 package com.edgar.jdbc.codegen;
 
 import com.edgar.jdbc.codegen.util.CodeGenUtil;
-import com.edgar.jdbc.codegen.util.StringUtils;
-import com.edgar.jdbc.codegen.util.WordUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 

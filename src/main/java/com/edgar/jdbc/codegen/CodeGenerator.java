@@ -19,8 +19,8 @@
 package com.edgar.jdbc.codegen;
 
 import com.edgar.jdbc.codegen.util.CodeGenUtil;
-import com.edgar.jdbc.codegen.util.StringUtils;
-import com.edgar.jdbc.codegen.util.WordUtils;
+import com.google.common.base.CaseFormat;
+import com.google.common.base.CharMatcher;
 import com.google.common.base.Splitter;
 import com.google.common.base.Strings;
 import com.google.common.collect.Iterables;
@@ -85,7 +85,7 @@ public class CodeGenerator {
     }
 
     private void loadProperties() throws Exception {
-        if (StringUtils.isBlank(this.propertiesFile)) {
+        if (Strings.isNullOrEmpty(this.propertiesFile)) {
             logger.error("Properties file is not set");
             throw new Exception("Properties file is not set");
         }
@@ -163,9 +163,9 @@ public class CodeGenerator {
             StringTokenizer strTok = new StringTokenizer(ignoreTableListStr, ",");
             while (strTok.hasMoreTokens()) {
                 String token = strTok.nextToken().toLowerCase().trim();
-                if (StringUtils.startsWith(token, "*")) {
+                if (CharMatcher.anyOf("*").indexIn(token) == 0) {
                     this.ignoreTableEndsWithPattern.add(token.substring(1, token.length()));
-                } else if (StringUtils.endsWith(token, "*")) {
+                } else if (CharMatcher.anyOf("*").lastIndexIn(token) == token.length() - 1) {
                     this.ignoreTableStartsWithPattern.add(token.substring(0, token.length() - 1));
                 } else {
                     this.ignoreTableList.add(token);
@@ -240,13 +240,13 @@ public class CodeGenerator {
         }
         // do a startswith check
         for (String ignoreStartsWithPattern : this.ignoreTableStartsWithPattern) {
-            if (StringUtils.startsWith(tableName, ignoreStartsWithPattern)) {
+            if (tableName.startsWith(ignoreStartsWithPattern)) {
                 return true;
             }
         }
         // do a startswith check
         for (String ignoreEndsWithPattern : this.ignoreTableEndsWithPattern) {
-            if (StringUtils.endsWith(tableName, ignoreEndsWithPattern)) {
+            if (tableName.endsWith(ignoreEndsWithPattern)) {
                 return true;
             }
         }
@@ -264,11 +264,11 @@ public class CodeGenerator {
         List<Field> fields = new ArrayList<Field>();
         List<Field> dbFields = new ArrayList<Field>();
         List<Method> methods = new ArrayList<Method>();
-
+        String humpTableName = CaseFormat.LOWER_UNDERSCORE.to(CaseFormat.UPPER_CAMEL, tableName.toLowerCase());
         DomainClass domainClass = new DomainClass();
         domainClass.setDbProductName(metaData.getDatabaseProductName());
         domainClass.setDbProductVersion(metaData.getDatabaseProductVersion());
-        domainClass.setName(tableName);
+        domainClass.setName(humpTableName);
         domainClass.setRootFolderPath(rootFolderPath);
         domainClass.setPackageName(domainPackageName);
         domainClass.setFields(fields);
@@ -304,15 +304,16 @@ public class CodeGenerator {
 
         // create the db class
         DBClass dbClass = new DBClass();
-        dbClass.getImports().add(domainPackageName + "." + WordUtils.capitalize(CodeGenUtil.normalize(domainClass.getName())));
-        dbClass.setName(tableName);
+        dbClass.getImports().add(domainPackageName + "." + domainClass.getName());
+        dbClass.setName(humpTableName);
         dbClass.setRootFolderPath(rootFolderPath);
         dbClass.setPackageName(dbPackageName);
         dbClass.setFields(dbFields);
 
         //mapper xml
         MapperXmlClass mapperXmlClass = new MapperXmlClass();
-        mapperXmlClass.setName(tableName);
+        mapperXmlClass.setName(humpTableName);
+        mapperXmlClass.setTableName(tableName);
         mapperXmlClass.setRootFolderPath(rootResourceFolderPath);
         mapperXmlClass.setPackageName(mapperXmlPackgeName);
         mapperXmlClass.setFields(dbFields);
@@ -322,8 +323,8 @@ public class CodeGenerator {
         //创建MyBatis的Mapper
         MapperClass mapperClass = new MapperClass();
         mapperClass.createLogger();
-        mapperClass.getImports().add(domainPackageName + "." + WordUtils.capitalize(CodeGenUtil.normalize(domainClass.getName())));
-        mapperClass.setName(tableName);
+        mapperClass.getImports().add(domainPackageName + "." + domainClass.getName());
+        mapperClass.setName(humpTableName);
         mapperClass.setRootFolderPath(rootFolderPath);
         mapperClass.setPackageName(repositoryPackageName);
         //主键
@@ -339,40 +340,6 @@ public class CodeGenerator {
         mapperClass.setPkeys(domainClass.getPkeys());
         dbClass.setPkeys(domainClass.getPkeys());
         mapperXmlClass.setPkeys(domainClass.getPkeys());
-        //外键
-        String generateFKeyRefsStr = this.properties.getProperty("generate.fkey.references");
-        boolean generateFKeyRefs = Boolean.parseBoolean(generateFKeyRefsStr);
-        if (generateFKeyRefs) {
-            ResultSet fkSet = metaData.getImportedKeys(null, null, tableName);
-            while (fkSet.next()) {
-                String fkName = fkSet.getString("FK_NAME");
-                String pkTableName = fkSet.getString("PKTABLE_NAME");
-                logger.debug("PK Table Name:{}", pkTableName);
-                String pkColName = fkSet.getString("PKCOLUMN_NAME");
-                logger.debug("PK Col Name:{}", pkColName);
-                String fkTableName = fkSet.getString("FKTABLE_NAME");
-                logger.debug("FK Table Name:{}", fkTableName);
-                String fkColName = fkSet.getString("FKCOLUMN_NAME");
-                logger.debug("FK Col Name:{}", fkColName);
-                if (this.ignoreFKeys.contains(fkColName)) {
-                    logger.debug("Ignoring Fkey:{}", fkColName);
-                } else {
-                    ForeignKey fkey = new ForeignKey();
-                    fkey.setFkName(fkName);
-                    fkey.setFkTableName(fkTableName);
-                    fkey.setFkColumnName(fkColName);
-                    fkey.setRefTableName(pkTableName);
-                    fkey.setRefColumnName(pkColName);
-                    fkey.setFieldName(CodeGenUtil.removeTrailingId(fkColName));
-
-                    domainClass.getFkeys().put(fkColName, fkey);
-                    dbClass.getFkeys().put(fkColName, fkey);
-                    mapperClass.getFkeys().put(fkColName, fkey);
-                    mapperXmlClass.getFkeys().put(fkColName, fkey);
-
-                }
-            }
-        }
 
         ResultSet childRset = metaData.getExportedKeys(null, null, tableName);
         while (childRset.next()) {
@@ -415,18 +382,19 @@ public class CodeGenerator {
             //根据字段类型映射属性类型
             Parameter parameter = getParameter(domainClass, dbClass, cset, colName);
 
+            String humpName = CaseFormat.LOWER_UNDERSCORE.to(CaseFormat.LOWER_CAMEL, colName);
             //add to db fields only
             Field dbField = new Field();
             dbFields.add(dbField);
             dbField.setColName(colName);
-            dbField.setHumpName(CodeGenUtil.normalize(colName));
+            dbField.setHumpName(humpName);
             dbField.setType(parameter.getType());
 
             //属性、方法
             if (!this.ignoreColumnList.contains(colName)) {
                 Method method = new Method();
                 methods.add(method);
-                method.setName(colName);
+                method.setName(CaseFormat.LOWER_CAMEL.to(CaseFormat.UPPER_CAMEL, humpName));
                 method.setParameter(parameter);
 
                 Field field = new Field();
@@ -434,7 +402,7 @@ public class CodeGenerator {
                 field.setNullable(isNullable);
                 field.setSize(colSize);
                 field.setColName(colName);
-                field.setHumpName(CodeGenUtil.normalize(colName));
+                field.setHumpName(humpName);
                 field.setType(parameter.getType());
                 field.setDefaultValue(defaultValue);
                 field.setPrimitive(parameter.getType().isPrimitive());

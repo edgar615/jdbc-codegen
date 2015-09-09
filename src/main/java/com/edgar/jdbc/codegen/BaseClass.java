@@ -19,8 +19,7 @@
 package com.edgar.jdbc.codegen;
 
 import com.edgar.jdbc.codegen.util.CodeGenUtil;
-import com.edgar.jdbc.codegen.util.StringUtils;
-import com.edgar.jdbc.codegen.util.WordUtils;
+import com.google.common.base.CharMatcher;
 import com.google.common.base.Splitter;
 import com.google.common.base.Strings;
 import com.google.common.collect.Iterables;
@@ -42,14 +41,15 @@ public abstract class BaseClass {
     protected String rootFolderPath;
     protected String packageName;
     protected List<String> imports = new ArrayList<String>();
+    //转换为驼峰的名字
     protected String name;
+    protected String tableName;
     protected String classSuffix = "";
     protected String extendsClassName;
     protected String interfaceName;
     protected List<Field> fields;
     protected List<Method> methods;
     protected Map<String, ParameterType> pkeys = new HashMap<String, ParameterType>();
-    protected Map<String, ForeignKey> fkeys = new TreeMap<String, ForeignKey>();
     protected StringBuffer userSourceBuf = new StringBuffer("");
     protected StringBuffer sourceBuf = new StringBuffer("");
 
@@ -123,19 +123,19 @@ public abstract class BaseClass {
     }
 
     protected void printClassDefn() {
-        sourceBuf.append("public class " + WordUtils.capitalize(CodeGenUtil.normalize(name)) + this.classSuffix);
+        sourceBuf.append("public class " + name + this.classSuffix);
     }
 
     protected void printClassExtends() {
         if (!Strings.isNullOrEmpty(extendsClassName)) {
-            String extendsClass = this.extendsClassName.substring(StringUtils.lastIndexOf(this.extendsClassName, ".") + 1);
+            String extendsClass = this.extendsClassName.substring(CharMatcher.anyOf(".").lastIndexIn(this.extendsClassName) + 1);
             sourceBuf.append(" extends " + extendsClass);
         }
     }
 
     protected void printClassImplements() {
         if (!Strings.isNullOrEmpty(interfaceName)) {
-            String implementsClass = this.interfaceName.substring(StringUtils.lastIndexOf(this.interfaceName, ".") + 1);
+            String implementsClass = this.interfaceName.substring(CharMatcher.anyOf(".").lastIndexIn(this.interfaceName) + 1);
             sourceBuf.append(" implements " + implementsClass);
         }
         sourceBuf.append(" ");
@@ -153,7 +153,7 @@ public abstract class BaseClass {
 
     protected void printCtor() {
         // no args constructor
-        sourceBuf.append("\tpublic " + WordUtils.capitalize(CodeGenUtil.normalize(name)) + this.classSuffix + " () ");
+        sourceBuf.append("\tpublic " + name + this.classSuffix + "() ");
         this.printOpenBrace(0, 2);
         this.printCloseBrace(1, 2);
     }
@@ -161,13 +161,13 @@ public abstract class BaseClass {
     protected String getSourceFileName() {
         String path = "";
         if (!Strings.isNullOrEmpty(this.packageName)) {
-            path = StringUtils.replace(this.packageName, ".", "/") + "/";
+            path = CharMatcher.anyOf(".").replaceFrom(this.packageName, "/") + "/";
         }
         if (!Strings.isNullOrEmpty(this.rootFolderPath)) {
             path = this.rootFolderPath + "/" + path;
         }
 
-        String fileName = path + WordUtils.capitalize(CodeGenUtil.normalize(name)) + classSuffix + ".java";
+        String fileName = path + name + classSuffix + ".java";
         return fileName;
     }
 
@@ -194,8 +194,8 @@ public abstract class BaseClass {
             String contents = FileUtils.readFileToString(file);
             //logger.trace ("File contents:{}", contents);
 
-            int startIndex = StringUtils.indexOf(contents, IS_COMMENT_START);
-            int endIndex = StringUtils.indexOf(contents, IS_COMMENT_END);
+            int startIndex = contents.indexOf(IS_COMMENT_START);
+            int endIndex = contents.indexOf(IS_COMMENT_END);
             logger.debug("Start index:{} End index:{}", startIndex, endIndex);
             if (startIndex != -1 && endIndex != -1) {
                 userSourceBuf.append(contents.substring(startIndex, endIndex));
@@ -204,7 +204,7 @@ public abstract class BaseClass {
             // save the imports
             List<String> lines = FileUtils.readLines(file);
             for (String line : lines) {
-                if (StringUtils.startsWith(line, "import")) {
+                if (line.startsWith("import")) {
                     String[] tokens = Iterables.toArray(Splitter.on(" ").split(line), String.class);
                     if (tokens.length > 2) {
                         String iClass = tokens[1] + " " + tokens[2].substring(0, tokens[2].length() - 1);
@@ -231,7 +231,7 @@ public abstract class BaseClass {
 
     protected void printUserSourceCode() {
         String userSource = this.userSourceBuf.toString();
-        if (StringUtils.isBlank(userSource)) {
+        if (Strings.isNullOrEmpty(userSource)) {
             this.sourceBuf.append(BaseClass.generateUserSourceCodeTags());
         } else {
             this.sourceBuf.append("\t" + userSource);
@@ -245,14 +245,6 @@ public abstract class BaseClass {
 
     public void setSourceBuf(StringBuffer sourceBuf) {
         this.sourceBuf = sourceBuf;
-    }
-
-    public Map<String, ForeignKey> getFkeys() {
-        return this.fkeys;
-    }
-
-    public void setFkeys(Map<String, ForeignKey> fkeys) {
-        this.fkeys = fkeys;
     }
 
     public String getRootFolderPath() {
@@ -358,10 +350,17 @@ public abstract class BaseClass {
         this.dbProductVersion = dbProductVersion;
     }
 
+    public String getTableName() {
+        return tableName;
+    }
+
+    public void setTableName(String tableName) {
+        this.tableName = tableName;
+    }
 
     public boolean containsFieldName(String name) {
         for (Field field : fields) {
-            if (CodeGenUtil.normalize(field.getColName()).equals(name))
+            if (field.getHumpName().equals(name))
                 return true;
         }
         return false;

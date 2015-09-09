@@ -18,10 +18,13 @@
  */
 package com.edgar.jdbc.codegen.util;
 
+import com.google.common.base.CaseFormat;
+import com.google.common.base.CharMatcher;
 import com.google.common.base.Splitter;
 import com.google.common.base.Strings;
 import com.google.common.collect.Iterables;
 import org.apache.commons.io.FileUtils;
+import org.apache.ibatis.annotations.Case;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -40,6 +43,24 @@ public class CodeGenUtil {
 
     }
 
+    public static String uncapitalize(final String str) {
+        int strLen;
+        if (str == null || (strLen = str.length()) == 0) {
+            return str;
+        }
+
+        final char firstChar = str.charAt(0);
+        if (Character.isLowerCase(firstChar)) {
+            // already uncapitalized
+            return str;
+        }
+
+        return new StringBuilder(strLen)
+                .append(Character.toLowerCase(firstChar))
+                .append(str.substring(1))
+                .toString();
+    }
+
     /**
      * Returns the java bean style name for the input database column name.
      * assumes database column name words are separated by underscores ('_'). If
@@ -53,25 +74,14 @@ public class CodeGenUtil {
         StringBuilder strBuf = new StringBuilder("");
         // e,g created_at
         // should become createdAt
-        char[] delimiter =
-                {'_'};
         if (name.indexOf("_") != -1) {
-            name = WordUtils.capitalize(name, delimiter); // CreatedAt
-            name = StringUtils.uncapitalize(name); // createdAt
-            name = StringUtils.replace(name, "_", "");
+            name = CaseFormat.LOWER_UNDERSCORE.to(CaseFormat.LOWER_CAMEL, name.toLowerCase()); // createdAt
+            name = CharMatcher.anyOf("_").replaceFrom(name, "");
         } else {
-            name = StringUtils.uncapitalize(name); // id will return as id
+            name = uncapitalize(name); // id will return as id
         }
         strBuf.append(name);
         return strBuf.toString();
-    }
-
-    public static String removeTrailingId(String name) {
-        if (StringUtils.endsWith(name, "id") || StringUtils.endsWith(name, "ID")) {
-            name = name.substring(0, name.length() - 2);
-        }
-        name = CodeGenUtil.normalize(name);
-        return name;
     }
 
     public static String createTableAlias(String tableName) {
@@ -99,7 +109,7 @@ public class CodeGenUtil {
     public static void cleanup(String rootFolderPath, String packageName) throws Exception {
         String path = "";
         if (!Strings.isNullOrEmpty(packageName)) {
-            path = StringUtils.replace(packageName, ".", "/");
+            path = CharMatcher.anyOf(".").replaceFrom(packageName, "/");
             if (!Strings.isNullOrEmpty(rootFolderPath)) {
                 path = rootFolderPath + "/" + path;
             }
@@ -119,7 +129,7 @@ public class CodeGenUtil {
         boolean exists = false;
         String path = "";
         if (!Strings.isNullOrEmpty(packageName)) {
-            path = StringUtils.replace(packageName, ".", "/");
+            path = CharMatcher.anyOf(".").replaceFrom(packageName, "/");
             if (!Strings.isNullOrEmpty(rootFolderPath)) {
                 path = rootFolderPath + "/" + path;
             }
@@ -145,7 +155,7 @@ public class CodeGenUtil {
     public static void createPackage(String rootFolderPath, String packageName) throws Exception {
         String path = "";
         if (!Strings.isNullOrEmpty(packageName)) {
-            path = StringUtils.replace(packageName, ".", "/");
+            path = CharMatcher.anyOf(".").replaceFrom(packageName, "/");
             if (!Strings.isNullOrEmpty(rootFolderPath)) {
                 path = rootFolderPath + "/" + path;
             }
@@ -164,12 +174,12 @@ public class CodeGenUtil {
         logger.debug("Pluralizing name:{}, DontPluralize words:{}", new Object[]{name});
         StringBuffer buf = new StringBuffer(name);
 
-        if (StringUtils.endsWith(name, "y")) {
+        if (name.endsWith("y")) {
             buf = new StringBuffer(name.substring(0, name.length() - 1));
             buf.append("ies");
-        } else if (StringUtils.endsWith(name, "z")) {
+        } else if (name.endsWith("z")) {
             buf.append("zes");
-        } else if (!StringUtils.endsWith(name, "s")) // has to be the last condition
+        } else if (!name.endsWith("s")) // has to be the last condition
         {
             // pluralize
             buf.append("s");

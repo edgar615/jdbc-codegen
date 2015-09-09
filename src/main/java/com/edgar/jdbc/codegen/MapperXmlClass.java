@@ -19,8 +19,8 @@
 package com.edgar.jdbc.codegen;
 
 import com.edgar.jdbc.codegen.util.CodeGenUtil;
-import com.edgar.jdbc.codegen.util.StringUtils;
-import com.edgar.jdbc.codegen.util.WordUtils;
+import com.google.common.base.CharMatcher;
+import com.google.common.base.Joiner;
 import com.google.common.base.Splitter;
 import com.google.common.base.Strings;
 import com.google.common.collect.Iterables;
@@ -76,13 +76,13 @@ public class MapperXmlClass extends BaseClass {
     protected String getSourceFileName() {
         String path = "";
         if (!Strings.isNullOrEmpty(this.packageName)) {
-            path = StringUtils.replace(this.packageName, ".", "/") + "/";
+            path = CharMatcher.anyOf(".").replaceFrom(this.packageName, "/") + "/";
         }
         if (!Strings.isNullOrEmpty(this.rootFolderPath)) {
             path = this.rootFolderPath + "/" + path;
         }
 
-        String fileName = path + WordUtils.capitalize(CodeGenUtil.normalize(name)) + classSuffix + ".xml";
+        String fileName = path + name + classSuffix + ".xml";
         return fileName;
     }
 
@@ -94,7 +94,7 @@ public class MapperXmlClass extends BaseClass {
     }
 
     protected void printRootMapper() {
-        sourceBuf.append("<mapper namespace=\"" + repositoryPackageName + "." + WordUtils.capitalize(CodeGenUtil.normalize(name)) + classSuffix + "\">\n");
+        sourceBuf.append("<mapper namespace=\"" + repositoryPackageName + "." +name + classSuffix + "\">\n");
         printResultMap();
         printAllColumn();
         printLimitSql();
@@ -112,7 +112,7 @@ public class MapperXmlClass extends BaseClass {
 
     protected void printUserSourceCode() {
         String userSource = this.userSourceBuf.toString();
-        if (StringUtils.isBlank(userSource)) {
+        if (Strings.isNullOrEmpty(userSource)) {
             this.sourceBuf.append(cusgenerateUserSourceCodeTags());
         } else {
             this.sourceBuf.append("\t" + userSource);
@@ -130,8 +130,8 @@ public class MapperXmlClass extends BaseClass {
             String contents = FileUtils.readFileToString(file);
             //logger.trace ("File contents:{}", contents);
 
-            int startIndex = StringUtils.indexOf(contents, is_comment_start);
-            int endIndex = StringUtils.indexOf(contents, is_comment_end);
+            int startIndex = contents.indexOf(is_comment_start);
+            int endIndex = contents.indexOf(is_comment_end);
             logger.debug("Start index:{} End index:{}", startIndex, endIndex);
             if (startIndex != -1 && endIndex != -1) {
                 userSourceBuf.append(contents.substring(startIndex, endIndex));
@@ -140,7 +140,7 @@ public class MapperXmlClass extends BaseClass {
             // save the imports
             List<String> lines = FileUtils.readLines(file);
             for (String line : lines) {
-                if (StringUtils.startsWith(line, "import")) {
+                if (line.startsWith("import")) {
                     String[] tokens = Iterables.toArray(Splitter.on(" ").split(line), String.class);
                     if (tokens.length > 2) {
                         String iClass = tokens[1] + " " + tokens[2].substring(0, tokens[2].length() - 1);
@@ -167,7 +167,7 @@ public class MapperXmlClass extends BaseClass {
 
     protected void printResultMap() {
         sourceBuf.append("\t<resultMap id=\"" + resultMap + "\" type=\"" +
-                WordUtils.capitalize(CodeGenUtil.normalize(name)) + "\">\n");
+                name + "\">\n");
         for (Field field : this.fields) {
             if (field.isPersistable()) {
                 sourceBuf.append("\t\t<result column=\"" + field.getColName() + "\" property=\"" + field.getHumpName() + "\" />\n");
@@ -207,8 +207,8 @@ public class MapperXmlClass extends BaseClass {
      */
     protected void printInsertSql() {
 
-        sourceBuf.append("\t<insert id=\"insert\" parameterType=\"" + WordUtils.capitalize(CodeGenUtil.normalize(name)) + "\">\n");
-        sourceBuf.append("\t\tinsert into \n\t\t").append(name).append("(");
+        sourceBuf.append("\t<insert id=\"insert\" parameterType=\"" + name + "\">\n");
+        sourceBuf.append("\t\tinsert into \n\t\t").append(tableName).append("(");
         List<String> columns = new ArrayList<>();
         List<String> args = new ArrayList<>();
         for (Field field : this.fields) {
@@ -217,8 +217,8 @@ public class MapperXmlClass extends BaseClass {
                 args.add("#{" + field.getHumpName() + "}");
             }
         }
-        sourceBuf.append(StringUtils.join(columns, ", "))
-                .append(") \n\t\tvalues(").append(StringUtils.join(args, ", ")).append(")");
+        sourceBuf.append(Joiner.on(",").join(columns))
+                .append(") \n\t\tvalues(").append(Joiner.on(",").join(args)).append(")");
         sourceBuf.append("\n\t</insert>");
         sourceBuf.append("\n\n");
     }
@@ -238,7 +238,7 @@ public class MapperXmlClass extends BaseClass {
         }
         sourceBuf.append("\">\n");
         sourceBuf.append("\t\tdelete from ")
-                .append(name);
+                .append(tableName);
         if (pkeys.size() == 1) {
             sourceBuf.append(" \n\t\twhere ");
             String key = pkeys.entrySet().iterator().next().getKey();
@@ -269,7 +269,7 @@ public class MapperXmlClass extends BaseClass {
         sourceBuf.append("map");
         sourceBuf.append("\">\n");
         sourceBuf.append("\t\tdelete from ")
-                .append(name);
+                .append(tableName);
         if (pkeys.size() == 1) {
             sourceBuf.append(" \n\t\twhere ");
             String key = pkeys.entrySet().iterator().next().getKey();
@@ -300,12 +300,11 @@ public class MapperXmlClass extends BaseClass {
         if (pkeys.isEmpty()) {
             return;
         }
-        sourceBuf.append("\t<update id=\"updateByPrimaryKey\" parameterType=\"" + WordUtils.capitalize(CodeGenUtil.normalize(name)) + "\">\n");
-        sourceBuf.append("\t\tupdate ").append(name).append("\n\t\t<set>\n ");
+        sourceBuf.append("\t<update id=\"updateByPrimaryKey\" parameterType=\"" + name + "\">\n");
+        sourceBuf.append("\t\tupdate ").append(tableName).append("\n\t\t<set>\n ");
         List<String> sets = new ArrayList<>();
         for (Field field : this.fields) {
             if (!this.ignoreUpdatedColumnListStr.contains(field.getColName().toLowerCase()) && field.isPersistable()) {
-//                sets.add(" \n\t\t" + field.getName() + " = #{" + CodeGenUtil.normalize(field.getName().toLowerCase()) + "}");
                 StringBuffer set = new StringBuffer();
                 set.append("\t\t\t<if test=\"" + CodeGenUtil.normalize(field.getColName().toLowerCase()) + " != null\">")
                         .append(" \n\t\t\t\t" + field.getColName() + " = #{" + field.getHumpName() + "},")
@@ -313,8 +312,7 @@ public class MapperXmlClass extends BaseClass {
                 sets.add(set.toString());
             }
         }
-        sourceBuf.append(StringUtils.join(sets, ""));
-//        sourceBuf.append(StringUtils.join(sets, ","));
+        sourceBuf.append(Joiner.on(",").join(sets));
 
         sourceBuf.append("\t\t</set>");
         if (pkeys.size() == 1) {
@@ -339,8 +337,8 @@ public class MapperXmlClass extends BaseClass {
         if (pkeys.isEmpty()) {
             return;
         }
-        sourceBuf.append("\t<update id=\"updateByPrimaryKey\" parameterType=\"" + WordUtils.capitalize(CodeGenUtil.normalize(name)) + "\">\n");
-        sourceBuf.append("\t\tupdate ").append(name).append("\n\t\t<set>\n ");
+        sourceBuf.append("\t<update id=\"updateByPrimaryKey\" parameterType=\"" + name + "\">\n");
+        sourceBuf.append("\t\tupdate ").append(tableName).append("\n\t\t<set>\n ");
         List<String> sets = new ArrayList<>();
         for (Field field : this.fields) {
             if (!this.ignoreUpdatedColumnListStr.contains(field.getColName().toLowerCase()) && field.isPersistable()) {
@@ -351,17 +349,9 @@ public class MapperXmlClass extends BaseClass {
                 sets.add(set.toString());
             }
         }
-        sourceBuf.append(StringUtils.join(sets, ""));
+        sourceBuf.append(Joiner.on(",").join(sets));
 
         sourceBuf.append("\t\t</set>");
-//        sourceBuf.append("\t\tupdate ").append(name).append(" set ");
-//        List<String> sets = new ArrayList<>();
-//        for (Field field : this.fields) {
-//            if (!this.ignoreUpdatedColumnListStr.contains(field.getName().toLowerCase()) && field.isPersistable()) {
-//                sets.add(" \n\t\t" + field.getName() + " = #{" + CodeGenUtil.normalize(field.getName().toLowerCase()) + "}");
-//            }
-//        }
-//        sourceBuf.append(StringUtils.join(sets, ","));
 
         if (pkeys.size() == 1) {
             sourceBuf.append(" \n\t\twhere ");
@@ -388,20 +378,20 @@ public class MapperXmlClass extends BaseClass {
         if (pkeys.isEmpty() || optimisticLockColumnList.isEmpty()) {
             return;
         }
-        sourceBuf.append("\t<update id=\"updateByPrimaryKeyWithLock\" parameterType=\"" + WordUtils.capitalize(CodeGenUtil.normalize(name)) + "\">\n");
+        sourceBuf.append("\t<update id=\"updateByPrimaryKeyWithLock\" parameterType=\"" + name + "\">\n");
 
-        sourceBuf.append("\t\tupdate ").append(name).append("\n\t\t<set>\n ");
+        sourceBuf.append("\t\tupdate ").append(tableName).append("\n\t\t<set>\n ");
         List<String> sets = new ArrayList<>();
         for (Field field : this.fields) {
             if (!this.ignoreUpdatedColumnListStr.contains(field.getColName().toLowerCase()) && field.isPersistable()) {
                 StringBuffer set = new StringBuffer();
-                set.append("\t\t\t<if test=\"" + CodeGenUtil.normalize(field.getColName().toLowerCase()) + " != null\">")
+                set.append("\t\t\t<if test=\"" + field.getHumpName() + " != null\">")
                         .append(" \n\t\t\t\t" + field.getColName() + " = #{" + field.getHumpName() + "},")
                         .append("\n\t\t\t</if>\n");
                 sets.add(set.toString());
             }
         }
-        sourceBuf.append(StringUtils.join(sets, ""));
+        sourceBuf.append(Joiner.on(",").join(sets));
 
         sourceBuf.append("\t\t</set>");
 
@@ -451,7 +441,7 @@ public class MapperXmlClass extends BaseClass {
             }
         }
         sourceBuf.append(" \n\t\tfrom ")
-                .append(name);
+                .append(tableName);
         if (pkeys.size() == 1) {
             sourceBuf.append(" \n\t\twhere ");
             String key = pkeys.entrySet().iterator().next().getKey();
@@ -483,7 +473,7 @@ public class MapperXmlClass extends BaseClass {
 
     public void generateSource() {
         // generate the default stuff from the super class
-        this.resultMap = WordUtils.capitalize(CodeGenUtil.normalize(name)) + "ResultMap";
+        this.resultMap = name + "ResultMap";
         this.printDocType();
         this.printRootMapper();
     }
