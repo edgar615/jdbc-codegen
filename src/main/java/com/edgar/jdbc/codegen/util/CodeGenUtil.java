@@ -24,7 +24,6 @@ import com.google.common.base.Splitter;
 import com.google.common.base.Strings;
 import com.google.common.collect.Iterables;
 import org.apache.commons.io.FileUtils;
-import org.apache.ibatis.annotations.Case;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
