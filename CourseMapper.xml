@@ -1,0 +1,91 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+        PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="null.CourseMapper">
+	<resultMap id="CourseResultMap" type="Course">
+		<result column="course_id" property="courseId" />
+		<result column="course_sum_id" property="courseSumId" />
+		<result column="course_name" property="courseName" />
+		<result column="description" property="description" />
+		<result column="course_time" property="courseTime" />
+		<result column="course_type" property="courseType" />
+		<result column="course_path" property="coursePath" />
+		<result column="is_local" property="isLocal" />
+		<result column="occupation" property="occupation" />
+		<result column="application_level" property="applicationLevel" />
+	</resultMap>
+
+	<sql id="all_column">
+		course_id, course_sum_id, course_name, description, course_time, course_type, course_path, is_local, occupation, application_level
+	</sql>
+
+	<sql id="limit">
+		<if test="limit != null">
+			limit
+			<if test="offset != null">
+			#{offset},
+			</if>
+			#{limit}
+		</if>
+	</sql>
+
+	<insert id="insert" parameterType="Course">
+		insert into 
+		course(course_id,course_sum_id,course_name,description,course_time,course_type,course_path,is_local,occupation,application_level) 
+		values(#{courseId},#{courseSumId},#{courseName},#{description},#{courseTime},#{courseType},#{coursePath},#{isLocal},#{occupation},#{applicationLevel})
+	</insert>
+
+	<delete id="deleteByPrimaryKey" parameterType="int">
+		delete from course 
+		where course_id = #{id}
+	</delete>
+
+	<update id="updateByPrimaryKey" parameterType="Course">
+		update course
+		<set>
+ 			<if test="courseId != null"> 
+				course_id = #{courseId},
+			</if>
+,			<if test="courseSumId != null"> 
+				course_sum_id = #{courseSumId},
+			</if>
+,			<if test="courseName != null"> 
+				course_name = #{courseName},
+			</if>
+,			<if test="description != null"> 
+				description = #{description},
+			</if>
+,			<if test="courseTime != null"> 
+				course_time = #{courseTime},
+			</if>
+,			<if test="courseType != null"> 
+				course_type = #{courseType},
+			</if>
+,			<if test="coursePath != null"> 
+				course_path = #{coursePath},
+			</if>
+,			<if test="isLocal != null"> 
+				is_local = #{isLocal},
+			</if>
+,			<if test="occupation != null"> 
+				occupation = #{occupation},
+			</if>
+,			<if test="applicationLevel != null"> 
+				application_level = #{applicationLevel},
+			</if>
+		</set> 
+		where course_id = #{courseId}
+	</update>
+
+	<select id="selectByPrimaryKey" resultMap="CourseResultMap" parameterType="int">
+		select course_id, course_sum_id, course_name, description, course_time, course_type, course_path, is_local, occupation, application_level 
+		from course 
+		where course_id = #{id}
+	</select>
+
+	<!-- START 写在START和END中间的代码不会被替换 -->
+
+	<!-- END 写在START和END中间的代码不会被替换-->
+
+</mapper>

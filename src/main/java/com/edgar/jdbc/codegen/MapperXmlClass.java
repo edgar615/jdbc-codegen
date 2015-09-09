@@ -42,7 +42,7 @@ public class MapperXmlClass extends BaseClass {
     final static Logger logger = LoggerFactory.getLogger(MapperXmlClass.class);
     public static String DB_CLASSSUFFIX = "Mapper";
 
-    private String repositoryPackageName;
+    private String mapperPackageName;
 
     private String resultMap;
 
@@ -69,8 +69,8 @@ public class MapperXmlClass extends BaseClass {
         this.ignoreUpdatedColumnListStr = ignoreUpdatedColumnListStr;
     }
 
-    public void setRepositoryPackageName(String repositoryPackageName) {
-        this.repositoryPackageName = repositoryPackageName;
+    public void setMapperPackageName(String mapperPackageName) {
+        this.mapperPackageName = mapperPackageName;
     }
 
     protected String getSourceFileName() {
@@ -94,7 +94,7 @@ public class MapperXmlClass extends BaseClass {
     }
 
     protected void printRootMapper() {
-        sourceBuf.append("<mapper namespace=\"" + repositoryPackageName + "." +name + classSuffix + "\">\n");
+        sourceBuf.append("<mapper namespace=\"" + mapperPackageName + "." +name + classSuffix + "\">\n");
         printResultMap();
         printAllColumn();
         printLimitSql();

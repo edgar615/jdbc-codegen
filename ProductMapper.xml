@@ -1,0 +1,35 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+        PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="null.ProductMapper">
+	<resultMap id="ProductResultMap" type="Product">
+		<result column="id" property="id" />
+		<result column="description" property="description" />
+	</resultMap>
+
+	<sql id="all_column">
+		id, description
+	</sql>
+
+	<sql id="limit">
+		<if test="limit != null">
+			limit
+			<if test="offset != null">
+			#{offset},
+			</if>
+			#{limit}
+		</if>
+	</sql>
+
+	<insert id="insert" parameterType="Product">
+		insert into 
+		product(id,description) 
+		values(#{id},#{description})
+	</insert>
+
+	<!-- START 写在START和END中间的代码不会被替换 -->
+
+	<!-- END 写在START和END中间的代码不会被替换-->
+
+</mapper>

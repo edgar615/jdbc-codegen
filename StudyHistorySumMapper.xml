@@ -1,0 +1,107 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+        PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="null.StudyHistorySumMapper">
+	<resultMap id="StudyHistorySumResultMap" type="StudyHistorySum">
+		<result column="study_history_sum_id" property="studyHistorySumId" />
+		<result column="applicant_id" property="applicantId" />
+		<result column="course_sum_id" property="courseSumId" />
+		<result column="study_time" property="studyTime" />
+		<result column="study_count" property="studyCount" />
+		<result column="course_time" property="courseTime" />
+		<result column="course_cout" property="courseCout" />
+		<result column="status" property="status" />
+		<result column="occupation" property="occupation" />
+		<result column="application_level" property="applicationLevel" />
+		<result column="fullname" property="fullname" />
+		<result column="gender" property="gender" />
+		<result column="identity_type" property="identityType" />
+		<result column="identity_no" property="identityNo" />
+	</resultMap>
+
+	<sql id="all_column">
+		study_history_sum_id, applicant_id, course_sum_id, study_time, study_count, course_time, course_cout, status, occupation, application_level, fullname, gender, identity_type, identity_no
+	</sql>
+
+	<sql id="limit">
+		<if test="limit != null">
+			limit
+			<if test="offset != null">
+			#{offset},
+			</if>
+			#{limit}
+		</if>
+	</sql>
+
+	<insert id="insert" parameterType="StudyHistorySum">
+		insert into 
+		study_history_sum(study_history_sum_id,applicant_id,course_sum_id,study_time,study_count,course_time,course_cout,status,occupation,application_level,fullname,gender,identity_type,identity_no) 
+		values(#{studyHistorySumId},#{applicantId},#{courseSumId},#{studyTime},#{studyCount},#{courseTime},#{courseCout},#{status},#{occupation},#{applicationLevel},#{fullname},#{gender},#{identityType},#{identityNo})
+	</insert>
+
+	<delete id="deleteByPrimaryKey" parameterType="int">
+		delete from study_history_sum 
+		where study_history_sum_id = #{id}
+	</delete>
+
+	<update id="updateByPrimaryKey" parameterType="StudyHistorySum">
+		update study_history_sum
+		<set>
+ 			<if test="studyHistorySumId != null"> 
+				study_history_sum_id = #{studyHistorySumId},
+			</if>
+,			<if test="applicantId != null"> 
+				applicant_id = #{applicantId},
+			</if>
+,			<if test="courseSumId != null"> 
+				course_sum_id = #{courseSumId},
+			</if>
+,			<if test="studyTime != null"> 
+				study_time = #{studyTime},
+			</if>
+,			<if test="studyCount != null"> 
+				study_count = #{studyCount},
+			</if>
+,			<if test="courseTime != null"> 
+				course_time = #{courseTime},
+			</if>
+,			<if test="courseCout != null"> 
+				course_cout = #{courseCout},
+			</if>
+,			<if test="status != null"> 
+				status = #{status},
+			</if>
+,			<if test="occupation != null"> 
+				occupation = #{occupation},
+			</if>
+,			<if test="applicationLevel != null"> 
+				application_level = #{applicationLevel},
+			</if>
+,			<if test="fullname != null"> 
+				fullname = #{fullname},
+			</if>
+,			<if test="gender != null"> 
+				gender = #{gender},
+			</if>
+,			<if test="identityType != null"> 
+				identity_type = #{identityType},
+			</if>
+,			<if test="identityNo != null"> 
+				identity_no = #{identityNo},
+			</if>
+		</set> 
+		where study_history_sum_id = #{studyHistorySumId}
+	</update>
+
+	<select id="selectByPrimaryKey" resultMap="StudyHistorySumResultMap" parameterType="int">
+		select study_history_sum_id, applicant_id, course_sum_id, study_time, study_count, course_time, course_cout, status, occupation, application_level, fullname, gender, identity_type, identity_no 
+		from study_history_sum 
+		where study_history_sum_id = #{id}
+	</select>
+
+	<!-- START 写在START和END中间的代码不会被替换 -->
+
+	<!-- END 写在START和END中间的代码不会被替换-->
+
+</mapper>

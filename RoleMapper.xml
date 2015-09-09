@@ -1,0 +1,59 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+        PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="null.RoleMapper">
+	<resultMap id="RoleResultMap" type="Role">
+		<result column="role_id" property="roleId" />
+		<result column="role_name" property="roleName" />
+	</resultMap>
+
+	<sql id="all_column">
+		role_id, role_name
+	</sql>
+
+	<sql id="limit">
+		<if test="limit != null">
+			limit
+			<if test="offset != null">
+			#{offset},
+			</if>
+			#{limit}
+		</if>
+	</sql>
+
+	<insert id="insert" parameterType="Role">
+		insert into 
+		role(role_id,role_name) 
+		values(#{roleId},#{roleName})
+	</insert>
+
+	<delete id="deleteByPrimaryKey" parameterType="int">
+		delete from role 
+		where role_id = #{id}
+	</delete>
+
+	<update id="updateByPrimaryKey" parameterType="Role">
+		update role
+		<set>
+ 			<if test="roleId != null"> 
+				role_id = #{roleId},
+			</if>
+,			<if test="roleName != null"> 
+				role_name = #{roleName},
+			</if>
+		</set> 
+		where role_id = #{roleId}
+	</update>
+
+	<select id="selectByPrimaryKey" resultMap="RoleResultMap" parameterType="int">
+		select role_id, role_name 
+		from role 
+		where role_id = #{id}
+	</select>
+
+	<!-- START 写在START和END中间的代码不会被替换 -->
+
+	<!-- END 写在START和END中间的代码不会被替换-->
+
+</mapper>

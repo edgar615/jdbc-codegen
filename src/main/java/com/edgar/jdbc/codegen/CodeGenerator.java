@@ -39,26 +39,31 @@ import java.util.StringTokenizer;
  * Code generator class which creates Java bean classes and interfaces for all
  * the tables in the input database schema. Reads the properties file named
  * generator.properties.
- *
- * @author Kalyan Mulampaka
+ *删除了对外键的生成，因为在大多数的应用中，都不会考虑到外键
+ * @author Kalyan Mulampaka， Edgar
  */
 public class CodeGenerator {
     final static Logger logger = LoggerFactory.getLogger(CodeGenerator.class);
     private Properties properties;
+    //忽略的字段
     private List<String> ignoreColumnList = new ArrayList<String>();
+    //更新时忽略的字段
     private List<String> ignoreUpdatedColumnList = new ArrayList<String>();
+    //乐观锁字段
     private List<String> optimisticLockColumnList = new ArrayList<String>();
+    //忽略的表
     private List<String> ignoreTableList = new ArrayList<String>();
+    //使用前缀匹配忽略的表
     private List<String> ignoreTableStartsWithPattern = new ArrayList<String>();
+    //使用后缀匹配忽略的表
     private List<String> ignoreTableEndsWithPattern = new ArrayList<String>();
-    private List<String> ignoreFKeys = new ArrayList<String>();
 
     private String propertiesFile;
 
     private String srcFolderPath;
     private String domainPackageName;
     private String dbPackageName;
-    private String repositoryPackageName;
+    private String mapperPackageName;
     private String rootResourceFolderPath;
     private String mapperXmlPackgeName;
     private String rootFolderPath;
@@ -106,17 +111,11 @@ public class CodeGenerator {
         if (this.properties == null || this.properties.isEmpty()) {
             throw new Exception("Properties are not set.");
         }
-        boolean codeGenerationEnabled = Boolean.parseBoolean(this.properties.getProperty("codegeneration.enabled"));
-        if (!codeGenerationEnabled) {
-            logger.warn("Code generation is disabled.");
-            return;
-        }
-
         srcFolderPath = this.properties.getProperty("src.folder.path");
         logger.info("Generated Sources will be in folder:{}", srcFolderPath);
         domainPackageName = this.properties.getProperty("domain.package.name");
         dbPackageName = this.properties.getProperty("repository.db.package.name");
-        repositoryPackageName = this.properties.getProperty("repository.package.name");
+        mapperPackageName = this.properties.getProperty("repository.package.name");
         rootResourceFolderPath = this.properties.getProperty("resource.folder.path");
         mapperXmlPackgeName = this.properties.getProperty("mapper.xml.package.name");
         rootFolderPath = this.properties.getProperty("src.folder.path");
@@ -176,12 +175,6 @@ public class CodeGenerator {
             logger.info("Ignore table Ends with pattern:{}", this.ignoreTableEndsWithPattern);
         }
 
-        // 忽略的外键
-        String ignoreFKeys = this.properties.getProperty("ignore.fkeys");
-        String[] fkeys = ignoreFKeys.split(",");
-        for (String fkey : fkeys) {
-            this.ignoreFKeys.add(fkey.trim());
-        }
     }
 
     public void generate() {
@@ -198,7 +191,7 @@ public class CodeGenerator {
                 //创建包
                 CodeGenUtil.createPackage(srcFolderPath, domainPackageName);
 //				CodeGenUtil.createPackage (srcFolderPath, dbPackageName);
-                CodeGenUtil.createPackage(srcFolderPath, repositoryPackageName);
+                CodeGenUtil.createPackage(srcFolderPath, mapperPackageName);
                 CodeGenUtil.createPackage(rootResourceFolderPath, mapperXmlPackgeName);
 
                 //读取table
@@ -317,7 +310,7 @@ public class CodeGenerator {
         mapperXmlClass.setRootFolderPath(rootResourceFolderPath);
         mapperXmlClass.setPackageName(mapperXmlPackgeName);
         mapperXmlClass.setFields(dbFields);
-        mapperXmlClass.setRepositoryPackageName(repositoryPackageName);
+        mapperXmlClass.setMapperPackageName(mapperPackageName);
         mapperXmlClass.setIgnoreUpdatedColumnListStr(ignoreUpdatedColumnList);
 
         //创建MyBatis的Mapper
@@ -326,7 +319,7 @@ public class CodeGenerator {
         mapperClass.getImports().add(domainPackageName + "." + domainClass.getName());
         mapperClass.setName(humpTableName);
         mapperClass.setRootFolderPath(rootFolderPath);
-        mapperClass.setPackageName(repositoryPackageName);
+        mapperClass.setPackageName(mapperPackageName);
         //主键
         ResultSet pkSet = metaData.getPrimaryKeys(null, null, tableName);
         while (pkSet.next()) {
@@ -340,23 +333,6 @@ public class CodeGenerator {
         mapperClass.setPkeys(domainClass.getPkeys());
         dbClass.setPkeys(domainClass.getPkeys());
         mapperXmlClass.setPkeys(domainClass.getPkeys());
-
-        ResultSet childRset = metaData.getExportedKeys(null, null, tableName);
-        while (childRset.next()) {
-            String pkName = childRset.getString("PK_NAME");
-            logger.debug("Child :PK Name:{}", pkName);
-            String fkName = childRset.getString("FK_NAME");
-            logger.debug("Child :FK Name:{}", fkName);
-            String pkTableName = childRset.getString("PKTABLE_NAME");
-            logger.debug("Child :PK Table Name:{}", pkTableName);
-            String pkColumnName = childRset.getString("PKCOLUMN_NAME");
-            logger.debug("Child :PK Column Name:{}", pkColumnName);
-
-            String fkTableName = childRset.getString("FKTABLE_NAME");
-            logger.debug("Child :FK Table Name:{}", fkTableName);
-            String fkColumnName = childRset.getString("FKCOLUMN_NAME");
-            logger.debug("Child :FK Column Name:{}", fkColumnName);
-        }
 
         //字段
         ResultSet cset = metaData.getColumns(null, null, tableName, null);

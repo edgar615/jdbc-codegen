@@ -31,14 +31,12 @@
         </encoder>      
     </appender>
     <logger name="com.mchange.v2" level="INFO" />
-    <logger name="httpclient.wire" level="WARN" />
-    <logger name="com.mulampaka.spring.data.jdbc.codegen" level="DEBUG" />
+    <logger name="com.edgar.jdbc.codegen" level="DEBUG" />
     <logger name="org.springframework" level="WARN" />
-    <logger name="org.apache" level="WARN" />   
+    <logger name="org.apache" level="WARN" />
     <logger name="ch.qos.logback.core" level="WARN" />
     <logger name="ch.qos.logback.classic" level="WARN" />  
-    <logger name="com.jolbox.bonecp" level="INFO" />
-    <logger name="org.maven" level="INFO" />    
+    <logger name="org.maven" level="INFO" />
     
     
     <root level="INFO">
