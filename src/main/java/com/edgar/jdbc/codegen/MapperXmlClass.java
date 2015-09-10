@@ -312,7 +312,7 @@ public class MapperXmlClass extends BaseClass {
                 sets.add(set.toString());
             }
         }
-        sourceBuf.append(Joiner.on(",").join(sets));
+        sourceBuf.append(Joiner.on("").join(sets));
 
         sourceBuf.append("\t\t</set>");
         if (pkeys.size() == 1) {
@@ -349,7 +349,7 @@ public class MapperXmlClass extends BaseClass {
                 sets.add(set.toString());
             }
         }
-        sourceBuf.append(Joiner.on(",").join(sets));
+        sourceBuf.append(Joiner.on("").join(sets));
 
         sourceBuf.append("\t\t</set>");
 

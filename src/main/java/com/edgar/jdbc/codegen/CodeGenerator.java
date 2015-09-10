@@ -323,9 +323,9 @@ public class CodeGenerator {
         //主键
         ResultSet pkSet = metaData.getPrimaryKeys(null, null, tableName);
         while (pkSet.next()) {
-            String pkColName = pkSet.getString("COLUMN_NAME");
-            String pkName = pkSet.getString("PK_NAME");
-            String keySeq = pkSet.getString("KEY_SEQ");
+            String pkColName = pkSet.getString("COLUMN_NAME").toLowerCase();
+            String pkName = pkSet.getString("PK_NAME").toLowerCase();
+            String keySeq = pkSet.getString("KEY_SEQ").toLowerCase();
             domainClass.getPkeys().put(pkColName, null);
             logger.debug("PK:ColName:{}, PKName:{}, Key Seq:{}", new Object[]{pkColName, pkName, keySeq});
         }
