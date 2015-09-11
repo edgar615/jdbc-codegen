@@ -81,6 +81,8 @@ public abstract class BaseClass {
     }
 
     protected void printImports() {
+        this.imports.add("java.util.List");
+        this.imports.add("java.util.Map");
         if (!this.imports.isEmpty()) {
             for (String importClass : this.imports) {
                 sourceBuf.append("import " + importClass + ";\n");
