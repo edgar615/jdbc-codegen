@@ -68,6 +68,7 @@ public class CodeGenerator {
     private String mapperXmlPackgeName;
     private String rootFolderPath;
     private boolean generateJsr303Annotations = false;
+    private boolean generateRepositoryAnnotations = false;
 
     public CodeGenerator() {
 
@@ -124,6 +125,12 @@ public class CodeGenerator {
 
         if (!Strings.isNullOrEmpty(generateJsr303AnnotationsStr)) {
             generateJsr303Annotations = Boolean.parseBoolean(generateJsr303AnnotationsStr);
+        }
+
+        String generateRepositoryAnnotationsStr = this.properties.getProperty("generate.repository.annotations");
+
+        if (!Strings.isNullOrEmpty(generateRepositoryAnnotationsStr)) {
+            generateRepositoryAnnotations = Boolean.parseBoolean(generateRepositoryAnnotationsStr);
         }
 
         // 忽略的字段
@@ -320,6 +327,7 @@ public class CodeGenerator {
         mapperClass.setName(humpTableName);
         mapperClass.setRootFolderPath(rootFolderPath);
         mapperClass.setPackageName(mapperPackageName);
+        mapperClass.setGenerateRepositoryAnnotations(generateRepositoryAnnotations);
         //主键
         ResultSet pkSet = metaData.getPrimaryKeys(null, null, tableName);
         while (pkSet.next()) {

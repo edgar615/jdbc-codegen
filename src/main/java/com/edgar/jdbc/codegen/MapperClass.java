@@ -28,6 +28,8 @@ public class MapperClass extends BaseClass {
     final static Logger logger = LoggerFactory.getLogger(MapperClass.class);
     private static String CLASS_SUFFIX = "Mapper";
 
+    private boolean generateRepositoryAnnotations = false;
+
     public MapperClass() {
         this.classSuffix = CLASS_SUFFIX;
         super.setExtendsClassName("com.edgar.core.repository.BaseMapper");
@@ -36,11 +38,15 @@ public class MapperClass extends BaseClass {
 
     @Override
     protected void addImports() {
-        this.imports.add("org.springframework.stereotype.Repository");
+        if (generateRepositoryAnnotations) {
+            this.imports.add("org.springframework.stereotype.Repository");
+        }
     }
 
     protected void printClassAnnotations() {
-        sourceBuf.append("@Repository\n");
+        if (generateRepositoryAnnotations) {
+            sourceBuf.append("@Repository\n");
+        }
     }
 
     protected void printClassDefn() {
@@ -134,5 +140,11 @@ public class MapperClass extends BaseClass {
         super.printCloseBrace(0, 2);
     }
 
+    public boolean isGenerateRepositoryAnnotations() {
+        return generateRepositoryAnnotations;
+    }
 
+    public void setGenerateRepositoryAnnotations(boolean generateRepositoryAnnotations) {
+        this.generateRepositoryAnnotations = generateRepositoryAnnotations;
+    }
 }

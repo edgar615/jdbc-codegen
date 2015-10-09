@@ -387,7 +387,7 @@ public class DomainClass extends BaseClass {
             if (this.pkeys.size() > 1) {
                 this.imports.add("java.util.HashMap");
                 this.imports.add("java.util.Map");
-                this.imports.add("java.util.Collections");
+                this.imports.add("java.util.List");
             }
             this.imports.add("com.google.common.base.MoreObjects");
         }
