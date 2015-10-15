@@ -99,6 +99,10 @@ public class DomainClass extends BaseClass {
         sourceBuf.append(" ");
     }
 
+    protected void printNullObj() {
+        sourceBuf.append("\tpublic static final " + name + this.classSuffix + " NULL = new " + name + this.classSuffix + "();\n\n");
+    }
+
     protected void printFields() {
         sourceBuf.append("\tprivate static final long serialVersionUID = 1L;\n\n");
 
@@ -405,6 +409,7 @@ public class DomainClass extends BaseClass {
 
         super.printOpenBrace(0, 2);
 
+        this.printNullObj();
         this.printFields();
 
         super.printCtor();
