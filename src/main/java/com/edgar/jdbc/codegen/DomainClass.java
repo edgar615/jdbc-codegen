@@ -109,9 +109,9 @@ public class DomainClass extends BaseClass {
         for (Field field : fields) {
 
             String type = field.getType().getName();
-            if (field.isPrimitive()) {
-                type = field.getType().getPrimitiveName();
-            }
+//            if (field.isPrimitive()) {
+//                type = field.getType().getPrimitiveName();
+//            }
 
             String fieldName = field.getHumpName();
             StringBuffer modifiers = new StringBuffer("");
@@ -319,7 +319,7 @@ public class DomainClass extends BaseClass {
                     name = method.getParameter().getName();
                 paramType = name;
             } else {
-                paramType = pType.getPrimitiveName();
+                paramType = pType.getName();
             }
             String fieldName = method.getParameter().getName();
 
