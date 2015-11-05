@@ -42,6 +42,7 @@ public class MapperXmlClass extends BaseClass {
     final static Logger logger = LoggerFactory.getLogger(MapperXmlClass.class);
     public static String DB_CLASSSUFFIX = "Mapper";
 
+    private boolean hasAutoIncCol;
     private String mapperPackageName;
 
     private String resultMap;
@@ -59,6 +60,14 @@ public class MapperXmlClass extends BaseClass {
     public MapperXmlClass() {
         this.addImports();
         this.classSuffix = DB_CLASSSUFFIX;
+    }
+
+    public boolean isHasAutoIncCol() {
+        return hasAutoIncCol;
+    }
+
+    public void setHasAutoIncCol(boolean hasAutoIncCol) {
+        this.hasAutoIncCol = hasAutoIncCol;
     }
 
     public void addOptimisticLockColumn(String optimisticLockColumn) {
@@ -206,21 +215,46 @@ public class MapperXmlClass extends BaseClass {
      * 生成insert的sql语句
      */
     protected void printInsertSql() {
-
-        sourceBuf.append("\t<insert id=\"insert\" parameterType=\"" + name + "\">\n");
-        sourceBuf.append("\t\tinsert into \n\t\t").append(tableName).append("(");
-        List<String> columns = new ArrayList<>();
-        List<String> args = new ArrayList<>();
-        for (Field field : this.fields) {
-            if (!this.ignoreUpdatedColumnListStr.contains(field.getColName().toLowerCase()) && field.isPersistable()) {
-                columns.add(field.getColName());
-                args.add("#{" + field.getHumpName() + "}");
+        if (pkeys.size() == 1 && this.hasAutoIncCol) {
+            sourceBuf.append("\t<insert id=\"insert\" parameterType=\"" + name + "\"");
+            String key = pkeys.entrySet().iterator().next().getKey();
+            sourceBuf.append(" useGeneratedKeys=\"true\" keyProperty=\"id\" keyColumn=\"" + key + "\"" );
+            sourceBuf.append(">\n");
+            sourceBuf.append("\t\tinsert into \n\t\t").append(tableName).append("(");
+            List<String> columns = new ArrayList<>();
+            List<String> args = new ArrayList<>();
+            for (Field field : this.fields) {
+                if (!this.ignoreUpdatedColumnListStr.contains(field.getColName().toLowerCase()) && field.isPersistable() && !field.isAutoInc()) {
+                    columns.add(field.getColName());
+                    args.add("#{" + field.getHumpName() + "}");
+                }
             }
+            sourceBuf.append(Joiner.on(",").join(columns))
+                    .append(") \n\t\tvalues(").append(Joiner.on(",").join(args)).append(")");
+
+            sourceBuf.append("\n\n\t\t<selectKey resultType=\"int\" order=\"AFTER\" keyProperty=\"id\" keyColumn=\"" + key + "\">");
+            sourceBuf.append("\n\t\t\tselect LAST_INSERT_ID() as " + key );
+            sourceBuf.append("\n\t\t</selectKey>");
+            sourceBuf.append("\n\t</insert>");
+            sourceBuf.append("\n\n");
+
+        } else {
+            sourceBuf.append("\t<insert id=\"insert\" parameterType=\"" + name + "\">\n");
+            sourceBuf.append("\t\tinsert into \n\t\t").append(tableName).append("(");
+            List<String> columns = new ArrayList<>();
+            List<String> args = new ArrayList<>();
+            for (Field field : this.fields) {
+                if (!this.ignoreUpdatedColumnListStr.contains(field.getColName().toLowerCase()) && field.isPersistable() && !field.isAutoInc()) {
+                    columns.add(field.getColName());
+                    args.add("#{" + field.getHumpName() + "}");
+                }
+            }
+            sourceBuf.append(Joiner.on(",").join(columns))
+                    .append(") \n\t\tvalues(").append(Joiner.on(",").join(args)).append(")");
+            sourceBuf.append("\n\t</insert>");
+            sourceBuf.append("\n\n");
         }
-        sourceBuf.append(Joiner.on(",").join(columns))
-                .append(") \n\t\tvalues(").append(Joiner.on(",").join(args)).append(")");
-        sourceBuf.append("\n\t</insert>");
-        sourceBuf.append("\n\n");
+
     }
 
     /**

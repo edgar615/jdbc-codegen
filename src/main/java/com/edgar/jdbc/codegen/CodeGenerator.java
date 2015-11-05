@@ -369,6 +369,16 @@ public class CodeGenerator {
                 isNullable = false;
             }
 
+            String autoIncable = cset.getString("IS_AUTOINCREMENT");
+            boolean isAutoInc = false;
+            if ("YES".equalsIgnoreCase(autoIncable)) {
+                logger.debug("{} is autoincrement", colName);
+                isAutoInc = true;
+                mapperXmlClass.setHasAutoIncCol(isAutoInc);
+            } else {
+                logger.debug("{} is not autoincrement", autoIncable);
+                isAutoInc = false;
+            }
             //根据字段类型映射属性类型
             Parameter parameter = getParameter(domainClass, dbClass, cset, colName);
 
@@ -379,6 +389,7 @@ public class CodeGenerator {
             dbField.setColName(colName);
             dbField.setHumpName(humpName);
             dbField.setType(parameter.getType());
+            dbField.setAutoInc(isAutoInc);
 
             //属性、方法
             if (!this.ignoreColumnList.contains(colName)) {
@@ -396,6 +407,7 @@ public class CodeGenerator {
                 field.setType(parameter.getType());
                 field.setDefaultValue(defaultValue);
                 field.setPrimitive(parameter.getType().isPrimitive());
+                field.setAutoInc(isAutoInc);
 
                 boolean isPkCol = domainClass.getPkeys().containsKey(colName);
                 if (isPkCol) {

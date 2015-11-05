@@ -28,12 +28,21 @@ public class Field {
     private int size;
     private boolean isNullable = true;
     private boolean isPrimitive = false;
+    private boolean isAutoInc = false;
     private boolean persistable = true;
     private String defaultValue;
     private List<String> modifiers = new ArrayList<String>();
 
     public Field() {
 
+    }
+
+    public boolean isAutoInc() {
+        return isAutoInc;
+    }
+
+    public void setAutoInc(boolean isAutoInc) {
+        this.isAutoInc = isAutoInc;
     }
 
     public String getHumpName() {
