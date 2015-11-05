@@ -18,7 +18,6 @@
  */
 package com.edgar.jdbc.codegen;
 
-import com.edgar.jdbc.codegen.util.CodeGenUtil;
 import com.google.common.base.Strings;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -32,7 +31,7 @@ public class MapperClass extends BaseClass {
 
     public MapperClass() {
         this.classSuffix = CLASS_SUFFIX;
-        super.setExtendsClassName("com.edgar.core.repository.BaseMapper");
+        super.setExtendsClassName("com.edgar.repository.BaseMapper");
         this.addImports();
     }
 

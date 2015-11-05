@@ -18,7 +18,6 @@
  */
 package com.edgar.jdbc.codegen;
 
-import com.edgar.jdbc.codegen.util.CodeGenUtil;
 import com.google.common.base.CharMatcher;
 import com.google.common.base.Splitter;
 import com.google.common.base.Strings;
@@ -29,7 +28,10 @@ import org.slf4j.LoggerFactory;
 
 import java.io.File;
 import java.io.FileWriter;
-import java.util.*;
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
 
 public abstract class BaseClass {
     final static Logger logger = LoggerFactory.getLogger(BaseClass.class);

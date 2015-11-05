@@ -22,9 +22,6 @@ import com.edgar.jdbc.codegen.util.CodeGenUtil;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import java.util.ArrayList;
-import java.util.List;
-
 /**
  * Class to represent the db metadata, row mappers and unmappers
  *

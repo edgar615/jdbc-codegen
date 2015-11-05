@@ -45,7 +45,7 @@ public class DomainClass extends BaseClass {
     private List<String> jsr303UpdateGroups = new ArrayList<String>();
 
     public DomainClass() {
-        super.setInterfaceName("com.edgar.core.repository.Persistable");
+        super.setInterfaceName("com.edgar.repository.Persistable");
         this.addImports();
     }
 
