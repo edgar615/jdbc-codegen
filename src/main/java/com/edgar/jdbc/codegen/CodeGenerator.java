@@ -69,6 +69,8 @@ public class CodeGenerator {
     private String rootFolderPath;
     private boolean generateJsr303Annotations = false;
     private boolean generateRepositoryAnnotations = false;
+    private String domainInterfaceName;
+    private String mapperExtendName;
 
     public CodeGenerator() {
 
@@ -120,6 +122,8 @@ public class CodeGenerator {
         rootResourceFolderPath = this.properties.getProperty("resource.folder.path");
         mapperXmlPackgeName = this.properties.getProperty("mapper.xml.package.name");
         rootFolderPath = this.properties.getProperty("src.folder.path");
+        domainInterfaceName = this.properties.getProperty("domain.interface.name");
+        mapperExtendName = this.properties.getProperty("repository.extend.name");
 
         String generateJsr303AnnotationsStr = this.properties.getProperty("generate.jsr303.annotations");
 
@@ -274,6 +278,7 @@ public class CodeGenerator {
         domainClass.setFields(fields);
         domainClass.setMethods(methods);
         domainClass.setGenerateJsr303Annotations(generateJsr303Annotations);
+        domainClass.setInterfaceName(domainInterfaceName);
 
         if (generateJsr303Annotations) {
             String insertGrpClass = this.properties.getProperty("insert.group.class");
@@ -328,6 +333,7 @@ public class CodeGenerator {
         mapperClass.setRootFolderPath(rootFolderPath);
         mapperClass.setPackageName(mapperPackageName);
         mapperClass.setGenerateRepositoryAnnotations(generateRepositoryAnnotations);
+        mapperClass.setExtendsClassName(mapperExtendName);
         //主键
         ResultSet pkSet = metaData.getPrimaryKeys(null, null, tableName);
         while (pkSet.next()) {

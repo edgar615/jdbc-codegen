@@ -22,6 +22,7 @@
         <guava.version>18.0</guava.version>
         <mybatis.version>3.3.0</mybatis.version>
 	</properties>
+
 	<dependencies>		       	
         <dependency>
             <groupId>junit</groupId>

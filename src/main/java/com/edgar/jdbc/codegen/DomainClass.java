@@ -45,7 +45,6 @@ public class DomainClass extends BaseClass {
     private List<String> jsr303UpdateGroups = new ArrayList<String>();
 
     public DomainClass() {
-        super.setInterfaceName("com.edgar.repository.Persistable");
         this.addImports();
     }
 
@@ -68,6 +67,7 @@ public class DomainClass extends BaseClass {
     @Override
     protected void addImports() {
     }
+
 
     public boolean isGenerateJsr303Annotations() {
         return this.generateJsr303Annotations;
