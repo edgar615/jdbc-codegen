@@ -31,7 +31,6 @@ public class MapperClass extends BaseClass {
 
     public MapperClass() {
         this.classSuffix = CLASS_SUFFIX;
-        super.setExtendsClassName("com.edgar.repository.BaseMapper");
         this.addImports();
     }
 
