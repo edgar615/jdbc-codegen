@@ -22,100 +22,100 @@ import java.util.ArrayList;
 import java.util.List;
 
 public class Field {
-    private ParameterType type;
-    private String colName;
-    private String humpName;
-    private int size;
-    private boolean isNullable = true;
-    private boolean isPrimitive = false;
-    private boolean isAutoInc = false;
-    private boolean persistable = true;
-    private String defaultValue;
-    private List<String> modifiers = new ArrayList<String>();
+  private ParameterType type;
+  private String colName;
+  private String humpName;
+  private int size;
+  private boolean isNullable = true;
+  private boolean isPrimitive = false;
+  private boolean isAutoInc = false;
+  private boolean persistable = true;
+  private String defaultValue;
+  private List<String> modifiers = new ArrayList<String>();
 
-    public Field() {
+  public Field() {
 
-    }
+  }
 
-    public boolean isAutoInc() {
-        return isAutoInc;
-    }
+  public boolean isAutoInc() {
+    return isAutoInc;
+  }
 
-    public void setAutoInc(boolean isAutoInc) {
-        this.isAutoInc = isAutoInc;
-    }
+  public void setAutoInc(boolean isAutoInc) {
+    this.isAutoInc = isAutoInc;
+  }
 
-    public String getHumpName() {
-        return humpName;
-    }
+  public String getHumpName() {
+    return humpName;
+  }
 
-    public void setHumpName(String humpName) {
-        this.humpName = humpName;
-    }
+  public void setHumpName(String humpName) {
+    this.humpName = humpName;
+  }
 
-    public int getSize() {
-        return this.size;
-    }
+  public int getSize() {
+    return this.size;
+  }
 
-    public void setSize(int size) {
-        this.size = size;
-    }
+  public void setSize(int size) {
+    this.size = size;
+  }
 
-    public boolean isNullable() {
-        return this.isNullable;
-    }
+  public boolean isNullable() {
+    return this.isNullable;
+  }
 
-    public void setNullable(boolean isNullable) {
-        this.isNullable = isNullable;
-    }
+  public void setNullable(boolean isNullable) {
+    this.isNullable = isNullable;
+  }
 
-    public boolean isPrimitive() {
-        return this.isPrimitive;
-    }
+  public boolean isPrimitive() {
+    return this.isPrimitive;
+  }
 
-    public void setPrimitive(boolean isPrimitive) {
-        this.isPrimitive = isPrimitive;
-    }
+  public void setPrimitive(boolean isPrimitive) {
+    this.isPrimitive = isPrimitive;
+  }
 
-    public String getDefaultValue() {
-        return this.defaultValue;
-    }
+  public String getDefaultValue() {
+    return this.defaultValue;
+  }
 
-    public void setDefaultValue(String defaultValue) {
-        this.defaultValue = defaultValue;
-    }
+  public void setDefaultValue(String defaultValue) {
+    this.defaultValue = defaultValue;
+  }
 
-    public boolean isPersistable() {
-        return this.persistable;
-    }
+  public boolean isPersistable() {
+    return this.persistable;
+  }
 
-    public void setPersistable(boolean persistable) {
-        this.persistable = persistable;
-    }
+  public void setPersistable(boolean persistable) {
+    this.persistable = persistable;
+  }
 
-    public ParameterType getType() {
-        return this.type;
-    }
+  public ParameterType getType() {
+    return this.type;
+  }
 
-    public void setType(ParameterType type) {
-        this.type = type;
-    }
+  public void setType(ParameterType type) {
+    this.type = type;
+  }
 
-    public String getColName() {
-        return this.colName;
-    }
+  public String getColName() {
+    return this.colName;
+  }
 
-    public void setColName(String colName) {
-        this.colName = colName;
-    }
+  public void setColName(String colName) {
+    this.colName = colName;
+  }
 
-    public List<String> getModifiers() {
-        return this.modifiers;
-    }
+  public List<String> getModifiers() {
+    return this.modifiers;
+  }
 
-    public void setModifiers(List<String> modifiers) {
-        this.modifiers = modifiers;
-    }
+  public void setModifiers(List<String> modifiers) {
+    this.modifiers = modifiers;
+  }
 
 
 }

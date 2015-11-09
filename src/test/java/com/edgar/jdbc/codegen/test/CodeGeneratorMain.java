@@ -7,9 +7,9 @@ import com.edgar.jdbc.codegen.CodeGenerator;
  */
 public class CodeGeneratorMain {
 
-    public static void main(String[] args) throws Exception {
-        CodeGenerator generator = new CodeGenerator();
-        generator.setPropertiesFile("src/test/resources/codegenerator.properties");
-        generator.generate();
-    }
+  public static void main(String[] args) throws Exception {
+    CodeGenerator generator = new CodeGenerator();
+    generator.setPropertiesFile("src/test/resources/codegenerator.properties");
+    generator.generate();
+  }
 }

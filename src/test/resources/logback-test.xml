@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <configuration>
     <appender name="FILE"
-        class="ch.qos.logback.core.rolling.RollingFileAppender">
+              class="ch.qos.logback.core.rolling.RollingFileAppender">
         <rollingPolicy class="ch.qos.logback.core.rolling.TimeBasedRollingPolicy">
             <!-- daily rollover -->
             <fileNamePattern>codegen.%d{yyyy-MM-dd}.log</fileNamePattern>
@@ -28,20 +28,20 @@
         <encoder>
             <pattern>%d{HH:mm:ss.SSS} [%thread] %-5level %logger{36} - %msg%n
             </pattern>
-        </encoder>      
+        </encoder>
     </appender>
-    <logger name="com.mchange.v2" level="INFO" />
-    <logger name="com.edgar.jdbc.codegen" level="DEBUG" />
-    <logger name="org.springframework" level="WARN" />
-    <logger name="org.apache" level="WARN" />
-    <logger name="ch.qos.logback.core" level="WARN" />
-    <logger name="ch.qos.logback.classic" level="WARN" />  
-    <logger name="org.maven" level="INFO" />
-    
-    
+    <logger name="com.mchange.v2" level="INFO"/>
+    <logger name="com.edgar.jdbc.codegen" level="DEBUG"/>
+    <logger name="org.springframework" level="WARN"/>
+    <logger name="org.apache" level="WARN"/>
+    <logger name="ch.qos.logback.core" level="WARN"/>
+    <logger name="ch.qos.logback.classic" level="WARN"/>
+    <logger name="org.maven" level="INFO"/>
+
+
     <root level="INFO">
-        <appender-ref ref="syslog" />
-        <appender-ref ref="STDOUT" />
-        <appender-ref ref="FILE" />
-    </root>     
+        <appender-ref ref="syslog"/>
+        <appender-ref ref="STDOUT"/>
+        <appender-ref ref="FILE"/>
+    </root>
 </configuration>
