@@ -18,11 +18,12 @@
  */
 package com.edgar.jdbc.codegen;
 
-import com.edgar.jdbc.codegen.util.CodeGenUtil;
 import com.google.common.base.CharMatcher;
 import com.google.common.base.Splitter;
 import com.google.common.base.Strings;
 import com.google.common.collect.Iterables;
+
+import com.edgar.jdbc.codegen.util.CodeGenUtil;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -41,7 +42,9 @@ public class DomainClass extends BaseClass {
   final static Logger logger = LoggerFactory.getLogger(DomainClass.class);
 
   private boolean generateJsr303Annotations = false;
+
   private List<String> jsr303InsertGroups = new ArrayList<String>();
+
   private List<String> jsr303UpdateGroups = new ArrayList<String>();
 
   public DomainClass() {
@@ -64,11 +67,6 @@ public class DomainClass extends BaseClass {
     this.jsr303UpdateGroups = jsr303UpdateGroups;
   }
 
-  @Override
-  protected void addImports() {
-  }
-
-
   public boolean isGenerateJsr303Annotations() {
     return this.generateJsr303Annotations;
   }
@@ -81,6 +79,39 @@ public class DomainClass extends BaseClass {
       this.imports.add("javax.validation.constraints.Size");
       this.imports.add("org.hibernate.validator.constraints.NotEmpty");
     }
+  }
+
+  public void generateSource() {
+    this.preprocess();
+
+    super.printPackage();
+    super.printImports();
+    super.printClassComments();
+    super.printClassDefn();
+    this.printClassImplements();
+
+    super.printOpenBrace(0, 2);
+
+    this.printNullObj();
+    this.printFields();
+
+    super.printCtor();
+
+    this.printInterfaceImpl();
+
+    this.printMethods();
+
+    this.printToString();
+
+    super.printUserSourceCode();
+
+    super.printCloseBrace(0, 0); // end of class
+    //logger.debug ("Printing Class file content:\n" + sourceBuf.toString ());
+
+  }
+
+  @Override
+  protected void addImports() {
   }
 
   @Override
@@ -102,7 +133,7 @@ public class DomainClass extends BaseClass {
 
   protected void printNullObj() {
     sourceBuf.append("\tpublic static final " + name + this.classSuffix + " NULL = new " + name +
-            this.classSuffix + "();\n\n");
+                             this.classSuffix + "();\n\n");
   }
 
   protected void printFields() {
@@ -236,7 +267,7 @@ public class DomainClass extends BaseClass {
                           ; // usual form 'value' :: character varying
                   if (tokens != null && tokens.length > 0) {
                     sourceBuf.append(" = \"" + tokens[0].substring(1, tokens[0].length() - 1) +
-                            "\";\n\n");
+                                             "\";\n\n");
                   } else {
                     sourceBuf.append(";\n\n");
                   }
@@ -278,7 +309,7 @@ public class DomainClass extends BaseClass {
       super.printOpenBrace(0, 1);
       for (String key : this.pkeys.keySet()) {
         sourceBuf.append("\t\tthis." + CodeGenUtil.normalize(key.toLowerCase()) + " = map.get(" +
-                CodeGenUtil.normalize(key.toLowerCase()) + ");\n");
+                                 CodeGenUtil.normalize(key.toLowerCase()) + ");\n");
       }
       super.printCloseBrace(1, 2);
 
@@ -302,14 +333,14 @@ public class DomainClass extends BaseClass {
       sourceBuf.append("\tpublic String getId() ");
       super.printOpenBrace(0, 1);
       sourceBuf.append("\t\tthrow new UnsupportedOperationException(\"There is no primary key\");" +
-              "\n");
+                               "\n");
       super.printCloseBrace(1, 2);
 
       sourceBuf.append("\t@Override\n");
       sourceBuf.append("\tpublic void setId(String id) ");
       super.printOpenBrace(0, 1);
       sourceBuf.append("\t\tthrow new UnsupportedOperationException(\"There is no primary key\");" +
-              "\n");
+                               "\n");
       super.printCloseBrace(1, 2);
     }
   }
@@ -333,7 +364,7 @@ public class DomainClass extends BaseClass {
       if (fieldName.equalsIgnoreCase("id") && this.pkeys.containsKey(fieldName)) {
         // id
         logger.debug("Found id as pk, it is handled in the pk section, so not adding setter and " +
-                "getter");
+                             "getter");
         continue;
       }
 
@@ -403,35 +434,6 @@ public class DomainClass extends BaseClass {
       }
       this.imports.add("com.google.common.base.MoreObjects");
     }
-
-  }
-
-  public void generateSource() {
-    this.preprocess();
-
-    super.printPackage();
-    super.printImports();
-    super.printClassComments();
-    super.printClassDefn();
-    this.printClassImplements();
-
-    super.printOpenBrace(0, 2);
-
-    this.printNullObj();
-    this.printFields();
-
-    super.printCtor();
-
-    this.printInterfaceImpl();
-
-    this.printMethods();
-
-    this.printToString();
-
-    super.printUserSourceCode();
-
-    super.printCloseBrace(0, 0); // end of class
-    //logger.debug ("Printing Class file content:\n" + sourceBuf.toString ());
 
   }
 

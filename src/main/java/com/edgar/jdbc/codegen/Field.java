@@ -23,14 +23,23 @@ import java.util.List;
 
 public class Field {
   private ParameterType type;
+
   private String colName;
+
   private String humpName;
+
   private int size;
+
   private boolean isNullable = true;
+
   private boolean isPrimitive = false;
+
   private boolean isAutoInc = false;
+
   private boolean persistable = true;
+
   private String defaultValue;
+
   private List<String> modifiers = new ArrayList<String>();
 
   public Field() {

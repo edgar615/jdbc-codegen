@@ -25,8 +25,11 @@ package com.edgar.jdbc.codegen;
  */
 public class Method {
   private String name;
+
   private Parameter parameter;
+
   private boolean generateSetter = true;
+
   private boolean generateGetter = true;
 
   public Method() {

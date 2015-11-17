@@ -25,7 +25,9 @@ package com.edgar.jdbc.codegen;
  */
 public class Parameter {
   private String name;
+
   private String className;
+
   private ParameterType type;
 
   public Parameter(String name, ParameterType type) {

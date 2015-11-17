@@ -30,11 +30,38 @@ import org.slf4j.LoggerFactory;
 public class DBClass extends BaseClass {
 
   final static Logger logger = LoggerFactory.getLogger(DBClass.class);
+
   public static String DB_CLASSSUFFIX = "DB";
 
   public DBClass() {
     this.addImports();
     this.classSuffix = DB_CLASSSUFFIX;
+  }
+
+  public void generateSource() {
+    // generate the default stuff from the super class
+    super.printPackage();
+
+    super.printImports();
+
+    super.printClassComments();
+
+    super.printClassDefn();
+
+    super.printClassImplements();
+
+    this.printOpenBrace(0, 2);
+
+    this.printDBTableInfo();
+
+    this.printColumnsEnum();
+
+    this.printCtor();
+
+    super.printUserSourceCode();
+
+    this.printCloseBrace(0, 0); // end of class
+    //logger.debug ("Printing Class file content:\n" + sourceBuf.toString ());
   }
 
   @Override
@@ -47,7 +74,7 @@ public class DBClass extends BaseClass {
   protected void printDBTableInfo() {
     // add the table name
     sourceBuf.append("\tprivate static String TABLE_NAME = \"" + this.name.toUpperCase() + "\";" +
-            "\n\n");
+                             "\n\n");
 
     // add the table name
     sourceBuf.append("\tprivate static String TABLE_ALIAS = \"" + CodeGenUtil.createTableAlias
@@ -56,9 +83,13 @@ public class DBClass extends BaseClass {
     sourceBuf.append("\tpublic static String getTableName()\n\t{\n\t\treturn TABLE_NAME;\n\t}\n\n");
 
     sourceBuf.append("\tpublic static String getTableAlias()\n\t{\n\t\treturn TABLE_NAME + \" as " +
-            "\" + TABLE_ALIAS;\n\t}\n\n");
+                             "\" + TABLE_ALIAS;\n\t}\n\n");
 
     sourceBuf.append("\tpublic static String getAlias()\n\t{\n\t\treturn TABLE_ALIAS;\n\t}\n\n");
+  }
+
+  protected void preprocess() {
+
   }
 
   private void printColumnsEnum() {
@@ -68,7 +99,7 @@ public class DBClass extends BaseClass {
     for (Field field : this.fields) {
       if (field.isPersistable()) {
         sourceBuf.append("\t\t" + field.getColName().toUpperCase() + "(\"" + field.getColName() +
-                "\"),\n");
+                                 "\"),\n");
       }
     }
     sourceBuf.append("\t\t;\n");
@@ -98,7 +129,7 @@ public class DBClass extends BaseClass {
     sourceBuf.append("\t\tpublic String getColumnAliasAsName () ");
     this.printOpenBrace(2, 1);
     sourceBuf.append("\t\t\treturn TABLE_ALIAS  + \".\" + this.columnName + \" as \" + " +
-            "TABLE_ALIAS + \"_\" + this.columnName;\n");
+                             "TABLE_ALIAS + \"_\" + this.columnName;\n");
     this.printCloseBrace(2, 2);
 
     sourceBuf.append("\t\tpublic String getColumnAliasName () ");
@@ -107,36 +138,6 @@ public class DBClass extends BaseClass {
     this.printCloseBrace(2, 2);
 
     this.printCloseBrace(1, 2);
-  }
-
-  protected void preprocess() {
-
-  }
-
-  public void generateSource() {
-    // generate the default stuff from the super class
-    super.printPackage();
-
-    super.printImports();
-
-    super.printClassComments();
-
-    super.printClassDefn();
-
-    super.printClassImplements();
-
-    this.printOpenBrace(0, 2);
-
-    this.printDBTableInfo();
-
-    this.printColumnsEnum();
-
-    this.printCtor();
-
-    super.printUserSourceCode();
-
-    this.printCloseBrace(0, 0); // end of class
-    //logger.debug ("Printing Class file content:\n" + sourceBuf.toString ());
   }
 
 }

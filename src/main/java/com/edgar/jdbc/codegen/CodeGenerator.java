@@ -18,18 +18,24 @@
  */
 package com.edgar.jdbc.codegen;
 
-import com.edgar.jdbc.codegen.util.CodeGenUtil;
 import com.google.common.base.CaseFormat;
 import com.google.common.base.CharMatcher;
 import com.google.common.base.Splitter;
 import com.google.common.base.Strings;
 import com.google.common.collect.Iterables;
+
+import com.edgar.jdbc.codegen.util.CodeGenUtil;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import java.io.File;
 import java.io.FileInputStream;
-import java.sql.*;
+import java.sql.Connection;
+import java.sql.DatabaseMetaData;
+import java.sql.DriverManager;
+import java.sql.ResultSet;
+import java.sql.SQLException;
+import java.sql.Types;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Properties;
@@ -45,32 +51,49 @@ import java.util.StringTokenizer;
  */
 public class CodeGenerator {
   final static Logger logger = LoggerFactory.getLogger(CodeGenerator.class);
+
   private Properties properties;
+
   //忽略的字段
   private List<String> ignoreColumnList = new ArrayList<String>();
+
   //更新时忽略的字段
   private List<String> ignoreUpdatedColumnList = new ArrayList<String>();
+
   //乐观锁字段
   private List<String> optimisticLockColumnList = new ArrayList<String>();
+
   //忽略的表
   private List<String> ignoreTableList = new ArrayList<String>();
+
   //使用前缀匹配忽略的表
   private List<String> ignoreTableStartsWithPattern = new ArrayList<String>();
+
   //使用后缀匹配忽略的表
   private List<String> ignoreTableEndsWithPattern = new ArrayList<String>();
 
   private String propertiesFile;
 
   private String srcFolderPath;
+
   private String domainPackageName;
+
   private String dbPackageName;
+
   private String mapperPackageName;
+
   private String rootResourceFolderPath;
+
   private String mapperXmlPackgeName;
+
   private String rootFolderPath;
+
   private boolean generateJsr303Annotations = false;
+
   private boolean generateRepositoryAnnotations = false;
+
   private String domainInterfaceName;
+
   private String mapperExtendName;
 
   public CodeGenerator() {
@@ -91,6 +114,55 @@ public class CodeGenerator {
 
   public void setPropertiesFile(String propertiesFile) {
     this.propertiesFile = propertiesFile;
+  }
+
+  public void generate() {
+    Connection conn = null;
+    try {
+      //加载属性文件
+      this.loadProperties();
+      this.setProperties();
+      conn = this.getConnection();
+      DatabaseMetaData metaData = conn.getMetaData();
+
+      if (metaData != null) {
+
+        //创建包
+        CodeGenUtil.createPackage(srcFolderPath, domainPackageName);
+//				CodeGenUtil.createPackage (srcFolderPath, dbPackageName);
+        CodeGenUtil.createPackage(srcFolderPath, mapperPackageName);
+        CodeGenUtil.createPackage(rootResourceFolderPath, mapperXmlPackgeName);
+
+        //读取table
+        ResultSet rset = metaData.getTables(null, null, null, new String[]{"TABLE"});
+        while (rset.next()) {
+          String tableName = rset.getString("TABLE_NAME");
+          logger.info("Found Table:" + tableName);
+          if (this.ignoreTable(tableName.toLowerCase())) {
+            logger.info("Table:{} is in the ignore table list, not generating code for this table" +
+                                ".", tableName);
+            continue;
+          }
+          logger.debug("DB Product name:{}", metaData.getDatabaseProductName());
+          logger.debug("DB Product version:{}", metaData.getDatabaseProductVersion());
+
+          // for each table create the classes
+          this.createClasses(metaData, tableName);
+
+        }
+      }
+    } catch (Exception e) {
+      logger.error("Error occcured during code generation." + e);
+      e.printStackTrace();
+    } finally {
+      if (conn != null) {
+        try {
+          conn.close();
+        } catch (Exception e) {
+          logger.warn("Error closing db connection.{}", e);
+        }
+      }
+    }
   }
 
   private void loadProperties() throws Exception {
@@ -127,14 +199,14 @@ public class CodeGenerator {
     mapperExtendName = this.properties.getProperty("repository.extend.name");
 
     String generateJsr303AnnotationsStr = this.properties.getProperty("generate.jsr303" +
-            ".annotations");
+                                                                              ".annotations");
 
     if (!Strings.isNullOrEmpty(generateJsr303AnnotationsStr)) {
       generateJsr303Annotations = Boolean.parseBoolean(generateJsr303AnnotationsStr);
     }
 
     String generateRepositoryAnnotationsStr = this.properties.getProperty("generate.repository" +
-            ".annotations");
+                                                                                  ".annotations");
 
     if (!Strings.isNullOrEmpty(generateRepositoryAnnotationsStr)) {
       generateRepositoryAnnotations = Boolean.parseBoolean(generateRepositoryAnnotationsStr);
@@ -191,55 +263,6 @@ public class CodeGenerator {
 
   }
 
-  public void generate() {
-    Connection conn = null;
-    try {
-      //加载属性文件
-      this.loadProperties();
-      this.setProperties();
-      conn = this.getConnection();
-      DatabaseMetaData metaData = conn.getMetaData();
-
-      if (metaData != null) {
-
-        //创建包
-        CodeGenUtil.createPackage(srcFolderPath, domainPackageName);
-//				CodeGenUtil.createPackage (srcFolderPath, dbPackageName);
-        CodeGenUtil.createPackage(srcFolderPath, mapperPackageName);
-        CodeGenUtil.createPackage(rootResourceFolderPath, mapperXmlPackgeName);
-
-        //读取table
-        ResultSet rset = metaData.getTables(null, null, null, new String[]{"TABLE"});
-        while (rset.next()) {
-          String tableName = rset.getString("TABLE_NAME");
-          logger.info("Found Table:" + tableName);
-          if (this.ignoreTable(tableName.toLowerCase())) {
-            logger.info("Table:{} is in the ignore table list, not generating code for this table" +
-                    ".", tableName);
-            continue;
-          }
-          logger.debug("DB Product name:{}", metaData.getDatabaseProductName());
-          logger.debug("DB Product version:{}", metaData.getDatabaseProductVersion());
-
-          // for each table create the classes
-          this.createClasses(metaData, tableName);
-
-        }
-      }
-    } catch (Exception e) {
-      logger.error("Error occcured during code generation." + e);
-      e.printStackTrace();
-    } finally {
-      if (conn != null) {
-        try {
-          conn.close();
-        } catch (Exception e) {
-          logger.warn("Error closing db connection.{}", e);
-        }
-      }
-    }
-  }
-
   private boolean ignoreTable(String tableName) {
 
     // first do a actual match
@@ -264,7 +287,7 @@ public class CodeGenerator {
   private void createClasses(DatabaseMetaData metaData, String tableName) throws Exception {
 
     String generateJsr303AnnotationsStr = this.properties.getProperty("generate.jsr303" +
-            ".annotations");
+                                                                              ".annotations");
     boolean generateJsr303Annotations = false;
     if (!Strings.isNullOrEmpty(generateJsr303AnnotationsStr)) {
       generateJsr303Annotations = Boolean.parseBoolean(generateJsr303AnnotationsStr);
@@ -337,7 +360,7 @@ public class CodeGenerator {
 
     //创建MyBatis的Mapper
     MapperClass mapperClass = new MapperClass();
-    mapperClass.createLogger();
+//    mapperClass.createLogger();
     mapperClass.getImports().add(domainPackageName + "." + domainClass.getName());
     mapperClass.setName(humpTableName);
     mapperClass.setRootFolderPath(rootFolderPath);
@@ -483,7 +506,7 @@ public class CodeGenerator {
     String userName = this.properties.getProperty("jdbc.username");
     String password = this.properties.getProperty("jdbc.password");
     logger.info("Connecting to database at:[" + url + "]" + " with username/password:[" +
-            userName + "/" + password + "]");
+                        userName + "/" + password + "]");
     Properties connProps = new Properties();
     if (userName == null && password == null) {
       conn = DriverManager.getConnection(url);

@@ -18,12 +18,13 @@
  */
 package com.edgar.jdbc.codegen;
 
-import com.edgar.jdbc.codegen.util.CodeGenUtil;
 import com.google.common.base.CharMatcher;
 import com.google.common.base.Joiner;
 import com.google.common.base.Splitter;
 import com.google.common.base.Strings;
 import com.google.common.collect.Iterables;
+
+import com.edgar.jdbc.codegen.util.CodeGenUtil;
 import org.apache.commons.io.FileUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -40,9 +41,11 @@ import java.util.List;
 public class MapperXmlClass extends BaseClass {
 
   final static Logger logger = LoggerFactory.getLogger(MapperXmlClass.class);
+
   public static String DB_CLASSSUFFIX = "Mapper";
 
   private boolean hasAutoIncCol;
+
   private String mapperPackageName;
 
   private String resultMap;
@@ -52,9 +55,11 @@ public class MapperXmlClass extends BaseClass {
   private List<String> optimisticLockColumnList = new ArrayList<>();
 
   private String comment_start = "<!-- START 写在START和END中间的代码不会被替换 -->";
+
   private String comment_end = "<!-- END 写在START和END中间的代码不会被替换-->";
 
   private String is_comment_start = "<!-- START";
+
   private String is_comment_end = "<!-- END";
 
   public MapperXmlClass() {
@@ -82,6 +87,17 @@ public class MapperXmlClass extends BaseClass {
     this.mapperPackageName = mapperPackageName;
   }
 
+  public String cusgenerateUserSourceCodeTags() {
+    return "\t" + comment_start + "\n\n\t" + comment_end + "\n\n";
+  }
+
+  public void generateSource() {
+    // generate the default stuff from the super class
+    this.resultMap = name + "ResultMap";
+    this.printDocType();
+    this.printRootMapper();
+  }
+
   protected String getSourceFileName() {
     String path = "";
     if (!Strings.isNullOrEmpty(this.packageName)) {
@@ -97,14 +113,14 @@ public class MapperXmlClass extends BaseClass {
 
   protected void printDocType() {
     sourceBuf.append("<?xml version=\"1.0\" encoding=\"UTF-8\" ?>\n" +
-            "<!DOCTYPE mapper\n" +
-            "        PUBLIC \"-//mybatis.org//DTD Mapper 3.0//EN\"\n" +
-            "        \"http://mybatis.org/dtd/mybatis-3-mapper.dtd\">\n");
+                             "<!DOCTYPE mapper\n" +
+                             "        PUBLIC \"-//mybatis.org//DTD Mapper 3.0//EN\"\n" +
+                             "        \"http://mybatis.org/dtd/mybatis-3-mapper.dtd\">\n");
   }
 
   protected void printRootMapper() {
     sourceBuf.append("<mapper namespace=\"" + mapperPackageName + "." + name + classSuffix +
-            "\">\n");
+                             "\">\n");
     printResultMap();
     printAllColumn();
     printLimitSql();
@@ -128,10 +144,6 @@ public class MapperXmlClass extends BaseClass {
       this.sourceBuf.append("\t" + userSource);
     }
 
-  }
-
-  public String cusgenerateUserSourceCodeTags() {
-    return "\t" + comment_start + "\n\n\t" + comment_end + "\n\n";
   }
 
   protected void readUserSourceCode(File file) {
@@ -177,7 +189,7 @@ public class MapperXmlClass extends BaseClass {
 
   protected void printResultMap() {
     sourceBuf.append("\t<resultMap id=\"" + resultMap + "\" type=\"" +
-            name + "\">\n");
+                             name + "\">\n");
     for (Field field : this.fields) {
       if (field.isPersistable()) {
         sourceBuf.append("\t\t<result column=\"" + field.getColName() + "\" property=\"" + field
@@ -236,7 +248,7 @@ public class MapperXmlClass extends BaseClass {
               .append(") \n\t\tvalues(").append(Joiner.on(",").join(args)).append(")");
 
       sourceBuf.append("\n\n\t\t<selectKey resultType=\"int\" order=\"AFTER\" keyProperty=\"id\" " +
-              "keyColumn=\"" + key + "\">");
+                               "keyColumn=\"" + key + "\">");
       sourceBuf.append("\n\t\t\tselect LAST_INSERT_ID() as " + key);
       sourceBuf.append("\n\t\t</selectKey>");
       sourceBuf.append("\n\t</insert>");
@@ -347,7 +359,7 @@ public class MapperXmlClass extends BaseClass {
               .isPersistable()) {
         StringBuffer set = new StringBuffer();
         set.append("\t\t\t<if test=\"" + CodeGenUtil.normalize(field.getColName().toLowerCase())
-                + " != null\">")
+                           + " != null\">")
                 .append(" \n\t\t\t\t" + field.getColName() + " = #{" + field.getHumpName() + "},")
                 .append("\n\t\t\t</if>\n");
         sets.add(set.toString());
@@ -421,7 +433,7 @@ public class MapperXmlClass extends BaseClass {
       return;
     }
     sourceBuf.append("\t<update id=\"updateByPrimaryKeyWithLock\" parameterType=\"" + name +
-            "\">\n");
+                             "\">\n");
 
     sourceBuf.append("\t\tupdate ").append(tableName).append("\n\t\t<set>\n ");
     List<String> sets = new ArrayList<>();
@@ -468,7 +480,7 @@ public class MapperXmlClass extends BaseClass {
       return;
     }
     sourceBuf.append("\t<select id=\"selectByPrimaryKey\" resultMap=\"" + resultMap + "\" " +
-            "parameterType=\"");
+                             "parameterType=\"");
     if (pkeys.size() == 1) {
       sourceBuf.append(pkeys.entrySet().iterator().next().getValue().getPrimitiveName());
     } else {
@@ -506,7 +518,6 @@ public class MapperXmlClass extends BaseClass {
     sourceBuf.append("\n\n");
   }
 
-
   protected void preprocess() {
 
   }
@@ -514,13 +525,6 @@ public class MapperXmlClass extends BaseClass {
   @Override
   protected void addImports() {
 
-  }
-
-  public void generateSource() {
-    // generate the default stuff from the super class
-    this.resultMap = name + "ResultMap";
-    this.printDocType();
-    this.printRootMapper();
   }
 
 }

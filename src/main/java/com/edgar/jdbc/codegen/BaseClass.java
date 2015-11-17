@@ -22,6 +22,7 @@ import com.google.common.base.CharMatcher;
 import com.google.common.base.Splitter;
 import com.google.common.base.Strings;
 import com.google.common.collect.Iterables;
+
 import org.apache.commons.io.FileUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -36,61 +37,56 @@ import java.util.Map;
 public abstract class BaseClass {
   final static Logger logger = LoggerFactory.getLogger(BaseClass.class);
 
-
-  protected String dbProductName;
-  protected String dbProductVersion;
-
-  protected String rootFolderPath;
-  protected String packageName;
-  protected List<String> imports = new ArrayList<String>();
-  //转换为驼峰的名字
-  protected String name;
-  protected String tableName;
-  protected String classSuffix = "";
-  protected String extendsClassName;
-  protected String interfaceName;
-  protected List<Field> fields;
-  protected List<Method> methods;
-  protected Map<String, ParameterType> pkeys = new HashMap<String, ParameterType>();
-  protected StringBuffer userSourceBuf = new StringBuffer("");
-  protected StringBuffer sourceBuf = new StringBuffer("");
-
-  protected int fieldNameCounter = 0;
-
   private static String COMMENT_START = "/* START 写在START和END中间的代码不会被替换*/";
+
   private static String COMMENT_END = "/* END 写在START和END中间的代码不会被替换*/";
 
   private static String IS_COMMENT_START = "/* START";
+
   private static String IS_COMMENT_END = "/* END";
+
+  protected String dbProductName;
+
+  protected String dbProductVersion;
+
+  protected String rootFolderPath;
+
+  protected String packageName;
+
+  protected List<String> imports = new ArrayList<String>();
+
+  //转换为驼峰的名字
+  protected String name;
+
+  protected String tableName;
+
+  protected String classSuffix = "";
+
+  protected String extendsClassName;
+
+  protected String interfaceName;
+
+  protected List<Field> fields;
+
+  protected List<Method> methods;
+
+  protected Map<String, ParameterType> pkeys = new HashMap<String, ParameterType>();
+
+  protected StringBuffer userSourceBuf = new StringBuffer("");
+
+  protected StringBuffer sourceBuf = new StringBuffer("");
+
+  protected int fieldNameCounter = 0;
 
   public BaseClass() {
 
   }
 
+  abstract public void generateSource();
+
   abstract protected void preprocess();
 
   abstract protected void addImports();
-
-  abstract public void generateSource();
-
-  protected void createLogger() {
-    this.imports.add("org.slf4j.LoggerFactory");
-    this.imports.add("org.slf4j.Logger");
-  }
-
-  protected void printPackage() {
-    sourceBuf.append("package " + packageName + ";\n\n");
-  }
-
-  protected void printImports() {
-//        this.imports.add("java.util.List");
-//        this.imports.add("java.util.Map");
-    if (!this.imports.isEmpty()) {
-      for (String importClass : this.imports) {
-        sourceBuf.append("import " + importClass + ";\n");
-      }
-    }
-  }
 
   public static StringBuffer generateClassComments() {
     StringBuffer strBuf = new StringBuffer("");
@@ -104,78 +100,6 @@ public abstract class BaseClass {
 
   public static String generateUserSourceCodeTags() {
     return COMMENT_START + "\n\n" + COMMENT_END + "\n\n";
-  }
-
-  protected void printClassComments() {
-    sourceBuf.append(generateClassComments());
-  }
-
-  protected void printOpenBrace(int indentLevel, int newLines) {
-    for (int i = 0; i < indentLevel; i++) {
-      sourceBuf.append("\t");
-    }
-    sourceBuf.append("{");
-    if (newLines == 0)
-      newLines = 1; // add atleast 1 new line
-    for (int i = 0; i < newLines; i++) {
-      sourceBuf.append("\n");
-    }
-  }
-
-  protected void printLogger() {
-    sourceBuf.append("\tfinal static Logger logger = LoggerFactory.getLogger (" + this.name +
-            this.classSuffix + ".class);\n\n");
-  }
-
-  protected void printClassDefn() {
-    sourceBuf.append("public class " + name + this.classSuffix);
-  }
-
-  protected void printClassExtends() {
-    if (!Strings.isNullOrEmpty(extendsClassName)) {
-      String extendsClass = this.extendsClassName.substring(CharMatcher.anyOf(".").lastIndexIn
-              (this.extendsClassName) + 1);
-      sourceBuf.append(" extends " + extendsClass);
-    }
-  }
-
-  protected void printClassImplements() {
-    if (!Strings.isNullOrEmpty(interfaceName)) {
-      String implementsClass = this.interfaceName.substring(CharMatcher.anyOf(".").lastIndexIn
-              (this.interfaceName) + 1);
-      sourceBuf.append(" implements " + implementsClass);
-    }
-    sourceBuf.append(" ");
-  }
-
-  protected void printCloseBrace(int indentLevel, int newLines) {
-    for (int i = 0; i < indentLevel; i++) {
-      sourceBuf.append("\t");
-    }
-    sourceBuf.append("}");
-    for (int i = 0; i < newLines; i++) {
-      sourceBuf.append("\n");
-    }
-  }
-
-  protected void printCtor() {
-    // no args constructor
-    sourceBuf.append("\tpublic " + name + this.classSuffix + "() ");
-    this.printOpenBrace(0, 2);
-    this.printCloseBrace(1, 2);
-  }
-
-  protected String getSourceFileName() {
-    String path = "";
-    if (!Strings.isNullOrEmpty(this.packageName)) {
-      path = CharMatcher.anyOf(".").replaceFrom(this.packageName, "/") + "/";
-    }
-    if (!Strings.isNullOrEmpty(this.rootFolderPath)) {
-      path = this.rootFolderPath + "/" + path;
-    }
-
-    String fileName = path + name + classSuffix + ".java";
-    return fileName;
   }
 
   public void createFile() throws Exception {
@@ -193,57 +117,6 @@ public abstract class BaseClass {
     writer.write(sourceBuf.toString());
     writer.close();
     logger.info("Class File created:" + fileName);
-  }
-
-  protected void readUserSourceCode(File file) {
-    try {
-      logger.debug("Reading file :{}", file.getName());
-      String contents = FileUtils.readFileToString(file);
-      //logger.trace ("File contents:{}", contents);
-
-      int startIndex = contents.indexOf(IS_COMMENT_START);
-      int endIndex = contents.indexOf(IS_COMMENT_END);
-      logger.debug("Start index:{} End index:{}", startIndex, endIndex);
-      if (startIndex != -1 && endIndex != -1) {
-        userSourceBuf.append(contents.substring(startIndex, endIndex));
-        userSourceBuf.append(COMMENT_END + "\n\n");
-      }
-      // save the imports
-      List<String> lines = FileUtils.readLines(file);
-      for (String line : lines) {
-        if (line.startsWith("import")) {
-          String[] tokens = Iterables.toArray(Splitter.on(" ").split(line), String.class);
-          if (tokens.length > 2) {
-            String iClass = tokens[1] + " " + tokens[2].substring(0, tokens[2].length() - 1);
-            logger.debug("iClass:{}", iClass);
-            if (!this.imports.contains(iClass)) {
-              this.imports.add(iClass);
-            }
-          } else {
-            String iClass = tokens[1].substring(0, tokens[1].length() - 1);
-            if (!this.imports.contains(iClass)) {
-              this.imports.add(iClass);
-            }
-          }
-        }
-      }
-
-    } catch (Exception e) {
-      logger.error(e.getMessage());
-    } finally {
-
-    }
-
-  }
-
-  protected void printUserSourceCode() {
-    String userSource = this.userSourceBuf.toString();
-    if (Strings.isNullOrEmpty(userSource)) {
-      this.sourceBuf.append(BaseClass.generateUserSourceCodeTags());
-    } else {
-      this.sourceBuf.append(userSource);
-    }
-
   }
 
   public StringBuffer getSourceBuf() {
@@ -332,7 +205,6 @@ public abstract class BaseClass {
     }
   }
 
-
   public Map<String, ParameterType> getPkeys() {
     return this.pkeys;
   }
@@ -371,6 +243,148 @@ public abstract class BaseClass {
         return true;
     }
     return false;
+  }
+
+  protected void createLogger() {
+//    this.imports.add("org.slf4j.LoggerFactory");
+//    this.imports.add("org.slf4j.Logger");
+  }
+
+  protected void printPackage() {
+    sourceBuf.append("package " + packageName + ";\n\n");
+  }
+
+  protected void printImports() {
+//        this.imports.add("java.util.List");
+//        this.imports.add("java.util.Map");
+    if (!this.imports.isEmpty()) {
+      for (String importClass : this.imports) {
+        sourceBuf.append("import " + importClass + ";\n");
+      }
+    }
+  }
+
+  protected void printClassComments() {
+    sourceBuf.append(generateClassComments());
+  }
+
+  protected void printOpenBrace(int indentLevel, int newLines) {
+    for (int i = 0; i < indentLevel; i++) {
+      sourceBuf.append("\t");
+    }
+    sourceBuf.append("{");
+    if (newLines == 0)
+      newLines = 1; // add atleast 1 new line
+    for (int i = 0; i < newLines; i++) {
+      sourceBuf.append("\n");
+    }
+  }
+
+  protected void printLogger() {
+    sourceBuf.append("\tfinal static Logger logger = LoggerFactory.getLogger (" + this.name +
+                             this.classSuffix + ".class);\n\n");
+  }
+
+  protected void printClassDefn() {
+    sourceBuf.append("public class " + name + this.classSuffix);
+  }
+
+  protected void printClassExtends() {
+    if (!Strings.isNullOrEmpty(extendsClassName)) {
+      String extendsClass = this.extendsClassName.substring(CharMatcher.anyOf(".").lastIndexIn
+              (this.extendsClassName) + 1);
+      sourceBuf.append(" extends " + extendsClass);
+    }
+  }
+
+  protected void printClassImplements() {
+    if (!Strings.isNullOrEmpty(interfaceName)) {
+      String implementsClass = this.interfaceName.substring(CharMatcher.anyOf(".").lastIndexIn
+              (this.interfaceName) + 1);
+      sourceBuf.append(" implements " + implementsClass);
+    }
+    sourceBuf.append(" ");
+  }
+
+  protected void printCloseBrace(int indentLevel, int newLines) {
+    for (int i = 0; i < indentLevel; i++) {
+      sourceBuf.append("\t");
+    }
+    sourceBuf.append("}");
+    for (int i = 0; i < newLines; i++) {
+      sourceBuf.append("\n");
+    }
+  }
+
+  protected void printCtor() {
+    // no args constructor
+    sourceBuf.append("\tpublic " + name + this.classSuffix + "() ");
+    this.printOpenBrace(0, 2);
+    this.printCloseBrace(1, 2);
+  }
+
+  protected String getSourceFileName() {
+    String path = "";
+    if (!Strings.isNullOrEmpty(this.packageName)) {
+      path = CharMatcher.anyOf(".").replaceFrom(this.packageName, "/") + "/";
+    }
+    if (!Strings.isNullOrEmpty(this.rootFolderPath)) {
+      path = this.rootFolderPath + "/" + path;
+    }
+
+    String fileName = path + name + classSuffix + ".java";
+    return fileName;
+  }
+
+  protected void readUserSourceCode(File file) {
+    try {
+      logger.debug("Reading file :{}", file.getName());
+      String contents = FileUtils.readFileToString(file);
+      //logger.trace ("File contents:{}", contents);
+
+      int startIndex = contents.indexOf(IS_COMMENT_START);
+      int endIndex = contents.indexOf(IS_COMMENT_END);
+      logger.debug("Start index:{} End index:{}", startIndex, endIndex);
+      if (startIndex != -1 && endIndex != -1) {
+        userSourceBuf.append(contents.substring(startIndex, endIndex));
+        userSourceBuf.append(COMMENT_END + "\n\n");
+      }
+      // save the imports
+      List<String> lines = FileUtils.readLines(file);
+      for (String line : lines) {
+        if (line.startsWith("import")) {
+          String[] tokens = Iterables.toArray(Splitter.on(" ").split(line), String.class);
+          if (tokens.length > 2) {
+            String iClass = tokens[1] + " " + tokens[2].substring(0, tokens[2].length() - 1);
+            logger.debug("iClass:{}", iClass);
+            if (!this.imports.contains(iClass)) {
+              this.imports.add(iClass);
+            }
+          } else {
+            String iClass = tokens[1].substring(0, tokens[1].length() - 1);
+            if (!this.imports.contains(iClass)) {
+              this.imports.add(iClass);
+            }
+          }
+        }
+      }
+
+    } catch (Exception e) {
+      logger.error(e.getMessage());
+    } finally {
+
+    }
+
+  }
+
+  protected void printUserSourceCode() {
+    String userSource = this.userSourceBuf.toString();
+    if (Strings.isNullOrEmpty(userSource)) {
+      this.sourceBuf.append(BaseClass.generateUserSourceCodeTags());
+    } else {
+      this.sourceBuf.append(userSource);
+    }
+
   }
 
   public enum DATABASE {

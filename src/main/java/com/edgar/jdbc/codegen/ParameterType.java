@@ -37,7 +37,9 @@ public enum ParameterType {
   LIST("List", "List", false);
 
   private String name;
+
   private String primitiveName;
+
   private boolean isPrimitive;
 
   private ParameterType(String name, String primitiveName, boolean isPrimitive) {
