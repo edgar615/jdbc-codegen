@@ -52,7 +52,7 @@ public class MapperXmlClass extends BaseClass {
 
   private List<String> ignoreUpdatedColumnListStr;
 
-  private List<String> optimisticLockColumnList = new ArrayList<>();
+  private String optimisticLockColumn;
 
   private String comment_start = "<!-- START 写在START和END中间的代码不会被替换 -->";
 
@@ -75,8 +75,8 @@ public class MapperXmlClass extends BaseClass {
     this.hasAutoIncCol = hasAutoIncCol;
   }
 
-  public void addOptimisticLockColumn(String optimisticLockColumn) {
-    this.optimisticLockColumnList.add(optimisticLockColumn);
+  public void setOptimisticLockColumn(String optimisticLockColumn) {
+    this.optimisticLockColumn = optimisticLockColumn;
   }
 
   public void setIgnoreUpdatedColumnListStr(List<String> ignoreUpdatedColumnListStr) {
@@ -313,7 +313,7 @@ public class MapperXmlClass extends BaseClass {
    * 生成根据主键删除的sql
    */
   protected void printDeleteByPkSqlLock() {
-    if (pkeys.isEmpty() || optimisticLockColumnList.isEmpty()) {
+    if (pkeys.isEmpty() || Strings.isNullOrEmpty(optimisticLockColumn)) {
       return;
     }
     sourceBuf.append("\t<delete id=\"deleteByPrimaryKeyWithLock\" parameterType=\"");
@@ -336,10 +336,8 @@ public class MapperXmlClass extends BaseClass {
         }
       }
     }
-    for (String o : optimisticLockColumnList) {
-      sourceBuf.append(" \n\t\tand ").append(o).append(" = ");
-      sourceBuf.append("#{" + CodeGenUtil.normalize(o.toLowerCase()) + "}");
-    }
+    sourceBuf.append(" \n\t\tand ").append(optimisticLockColumn).append(" = ");
+    sourceBuf.append("#{" + CodeGenUtil.normalize(optimisticLockColumn.toLowerCase()) + "}");
     sourceBuf.append("\n\t</delete>");
     sourceBuf.append("\n\n");
   }
@@ -429,17 +427,19 @@ public class MapperXmlClass extends BaseClass {
    * 生成根据主键更新的sql
    */
   protected void printUpdateByPkSqlLock() {
-    if (pkeys.isEmpty() || optimisticLockColumnList.isEmpty()) {
+    if (pkeys.isEmpty() || Strings.isNullOrEmpty(optimisticLockColumn)) {
       return;
     }
     sourceBuf.append("\t<update id=\"updateByPrimaryKeyWithLock\" parameterType=\"" + name +
                              "\">\n");
 
-    sourceBuf.append("\t\tupdate ").append(tableName).append("\n\t\t<set>\n ");
+    sourceBuf.append("\t\tupdate ").append(tableName);
+    sourceBuf.append("\n\t\t\tset " + optimisticLockColumn + " = " + optimisticLockColumn + " + 1");
+    sourceBuf.append("\n\t\t\t<trim prefix=\"\" prefixOverrides=\", \">\n");
     List<String> sets = new ArrayList<>();
     for (Field field : this.fields) {
       if (!this.ignoreUpdatedColumnListStr.contains(field.getColName().toLowerCase()) && field
-              .isPersistable()) {
+              .isPersistable() && !this.optimisticLockColumn.equalsIgnoreCase(field.getColName())) {
         StringBuffer set = new StringBuffer();
         set.append("\t\t\t<if test=\"" + field.getHumpName() + " != null\">")
                 .append(" \n\t\t\t\t" + field.getColName() + " = #{" + field.getHumpName() + "},")
@@ -449,7 +449,7 @@ public class MapperXmlClass extends BaseClass {
     }
     sourceBuf.append(Joiner.on(",").join(sets));
 
-    sourceBuf.append("\t\t</set>");
+    sourceBuf.append("\t\t</trim>");
 
     if (pkeys.size() == 1) {
       sourceBuf.append(" \n\t\twhere ");
@@ -465,9 +465,8 @@ public class MapperXmlClass extends BaseClass {
         }
       }
     }
-    for (String o : optimisticLockColumnList) {
-      sourceBuf.append(" \n\t\tand ").append(o).append(" = #{" + CodeGenUtil.normalize(o) + "}");
-    }
+    sourceBuf.append(" \n\t\tand ").append(optimisticLockColumn).append(" = #{" + CodeGenUtil
+            .normalize(optimisticLockColumn) + "}");
     sourceBuf.append("\n\t</update>");
     sourceBuf.append("\n\n");
   }

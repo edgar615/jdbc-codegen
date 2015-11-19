@@ -61,7 +61,7 @@ public class CodeGenerator {
   private List<String> ignoreUpdatedColumnList = new ArrayList<String>();
 
   //乐观锁字段
-  private List<String> optimisticLockColumnList = new ArrayList<String>();
+  private String optimisticLockColumn;
 
   //忽略的表
   private List<String> ignoreTableList = new ArrayList<String>();
@@ -233,14 +233,8 @@ public class CodeGenerator {
     }
 
     // 乐观锁字段
-    String optimisticLockColumnListStr = this.properties.getProperty("optimistic.lock.columnlist");
-    if (!Strings.isNullOrEmpty(optimisticLockColumnListStr)) {
-      StringTokenizer strTok = new StringTokenizer(optimisticLockColumnListStr, ",");
-      while (strTok.hasMoreTokens()) {
-        this.optimisticLockColumnList.add(strTok.nextToken().toLowerCase().trim());
-      }
-      logger.info("OptimisticLock updated column list:{}", this.optimisticLockColumnList);
-    }
+    optimisticLockColumn = this.properties.getProperty("optimistic.lock.column");
+    logger.info("OptimisticLock updated column:{}", this.optimisticLockColumn);
 
     //忽略的table
     String ignoreTableListStr = this.properties.getProperty("ignore.tablelist");
@@ -449,8 +443,8 @@ public class CodeGenerator {
 
         }
         //判断mapperXmlClass的乐观锁字段
-        if (optimisticLockColumnList.contains(colName)) {
-          mapperXmlClass.addOptimisticLockColumn(colName);
+        if (optimisticLockColumn.equalsIgnoreCase(colName)) {
+          mapperXmlClass.setOptimisticLockColumn(colName);
         }
       } else {
         logger.debug("ColName:{} is in ignore column list, so not adding to domain class", colName);
