@@ -434,8 +434,7 @@ public class MapperXmlClass extends BaseClass {
                              "\">\n");
 
     sourceBuf.append("\t\tupdate ").append(tableName);
-    sourceBuf.append("\n\t\t\tset " + optimisticLockColumn + " = " + optimisticLockColumn + " + 1");
-    sourceBuf.append("\n\t\t\t<trim prefix=\"\" prefixOverrides=\", \">\n");
+    sourceBuf.append("\n\t\t<set>\n");
     List<String> sets = new ArrayList<>();
     for (Field field : this.fields) {
       if (!this.ignoreUpdatedColumnListStr.contains(field.getColName().toLowerCase()) && field
@@ -447,10 +446,10 @@ public class MapperXmlClass extends BaseClass {
         sets.add(set.toString());
       }
     }
-    sourceBuf.append(Joiner.on(",").join(sets));
+    sourceBuf.append(Joiner.on("").join(sets));
 
-    sourceBuf.append("\t\t</trim>");
-
+    sourceBuf.append("\t\t</set>");
+    sourceBuf.append("\n\t\t\t, " + optimisticLockColumn + " = " + optimisticLockColumn + " + 1");
     if (pkeys.size() == 1) {
       sourceBuf.append(" \n\t\twhere ");
       String key = pkeys.entrySet().iterator().next().getKey();
