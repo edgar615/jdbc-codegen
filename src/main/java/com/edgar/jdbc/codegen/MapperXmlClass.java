@@ -128,6 +128,7 @@ public class MapperXmlClass extends BaseClass {
     printDeleteByPkSql();
     printDeleteByPkSqlLock();
     printUpdateByPkSql();
+    printUpdateNullByPrimaryKey();
     printUpdateByPkSqlLock();
     printSelectByPkSql();
 
@@ -354,10 +355,9 @@ public class MapperXmlClass extends BaseClass {
     List<String> sets = new ArrayList<>();
     for (Field field : this.fields) {
       if (!this.ignoreUpdatedColumnListStr.contains(field.getColName().toLowerCase()) && field
-              .isPersistable()) {
+              .isPersistable() && !field.getColName().equalsIgnoreCase(this.optimisticLockColumn)) {
         StringBuffer set = new StringBuffer();
-        set.append("\t\t\t<if test=\"" + CodeGenUtil.normalize(field.getColName().toLowerCase())
-                           + " != null\">")
+        set.append("\t\t\t<if test=\"" + field.getHumpName() + " != null\">")
                 .append(" \n\t\t\t\t" + field.getColName() + " = #{" + field.getHumpName() + "},")
                 .append("\n\t\t\t</if>\n");
         sets.add(set.toString());
@@ -366,6 +366,9 @@ public class MapperXmlClass extends BaseClass {
     sourceBuf.append(Joiner.on("").join(sets));
 
     sourceBuf.append("\t\t</set>");
+    if (!Strings.isNullOrEmpty(optimisticLockColumn)) {
+      sourceBuf.append("\n\t\t\t, " + optimisticLockColumn + " = " + optimisticLockColumn + " + 1");
+    }
     if (pkeys.size() == 1) {
       sourceBuf.append(" \n\t\twhere ");
       String key = pkeys.entrySet().iterator().next().getKey();
@@ -384,36 +387,47 @@ public class MapperXmlClass extends BaseClass {
     sourceBuf.append("\n\n");
   }
 
-  protected void printUpdateByPkSqlNotNull() {
+  protected void printUpdateNullByPrimaryKey() {
     if (pkeys.isEmpty()) {
       return;
     }
-    sourceBuf.append("\t<update id=\"updateByPrimaryKey\" parameterType=\"" + name + "\">\n");
+    sourceBuf.append("\t<update id=\"updateNullByPrimaryKey\" parameterType=\"map\">\n");
     sourceBuf.append("\t\tupdate ").append(tableName).append("\n\t\t<set>\n ");
     List<String> sets = new ArrayList<>();
     for (Field field : this.fields) {
       if (!this.ignoreUpdatedColumnListStr.contains(field.getColName().toLowerCase()) && field
-              .isPersistable()) {
+              .isPersistable() && !field.getColName().equalsIgnoreCase(this.optimisticLockColumn)) {
         StringBuffer set = new StringBuffer();
-        set.append("\t\t\t<if test=\"" + field.getHumpName() + " != null\">")
-                .append(" \n\t\t\t\t" + field.getColName() + " = #{" + field.getHumpName() + "},")
-                .append("\n\t\t\t</if>\n");
+        set.append("\n\t\t\t<choose>");
+        set.append("\n\t\t\t\t<when test=\"nulls.contains('" + field.getHumpName() + "')\">");
+        set.append(" \n\t\t\t\t\t" + field.getColName() + " = null,");
+        set.append("\n\t\t\t\t</when>");
+        set.append("\n\t\t\t\t<otherwise>");
+        set.append("\n\t\t\t\t\t<if test=\"entity." + field.getHumpName() + " != null\">")
+                .append(" \n\t\t\t\t\t\t" + field.getColName() + " = #{entity." + field.getHumpName
+                        () + "},")
+                .append("\n\t\t\t\t\t</if>");
+        set.append("\n\t\t\t\t</otherwise>");
+        set.append("\n\t\t\t</choose>");
         sets.add(set.toString());
       }
     }
     sourceBuf.append(Joiner.on("").join(sets));
 
     sourceBuf.append("\t\t</set>");
+    if (!Strings.isNullOrEmpty(optimisticLockColumn)) {
+      sourceBuf.append("\n\t\t\t, " + optimisticLockColumn + " = " + optimisticLockColumn + " + 1");
+    }
 
     if (pkeys.size() == 1) {
       sourceBuf.append(" \n\t\twhere ");
       String key = pkeys.entrySet().iterator().next().getKey();
-      sourceBuf.append(key).append(" = #{" + CodeGenUtil.normalize(key) + "}");
+      sourceBuf.append(key).append(" = #{entity." + CodeGenUtil.normalize(key) + "}");
     } else if (pkeys.size() > 1) {
       sourceBuf.append(" \n\t\twhere ");
       int i = pkeys.size();
       for (String key : pkeys.keySet()) {
-        sourceBuf.append(key).append(" = ").append(" #{" + CodeGenUtil.normalize(key) + "}");
+        sourceBuf.append(key).append(" = ").append(" #{entity." + CodeGenUtil.normalize(key) + "}");
         if (--i > 0) {
           sourceBuf.append(" \n\t\tand ");
         }
