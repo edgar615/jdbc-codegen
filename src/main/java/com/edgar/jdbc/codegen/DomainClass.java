@@ -156,55 +156,56 @@ public class DomainClass extends BaseClass {
 
       if (this.generateJsr303Annotations) {
         // generate the jsr303 annotations
-        if (!field.isNullable()) {
-          if (field.getType() == ParameterType.STRING) {
-            sourceBuf.append("\t@NotEmpty\n");
-          } else if (field.getColName().equalsIgnoreCase("id")) {
-            //update groups
-            sourceBuf.append("\t@NotNull(groups = {");
-            int i = this.jsr303UpdateGroups.size();
-            for (String name : this.jsr303UpdateGroups) {
-              sourceBuf.append(name + ".class");
-              if (--i > 0)
-                sourceBuf.append(", ");
-            }
-            sourceBuf.append("})\n");
-
-            // insert groups
-            sourceBuf.append("\t@Null(groups = {");
-            i = this.jsr303InsertGroups.size();
-            for (String name : this.jsr303InsertGroups) {
-              sourceBuf.append(name + ".class");
-              if (--i > 0)
-                sourceBuf.append(", ");
-            }
-            sourceBuf.append("})\n");
-          } else if (field.getColName().endsWith("id")) {
-            //update groups
-            sourceBuf.append("\t@NotNull(groups = {");
-            int i = this.jsr303UpdateGroups.size();
-            i = this.jsr303InsertGroups.size();
-            if (i > 0) {
-              for (String name : this.jsr303InsertGroups) {
-                sourceBuf.append(name + ".class");
-                if (--i > 0)
-                  sourceBuf.append(", ");
-              }
-              if (!this.jsr303UpdateGroups.isEmpty()) {
-                sourceBuf.append(", ");
-              }
-            }
-            for (String name : this.jsr303UpdateGroups) {
-              sourceBuf.append(name + ".class");
-              if (--i > 0)
-                sourceBuf.append(", ");
-            }
-
-            sourceBuf.append("})\n");
-          } else {
-            sourceBuf.append("\t@NotNull\n");
-          }
-        }
+        //暂时不实现notnull的定义，因为并不会每次都将每个属性提交到rest接口
+//        if (!field.isNullable()) {
+//          if (field.getType() == ParameterType.STRING) {
+//            sourceBuf.append("\t@NotEmpty\n");
+//          } else if (field.getColName().equalsIgnoreCase("id")) {
+//            //update groups
+//            sourceBuf.append("\t@NotNull(groups = {");
+//            int i = this.jsr303UpdateGroups.size();
+//            for (String name : this.jsr303UpdateGroups) {
+//              sourceBuf.append(name + ".class");
+//              if (--i > 0)
+//                sourceBuf.append(", ");
+//            }
+//            sourceBuf.append("})\n");
+//
+//            // insert groups
+//            sourceBuf.append("\t@Null(groups = {");
+//            i = this.jsr303InsertGroups.size();
+//            for (String name : this.jsr303InsertGroups) {
+//              sourceBuf.append(name + ".class");
+//              if (--i > 0)
+//                sourceBuf.append(", ");
+//            }
+//            sourceBuf.append("})\n");
+//          } else if (field.getColName().endsWith("id")) {
+//            //update groups
+//            sourceBuf.append("\t@NotNull(groups = {");
+//            int i = this.jsr303UpdateGroups.size();
+//            i = this.jsr303InsertGroups.size();
+//            if (i > 0) {
+//              for (String name : this.jsr303InsertGroups) {
+//                sourceBuf.append(name + ".class");
+//                if (--i > 0)
+//                  sourceBuf.append(", ");
+//              }
+//              if (!this.jsr303UpdateGroups.isEmpty()) {
+//                sourceBuf.append(", ");
+//              }
+//            }
+//            for (String name : this.jsr303UpdateGroups) {
+//              sourceBuf.append(name + ".class");
+//              if (--i > 0)
+//                sourceBuf.append(", ");
+//            }
+//
+//            sourceBuf.append("})\n");
+//          } else {
+//            sourceBuf.append("\t@NotNull\n");
+//          }
+//        }
         if (field.getSize() > 0) {
           if (field.getType() == ParameterType.STRING) {
             sourceBuf.append("\t@Size(max=" + field.getSize() + ")\n");
