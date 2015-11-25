@@ -159,19 +159,19 @@ public class DomainClass extends BaseClass {
         //notnull只用在insert中，，因为并不会每次修改都将每个属性提交到rest接口
         if (!field.isNullable() && !this.pkeys.containsKey(field.getColName())) {
           if (field.getType() == ParameterType.STRING) {
-            sourceBuf.append("\t@NotEmpty\n");
+            sourceBuf.append("\t@NotEmpty(groups = {");
           } else {
             sourceBuf.append("\t@NotNull(groups = {");
-            int i = this.jsr303InsertGroups.size();
-            if (i > 0) {
-              for (String name : this.jsr303InsertGroups) {
-                sourceBuf.append(name + ".class");
-                if (--i > 0)
-                  sourceBuf.append(", ");
-              }
-            }
-            sourceBuf.append("})\n");
           }
+          int i = this.jsr303InsertGroups.size();
+          if (i > 0) {
+            for (String name : this.jsr303InsertGroups) {
+              sourceBuf.append(name + ".class");
+              if (--i > 0)
+                sourceBuf.append(", ");
+            }
+          }
+          sourceBuf.append("})\n");
         }
         if (field.getSize() > 0) {
           if (field.getType() == ParameterType.STRING) {
