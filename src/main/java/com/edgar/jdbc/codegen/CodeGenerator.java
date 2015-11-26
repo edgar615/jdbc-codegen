@@ -406,20 +406,21 @@ public class CodeGenerator {
         logger.debug("{} is not autoincrement", autoIncable);
         isAutoInc = false;
       }
-      //根据字段类型映射属性类型
-      Parameter parameter = getParameter(domainClass, dbClass, cset, colName);
-
-      String humpName = CaseFormat.LOWER_UNDERSCORE.to(CaseFormat.LOWER_CAMEL, colName);
-      //add to db fields only
-      Field dbField = new Field();
-      dbFields.add(dbField);
-      dbField.setColName(colName);
-      dbField.setHumpName(humpName);
-      dbField.setType(parameter.getType());
-      dbField.setAutoInc(isAutoInc);
 
       //属性、方法
       if (!this.ignoreColumnList.contains(colName)) {
+        //根据字段类型映射属性类型
+        Parameter parameter = getParameter(domainClass, dbClass, cset, colName);
+
+        String humpName = CaseFormat.LOWER_UNDERSCORE.to(CaseFormat.LOWER_CAMEL, colName);
+        //add to db fields only
+        Field dbField = new Field();
+        dbFields.add(dbField);
+        dbField.setColName(colName);
+        dbField.setHumpName(humpName);
+        dbField.setType(parameter.getType());
+        dbField.setAutoInc(isAutoInc);
+
         Method method = new Method();
         methods.add(method);
         method.setName(CaseFormat.LOWER_CAMEL.to(CaseFormat.UPPER_CAMEL, humpName));
@@ -447,7 +448,7 @@ public class CodeGenerator {
           mapperXmlClass.setOptimisticLockColumn(colName);
         }
       } else {
-        logger.debug("ColName:{} is in ignore column list, so not adding to domain class", colName);
+        logger.debug("ColName:{} is in ignore column list, so not adding", colName);
       }
     }
 

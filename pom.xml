@@ -6,7 +6,7 @@
     <groupId>com.edgar.jdbc</groupId>
     <artifactId>jdbc-codegen</artifactId>
     <packaging>jar</packaging>
-    <version>1.0.3</version>
+    <version>1.0.5-SNAPSHOT</version>
     <name>Jdbc Code Generator</name>
     <url>https://github.com/kalyanmulampaka</url>
     <properties>

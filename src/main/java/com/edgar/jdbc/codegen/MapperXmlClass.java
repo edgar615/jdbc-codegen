@@ -500,15 +500,7 @@ public class MapperXmlClass extends BaseClass {
     }
     sourceBuf.append("\">\n");
     sourceBuf.append("\t\tselect");
-    int i = this.fields.size();
-    for (Field field : this.fields) {
-      if (field.isPersistable()) {
-        sourceBuf.append(" ").append(field.getColName());
-        if (--i > 0) {
-          sourceBuf.append(",");
-        }
-      }
-    }
+    sourceBuf.append("\n\t\t\t<include refid=\"all_column\" />");
     sourceBuf.append(" \n\t\tfrom ")
             .append(tableName);
     if (pkeys.size() == 1) {
@@ -517,7 +509,7 @@ public class MapperXmlClass extends BaseClass {
       sourceBuf.append(key).append(" = #{id}");
     } else if (pkeys.size() > 1) {
       sourceBuf.append(" \n\t\twhere ");
-      i = pkeys.size();
+      int i = pkeys.size();
       for (String key : pkeys.keySet()) {
         sourceBuf.append(key).append(" = ");
         sourceBuf.append("#{" + key + "}");
