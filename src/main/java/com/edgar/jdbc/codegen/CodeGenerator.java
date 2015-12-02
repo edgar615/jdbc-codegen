@@ -96,6 +96,8 @@ public class CodeGenerator {
 
   private String mapperExtendName;
 
+  private String domainExtendName;
+
   public CodeGenerator() {
 
   }
@@ -196,6 +198,7 @@ public class CodeGenerator {
     mapperXmlPackgeName = this.properties.getProperty("mapper.xml.package.name");
     rootFolderPath = this.properties.getProperty("src.folder.path");
     domainInterfaceName = this.properties.getProperty("domain.interface.name");
+    domainExtendName = this.properties.getProperty("domain.extends.name");
     mapperExtendName = this.properties.getProperty("repository.extend.name");
 
     String generateJsr303AnnotationsStr = this.properties.getProperty("generate.jsr303" +
@@ -302,6 +305,7 @@ public class CodeGenerator {
     domainClass.setMethods(methods);
     domainClass.setGenerateJsr303Annotations(generateJsr303Annotations);
     domainClass.setInterfaceName(domainInterfaceName);
+    domainClass.setExtendsClassName(domainExtendName);
 
     if (generateJsr303Annotations) {
       String insertGrpClass = this.properties.getProperty("insert.group.class");

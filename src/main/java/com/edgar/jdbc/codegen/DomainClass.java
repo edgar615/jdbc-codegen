@@ -88,6 +88,7 @@ public class DomainClass extends BaseClass {
     super.printImports();
     super.printClassComments();
     super.printClassDefn();
+    super.printClassExtends();
     this.printClassImplements();
 
     super.printOpenBrace(0, 2);
