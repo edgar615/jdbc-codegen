@@ -18,6 +18,8 @@
  */
 package com.edgar.jdbc.codegen;
 
+import com.edgar.jdbc.codegen.ParameterType;
+
 import java.util.ArrayList;
 import java.util.List;
 

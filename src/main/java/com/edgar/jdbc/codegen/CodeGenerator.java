@@ -122,8 +122,6 @@ public class CodeGenerator {
     Connection conn = null;
     try {
       //加载属性文件
-      this.loadProperties();
-      this.setProperties();
       conn = this.getConnection();
       DatabaseMetaData metaData = conn.getMetaData();
 
@@ -165,99 +163,6 @@ public class CodeGenerator {
         }
       }
     }
-  }
-
-  private void loadProperties() throws Exception {
-    if (Strings.isNullOrEmpty(this.propertiesFile)) {
-      logger.error("Properties file is not set");
-      throw new Exception("Properties file is not set");
-    }
-    logger.info("Loading properties from file:" + propertiesFile);
-    File f = new File(this.propertiesFile);
-    if (!f.exists()) {
-      throw new Exception(this.propertiesFile + " file does not exist");
-    }
-    FileInputStream propFile = new FileInputStream(propertiesFile);
-    this.properties = new Properties();
-    this.properties.load(propFile);
-    logger.debug("Loaded properties:" + this.properties);
-    propFile.close();
-
-  }
-
-  private void setProperties() throws Exception {
-    if (this.properties == null || this.properties.isEmpty()) {
-      throw new Exception("Properties are not set.");
-    }
-    srcFolderPath = this.properties.getProperty("src.folder.path");
-    logger.info("Generated Sources will be in folder:{}", srcFolderPath);
-    domainPackageName = this.properties.getProperty("domain.package.name");
-    dbPackageName = this.properties.getProperty("repository.db.package.name");
-    mapperPackageName = this.properties.getProperty("repository.package.name");
-    rootResourceFolderPath = this.properties.getProperty("resource.folder.path");
-    mapperXmlPackgeName = this.properties.getProperty("mapper.xml.package.name");
-    rootFolderPath = this.properties.getProperty("src.folder.path");
-    domainInterfaceName = this.properties.getProperty("domain.interface.name");
-    domainExtendName = this.properties.getProperty("domain.extends.name");
-    mapperExtendName = this.properties.getProperty("repository.extend.name");
-
-    String generateJsr303AnnotationsStr = this.properties.getProperty("generate.jsr303" +
-                                                                              ".annotations");
-
-    if (!Strings.isNullOrEmpty(generateJsr303AnnotationsStr)) {
-      generateJsr303Annotations = Boolean.parseBoolean(generateJsr303AnnotationsStr);
-    }
-
-    String generateRepositoryAnnotationsStr = this.properties.getProperty("generate.repository" +
-                                                                                  ".annotations");
-
-    if (!Strings.isNullOrEmpty(generateRepositoryAnnotationsStr)) {
-      generateRepositoryAnnotations = Boolean.parseBoolean(generateRepositoryAnnotationsStr);
-    }
-
-    // 忽略的字段
-    String ignoreColumnListStr = this.properties.getProperty("ignore.columnlist");
-    if (!Strings.isNullOrEmpty(ignoreColumnListStr)) {
-      StringTokenizer strTok = new StringTokenizer(ignoreColumnListStr, ",");
-      while (strTok.hasMoreTokens()) {
-        this.ignoreColumnList.add(strTok.nextToken().toLowerCase().trim());
-      }
-      logger.info("Ignore column list:{}", this.ignoreColumnList);
-    }
-
-    // 更新和插入忽略的字段
-    String ignoreUpdatedColumnListStr = this.properties.getProperty("ignore.updated.columnlist");
-    if (!Strings.isNullOrEmpty(ignoreUpdatedColumnListStr)) {
-      StringTokenizer strTok = new StringTokenizer(ignoreUpdatedColumnListStr, ",");
-      while (strTok.hasMoreTokens()) {
-        this.ignoreUpdatedColumnList.add(strTok.nextToken().toLowerCase().trim());
-      }
-      logger.info("Ignore updated column list:{}", this.ignoreUpdatedColumnList);
-    }
-
-    // 乐观锁字段
-    optimisticLockColumn = this.properties.getProperty("optimistic.lock.column");
-    logger.info("OptimisticLock updated column:{}", this.optimisticLockColumn);
-
-    //忽略的table
-    String ignoreTableListStr = this.properties.getProperty("ignore.tablelist");
-    if (!Strings.isNullOrEmpty(ignoreTableListStr)) {
-      StringTokenizer strTok = new StringTokenizer(ignoreTableListStr, ",");
-      while (strTok.hasMoreTokens()) {
-        String token = strTok.nextToken().toLowerCase().trim();
-        if (CharMatcher.anyOf("*").indexIn(token) == 0) {
-          this.ignoreTableEndsWithPattern.add(token.substring(1, token.length()));
-        } else if (CharMatcher.anyOf("*").lastIndexIn(token) == token.length() - 1) {
-          this.ignoreTableStartsWithPattern.add(token.substring(0, token.length() - 1));
-        } else {
-          this.ignoreTableList.add(token);
-        }
-      }
-      logger.info("Ignore table list:{}", this.ignoreTableList);
-      logger.info("Ignore table Starts with pattern:{}", this.ignoreTableStartsWithPattern);
-      logger.info("Ignore table Ends with pattern:{}", this.ignoreTableEndsWithPattern);
-    }
-
   }
 
   private boolean ignoreTable(String tableName) {
