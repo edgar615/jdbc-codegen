@@ -6,7 +6,7 @@
     <groupId>com.edgar.jdbc</groupId>
     <artifactId>jdbc-codegen</artifactId>
     <packaging>jar</packaging>
-    <version>1.0.5-SNAPSHOT</version>
+    <version>1.0.6-SNAPSHOT</version>
     <name>Jdbc Code Generator</name>
     <url>https://github.com/kalyanmulampaka</url>
     <properties>
@@ -77,12 +77,6 @@
             <artifactId>mysql-connector-java</artifactId>
             <version>${mysql.jdbc.version}</version>
             <scope>provided</scope>
-        </dependency>
-        <!-- Logging -->
-        <dependency>
-            <groupId>commons-io</groupId>
-            <artifactId>commons-io</artifactId>
-            <version>${commons.io.version}</version>
         </dependency>
         <dependency>
             <groupId>org.slf4j</groupId>

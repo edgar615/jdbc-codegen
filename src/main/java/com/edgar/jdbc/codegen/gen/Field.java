@@ -18,11 +18,8 @@
  */
 package com.edgar.jdbc.codegen.gen;
 
-import com.google.common.base.CaseFormat;
-
-import com.edgar.jdbc.codegen.Parameter;
-import com.edgar.jdbc.codegen.ParameterType;
 import com.edgar.jdbc.codegen.db.Column;
+import com.google.common.base.CaseFormat;
 
 import java.sql.Types;
 
@@ -34,7 +31,7 @@ public class Field {
   /**
    * 参数类型
    */
-  private Parameter type;
+  private ParameterType type;
 
   /**
    * 字段名称
@@ -85,7 +82,7 @@ public class Field {
     field.setPrimary(column.isPrimary());
     field.setSize(column.getSize());
     //TODO
-    field.setType(field.getParameter(column));
+    field.setType(field.getType(column));
     return field;
   }
 
@@ -137,11 +134,11 @@ public class Field {
     this.defaultValue = defaultValue;
   }
 
-  public Parameter getType() {
-    return this.type;
+  public ParameterType getType() {
+    return type;
   }
 
-  public void setType(Parameter type) {
+  public void setType(ParameterType type) {
     this.type = type;
   }
 
@@ -153,29 +150,29 @@ public class Field {
     this.colName = colName;
   }
 
-  private Parameter getParameter(Column column)  {
+  private ParameterType getType(Column column)  {
 
     int colType = column.getType();
-    Parameter parameter = null;
+    ParameterType parameter = null;
     if ((colType == Types.VARCHAR) || (colType == Types.LONGVARCHAR) || (colType == Types.CLOB)) {
-      parameter = new Parameter(colName, ParameterType.STRING);
+      parameter = ParameterType.STRING;
     } else if (colType == Types.BIGINT) {
-      parameter = new Parameter(colName, ParameterType.LONG);
+      parameter = ParameterType.LONG;
     } else if ((colType == Types.DOUBLE) || (colType == Types.NUMERIC)) {
-      parameter = new Parameter(colName, ParameterType.DOUBLE);
+      parameter = ParameterType.DOUBLE;
     } else if ((colType == Types.FLOAT) || (colType == Types.DECIMAL)) {
-      parameter = new Parameter(colName, ParameterType.FLOAT);
+      parameter = ParameterType.FLOAT;
     } else if ((colType == Types.INTEGER) || (colType == Types.SMALLINT) || (colType == Types.TINYINT)) {
-      parameter = new Parameter(colName, ParameterType.INTEGER);
+      parameter = ParameterType.INTEGER;
     } else if ((colType == Types.TIMESTAMP) || (colType == Types.TIME) || (colType == Types.DATE)) {
-      parameter = new Parameter(colName, ParameterType.DATE);
+      parameter = ParameterType.DATE;
     } else if ((colType == Types.BIT) || (colType == Types.BOOLEAN)) {
-      parameter = new Parameter(colName, ParameterType.BOOLEAN);
+      parameter = ParameterType.BOOLEAN;
     } else if (colType == Types.CHAR) {
-      parameter = new Parameter(colName, ParameterType.STRING);
+      parameter = ParameterType.STRING;
     } else {
       // no specific type found so set to generic object
-      parameter = new Parameter(colName, ParameterType.OBJECT);
+      parameter = ParameterType.OBJECT;
     }
     return parameter;
   }

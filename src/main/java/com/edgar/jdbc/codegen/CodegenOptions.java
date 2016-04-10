@@ -18,19 +18,21 @@ public class CodegenOptions {
   public static final String DEFAULT_RESOURCE_FOLDER_PATH = "src";
 
   //domain
-  public static final String DEFAULT_DOMAIN_PACKAGE = "com.generated.code.domain";
+  public static final String DEFAULT_DOMAIN_PACKAGE = "com.edgar.code.domain";
 
-  public static final String DEFAULT_DOMAIN_INTERFACES = "com.edgar.repository.Persistable";
+  public static final String DEFAULT_DOMAIN_INTERFACES = "";
 
-  public static final String DEFAULT_DOMAIN_EXTEND = "com.csst.core.model.BaseModel";
+  public static final String DEFAULT_DOMAIN_EXTEND = "";
 
   //mapper
-  public static final String DEFAULT_MAPPER_PACKAGE = "com.generated.code.domain";
+  public static final String DEFAULT_MAPPER_PACKAGE = "com.edgar.code.mapper";
 
-  public static final String DEFAULT_MAPPER_EXTENDS = "com.edgar.repository.Persistable";
+  public static final String DEFAULT_MAPPER_EXTENDS = "";
+
+  public static final boolean DEFAULT_GEN_REPOSITORY_ANNOTATION = false;
 
   //xml
-  public static final String DEFAULT_XML_PACKAGE = "com.generated.code.mapper";
+  public static final String DEFAULT_XML_PACKAGE = "com.edgar.code.mapper";
 
   //支持通配符,product, exa*, *e
   public static final String DEFAULT_IGNORE_TABLES = null;
@@ -86,6 +88,8 @@ public class CodegenOptions {
 
   private String mapperExtends;
 
+  private boolean genRepositoryAnnotation;
+
   private String xmlPackage;
 
   private String ignoreTablesStr;
@@ -119,6 +123,7 @@ public class CodegenOptions {
     this.domainExtend = DEFAULT_DOMAIN_EXTEND;
     this.mapperPackage = DEFAULT_MAPPER_PACKAGE;
     this.mapperExtends = DEFAULT_MAPPER_EXTENDS;
+    this.genRepositoryAnnotation = DEFAULT_GEN_REPOSITORY_ANNOTATION;
     this.xmlPackage = DEFAULT_XML_PACKAGE;
     this.ignoreTablesStr = DEFAULT_IGNORE_TABLES;
     this.ignoreColumnsStr = DEFAULT_IGNORE_COLUMN;
@@ -134,6 +139,14 @@ public class CodegenOptions {
     setIgnoreTable();
 
     setIgnoreColumn();
+  }
+
+  public boolean isGenRepositoryAnnotation() {
+    return genRepositoryAnnotation;
+  }
+
+  public void setGenRepositoryAnnotation(boolean genRepositoryAnnotation) {
+    this.genRepositoryAnnotation = genRepositoryAnnotation;
   }
 
   public String getSrcFolderPath() {

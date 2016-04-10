@@ -16,7 +16,7 @@
  *
  * @author Kalyan Mulampaka
  */
-package com.edgar.jdbc.codegen;
+package com.edgar.jdbc.codegen.gen;
 
 /**
  * Enum class for method parameter or return types

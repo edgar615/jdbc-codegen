@@ -248,7 +248,7 @@ The following properties created in a file named, codegenerator.properties is re
     # Generated domain class and interfaces will be created with the following package name and folder structure
     domain.package.name=com.generated.code.domain
  ```   
-Domain classes can be generated with JSR-303 validation annotations. Validations are based on the column size, type, constraints.
+Domain classes can be generated with JSR-303 validation annotations. Validations are based on the column size, parameterType, constraints.
 
 ``` java
     # Generate jsr-303 validation annotations

@@ -1,12 +1,7 @@
 package com.edgar.jdbc.codegen.test;
 
 import com.edgar.jdbc.codegen.CodegenOptions;
-import com.edgar.jdbc.codegen.FetchDataFromDB;
-import com.edgar.jdbc.codegen.db.Table;
-import com.edgar.jdbc.codegen.gen.ClassDefSourceGen;
-import com.edgar.jdbc.codegen.gen.Domain;
-
-import java.util.List;
+import com.edgar.jdbc.codegen.CodeGenerator;
 
 /**
  * Created by Administrator on 2015/6/9.
@@ -14,21 +9,17 @@ import java.util.List;
 public class FetchDataFromTest {
 
   public static void main(String[] args) throws Exception {
-    CodegenOptions options = new CodegenOptions().setUsername("admin")
-            .setPassword("csst")
+    CodegenOptions options = new CodegenOptions().setUsername("root")
+            .setPassword("123456")
             .setIgnoreTablesStr("*io,his*")
             .setIgnoreColumnsStr("created*,updated_on")
             .setJdbcUrl(
-                    "jdbc:mysql://10.4.7"
-                    + ".48:3306/task");
-    FetchDataFromDB fetchDataFromDB = new FetchDataFromDB(options);
-    List<Table> tables = fetchDataFromDB.fetchTablesFromDb();
-    tables.forEach(table -> System.out.println(table));
+                    "jdbc:mysql://localhost:3306/fire")
+            .setJsr303(true)
+            .setIgnoreColumnsStr("photo_path,degree")
+            .setDomainExtend("com.csst.core.model.BaseModel")
+            .setMapperExtends("com.csst.core.mapper.BaseMapper");
 
-    tables.forEach(table -> {
-      Domain domain = Domain.create(table);
-      ClassDefSourceGen gen = new ClassDefSourceGen();
-      System.out.println(gen.gen(domain, options));
-    });
+    CodeGenerator.create(options).generateCode();
   }
 }

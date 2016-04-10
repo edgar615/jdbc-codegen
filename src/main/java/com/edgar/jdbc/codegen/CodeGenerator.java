@@ -1,184 +1,116 @@
-/**
- *
- * Copyright 2013
- *
- * Licensed under the Apache License, Version 2.0 (the "License"); you may not
- * use this file except in compliance with the License. You may obtain a copy of
- * the License at
- *
- * http://www.apache.org/licenses/LICENSE-2.0
- *
- * Unless required by applicable law or agreed to in writing, software
- * distributed under the License is distributed on an "AS IS" BASIS, WITHOUT
- * WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied. See the
- * License for the specific language governing permissions and limitations under
- * the License.
- *
- * @author Kalyan Mulampaka
- */
 package com.edgar.jdbc.codegen;
 
-import com.google.common.base.CaseFormat;
-import com.google.common.base.CharMatcher;
-import com.google.common.base.Splitter;
-import com.google.common.base.Strings;
-import com.google.common.collect.Iterables;
-
-import com.edgar.jdbc.codegen.util.CodeGenUtil;
+import com.edgar.jdbc.codegen.db.Column;
+import com.edgar.jdbc.codegen.db.Table;
+import com.edgar.jdbc.codegen.gen.Domain;
+import com.edgar.jdbc.codegen.gen.Mapper;
+import com.edgar.jdbc.codegen.gen.MapperXml;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import java.io.File;
-import java.io.FileInputStream;
-import java.sql.Connection;
-import java.sql.DatabaseMetaData;
-import java.sql.DriverManager;
-import java.sql.ResultSet;
-import java.sql.SQLException;
-import java.sql.Types;
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Properties;
-import java.util.StringTokenizer;
+import java.sql.*;
+import java.util.*;
 
 /**
- * Code generator class which creates Java bean classes and interfaces for all
- * the tables in the input database schema. Reads the properties file named
- * generator.properties.
- * 删除了对外键的生成，因为在大多数的应用中，都不会考虑到外键
+ * Created by Edgar on 2016/4/1.
  *
- * @author Kalyan Mulampaka， Edgar
+ * @author Edgar  Date 2016/4/1
  */
 public class CodeGenerator {
-  final static Logger logger = LoggerFactory.getLogger(CodeGenerator.class);
 
-  private Properties properties;
+  private static final Logger LOGGER = LoggerFactory.getLogger(CodeGenerator.class);
 
-  //忽略的字段
-  private List<String> ignoreColumnList = new ArrayList<String>();
+  private CodegenOptions options;
 
-  //更新时忽略的字段
-  private List<String> ignoreUpdatedColumnList = new ArrayList<String>();
-
-  //乐观锁字段
-  private String optimisticLockColumn;
-
-  //忽略的表
-  private List<String> ignoreTableList = new ArrayList<String>();
-
-  //使用前缀匹配忽略的表
-  private List<String> ignoreTableStartsWithPattern = new ArrayList<String>();
-
-  //使用后缀匹配忽略的表
-  private List<String> ignoreTableEndsWithPattern = new ArrayList<String>();
-
-  private String propertiesFile;
-
-  private String srcFolderPath;
-
-  private String domainPackageName;
-
-  private String dbPackageName;
-
-  private String mapperPackageName;
-
-  private String rootResourceFolderPath;
-
-  private String mapperXmlPackgeName;
-
-  private String rootFolderPath;
-
-  private boolean generateJsr303Annotations = false;
-
-  private boolean generateRepositoryAnnotations = false;
-
-  private String domainInterfaceName;
-
-  private String mapperExtendName;
-
-  private String domainExtendName;
-
-  public CodeGenerator() {
-
+  private CodeGenerator(CodegenOptions options) {
+    this.options = options;
   }
 
-  public Properties getProperties() {
-    return properties;
+  public static CodeGenerator create(CodegenOptions options) {
+    return new CodeGenerator(options);
   }
 
-  public void setProperties(Properties properties) {
-    this.properties = properties;
+  public void generateCode() throws Exception {
+    CodeGenUtil.createPackage(options.getSrcFolderPath(), options.getDomainPackage());
+    CodeGenUtil.createPackage(options.getSrcFolderPath(), options.getMapperPackage());
+    CodeGenUtil.createPackage(options.getResourceFolderPath(), options.getXmlPackage());
+
+    CodeGenerator codeGenerator = new CodeGenerator(options);
+    List<Table> tables = codeGenerator.fetchTablesFromDb();
+    tables.forEach(table -> {
+      Domain domain = Domain.create(table, options);
+      domain.setRootFolderPath(options.getSrcFolderPath());
+      domain.setPackageName(options.getDomainPackage());
+
+      Mapper mapper = new Mapper(domain.getName(), domain.getPkField().getType(), options);
+      mapper.setRootFolderPath(options.getSrcFolderPath());
+      mapper.setPackageName(options.getMapperPackage());
+
+      MapperXml mapperXml = new MapperXml(domain, options);
+      try {
+        domain.createFile();
+        mapper.createFile();
+        mapperXml.createFile();
+      } catch (Exception e) {
+        throw new RuntimeException(e);
+      }
+    });
   }
 
-  public String getPropertiesFile() {
-    return this.propertiesFile;
-  }
-
-  public void setPropertiesFile(String propertiesFile) {
-    this.propertiesFile = propertiesFile;
-  }
-
-  public void generate() {
+  private List<Table> fetchTablesFromDb() {
+    List<Table> tables = new ArrayList<>();
     Connection conn = null;
     try {
-      //加载属性文件
       conn = this.getConnection();
       DatabaseMetaData metaData = conn.getMetaData();
 
       if (metaData != null) {
 
-        //创建包
-        CodeGenUtil.createPackage(srcFolderPath, domainPackageName);
-//				CodeGenUtil.createPackage (srcFolderPath, dbPackageName);
-        CodeGenUtil.createPackage(srcFolderPath, mapperPackageName);
-        CodeGenUtil.createPackage(rootResourceFolderPath, mapperXmlPackgeName);
-
         //读取table
         ResultSet rset = metaData.getTables(null, null, null, new String[]{"TABLE"});
         while (rset.next()) {
           String tableName = rset.getString("TABLE_NAME");
-          logger.info("Found Table:" + tableName);
-          if (this.ignoreTable(tableName.toLowerCase())) {
-            logger.info("Table:{} is in the ignore table list, not generating code for this table" +
-                                ".", tableName);
-            continue;
-          }
-          logger.debug("DB Product name:{}", metaData.getDatabaseProductName());
-          logger.debug("DB Product version:{}", metaData.getDatabaseProductVersion());
+          LOGGER.info("Found Table:" + tableName);
+          LOGGER.debug("DB Product name:{}", metaData.getDatabaseProductName());
+          LOGGER.debug("DB Product version:{}", metaData.getDatabaseProductVersion());
 
           // for each table create the classes
-          this.createClasses(metaData, tableName);
-
+          Table table = this.createTable(metaData, tableName);
+          if (this.ignoreTable(tableName.toLowerCase())) {
+            table.setIgnore(true);
+          }
+          tables.add(table);
         }
       }
     } catch (Exception e) {
-      logger.error("Error occcured during code generation." + e);
+      LOGGER.error("Error occcured during code generation." + e);
       e.printStackTrace();
     } finally {
       if (conn != null) {
         try {
           conn.close();
         } catch (Exception e) {
-          logger.warn("Error closing db connection.{}", e);
+          LOGGER.warn("Error closing db connection.{}", e);
         }
       }
     }
+    return tables;
   }
 
   private boolean ignoreTable(String tableName) {
 
     // first do a actual match
-    if (this.ignoreTableList.contains(tableName.toLowerCase())) {
+    if (this.options.getIgnoreTableList().contains(tableName.toLowerCase())) {
       return true;
     }
     // do a startswith check
-    for (String ignoreStartsWithPattern : this.ignoreTableStartsWithPattern) {
+    for (String ignoreStartsWithPattern : this.options.getIgnoreTableStartsWithPattern()) {
       if (tableName.startsWith(ignoreStartsWithPattern)) {
         return true;
       }
     }
     // do a startswith check
-    for (String ignoreEndsWithPattern : this.ignoreTableEndsWithPattern) {
+    for (String ignoreEndsWithPattern : this.options.getIgnoreTableEndsWithPattern()) {
       if (tableName.endsWith(ignoreEndsWithPattern)) {
         return true;
       }
@@ -186,243 +118,97 @@ public class CodeGenerator {
     return false;
   }
 
-  private void createClasses(DatabaseMetaData metaData, String tableName) throws Exception {
-
-    String generateJsr303AnnotationsStr = this.properties.getProperty("generate.jsr303" +
-                                                                              ".annotations");
-    boolean generateJsr303Annotations = false;
-    if (!Strings.isNullOrEmpty(generateJsr303AnnotationsStr)) {
-      generateJsr303Annotations = Boolean.parseBoolean(generateJsr303AnnotationsStr);
+  private Connection getConnection() throws SQLException {
+    Connection conn = null;
+    LOGGER.info("Trying to connect to db using the properties...");
+    String userName = options.getUsername();
+    String password = options.getPassword();
+    LOGGER.info(
+            "Connecting to database at:[" + options.getJdbcUrl() + "]" + " with username/password:["
+                    +
+                    userName + "/" + password + "]");
+    Properties connProps = new Properties();
+    if (userName == null && password == null) {
+      conn = DriverManager.getConnection(options.getJdbcUrl());
+    } else {
+      connProps.put("user", userName);
+      connProps.put("password", password);
+      conn = DriverManager.getConnection(options.getJdbcUrl(), connProps);
     }
 
-    List<Field> fields = new ArrayList<Field>();
-    List<Field> dbFields = new ArrayList<Field>();
-    List<Method> methods = new ArrayList<Method>();
-    String humpTableName = CaseFormat.LOWER_UNDERSCORE.to(CaseFormat.UPPER_CAMEL, tableName
-            .toLowerCase());
-    DomainClass domainClass = new DomainClass();
-    domainClass.setDbProductName(metaData.getDatabaseProductName());
-    domainClass.setDbProductVersion(metaData.getDatabaseProductVersion());
-    domainClass.setName(humpTableName);
-    domainClass.setRootFolderPath(rootFolderPath);
-    domainClass.setPackageName(domainPackageName);
-    domainClass.setFields(fields);
-    domainClass.setMethods(methods);
-    domainClass.setGenerateJsr303Annotations(generateJsr303Annotations);
-    domainClass.setInterfaceName(domainInterfaceName);
-    domainClass.setExtendsClassName(domainExtendName);
+    LOGGER.info("Connected to database");
+    return conn;
+  }
 
-    if (generateJsr303Annotations) {
-      String insertGrpClass = this.properties.getProperty("insert.group.class");
-      // TODO
-      if (!Strings.isNullOrEmpty(insertGrpClass)) {
-        String[] classes = Iterables.toArray(Splitter.on(",").trimResults().split(insertGrpClass)
-                , String.class);
-        for (String c : classes) {
-          if (!domainClass.getImports().contains(c.trim()))
-            domainClass.getImports().add(c.trim());
-          String[] classNameTokens = Iterables.toArray(Splitter.on(".").split(c.trim()), String
-                  .class);
-          // add only the class name and the FQ class name since the import is added
-          domainClass.getJsr303InsertGroups().add(classNameTokens[classNameTokens.length - 1]);
-        }
-      }
-      // TODO
-      String updateGrpClass = this.properties.getProperty("update.group.class");
-      if (!Strings.isNullOrEmpty(updateGrpClass)) {
-        String[] classes = Iterables.toArray(Splitter.on(",").trimResults().split(updateGrpClass)
-                , String.class);
-        for (String c : classes) {
-          if (!domainClass.getImports().contains(c.trim()))
-            domainClass.getImports().add(c.trim());
-          String[] classNameTokens = Iterables.toArray(Splitter.on(".").split(c.trim()), String
-                  .class);
-          // add only the class name and the FQ class name since the import is added
-          domainClass.getJsr303UpdateGroups().add(classNameTokens[classNameTokens.length - 1]);
-        }
-      }
-    }
+  private Table createTable(DatabaseMetaData metaData, String tableName) throws Exception {
 
-    // create the db class
-    DBClass dbClass = new DBClass();
-    dbClass.getImports().add(domainPackageName + "." + domainClass.getName());
-    dbClass.setName(humpTableName);
-    dbClass.setRootFolderPath(rootFolderPath);
-    dbClass.setPackageName(dbPackageName);
-    dbClass.setFields(dbFields);
-
-    //mapper xml
-    MapperXmlClass mapperXmlClass = new MapperXmlClass();
-    mapperXmlClass.setName(humpTableName);
-    mapperXmlClass.setTableName(tableName);
-    mapperXmlClass.setRootFolderPath(rootResourceFolderPath);
-    mapperXmlClass.setPackageName(mapperXmlPackgeName);
-    mapperXmlClass.setFields(dbFields);
-    mapperXmlClass.setMapperPackageName(mapperPackageName);
-    mapperXmlClass.setIgnoreUpdatedColumnListStr(ignoreUpdatedColumnList);
-
-    //创建MyBatis的Mapper
-    MapperClass mapperClass = new MapperClass();
-//    mapperClass.createLogger();
-    mapperClass.getImports().add(domainPackageName + "." + domainClass.getName());
-    mapperClass.setName(humpTableName);
-    mapperClass.setRootFolderPath(rootFolderPath);
-    mapperClass.setPackageName(mapperPackageName);
-    mapperClass.setGenerateRepositoryAnnotations(generateRepositoryAnnotations);
-    mapperClass.setExtendsClassName(mapperExtendName);
+    Table table = Table.create(tableName);
+    Set<String> pks = new HashSet<>();
     //主键
     ResultSet pkSet = metaData.getPrimaryKeys(null, null, tableName);
     while (pkSet.next()) {
       String pkColName = pkSet.getString("COLUMN_NAME").toLowerCase();
       String pkName = pkSet.getString("PK_NAME").toLowerCase();
       String keySeq = pkSet.getString("KEY_SEQ").toLowerCase();
-      domainClass.getPkeys().put(pkColName, null);
-      logger.debug("PK:ColName:{}, PKName:{}, Key Seq:{}", new Object[]{pkColName, pkName, keySeq});
+      pks.add(pkColName);
+      LOGGER.debug("PK:ColName:{}, PKName:{}, Key Seq:{}", new Object[]{pkColName, pkName,
+              keySeq});
     }
-
-    mapperClass.setPkeys(domainClass.getPkeys());
-    dbClass.setPkeys(domainClass.getPkeys());
-    mapperXmlClass.setPkeys(domainClass.getPkeys());
 
     //字段
     ResultSet cset = metaData.getColumns(null, null, tableName, null);
     while (cset.next()) {
-      String colName = cset.getString("COLUMN_NAME").toLowerCase();
-      logger.debug("Found Column:" + colName);
-      int colSize = cset.getInt("COLUMN_SIZE");
-      logger.debug("Column size:{}", colSize);
-
-      String defaultValue = cset.getString("COLUMN_DEF");
-      logger.debug("Column Default value:{}", defaultValue);
-      String nullable = cset.getString("IS_NULLABLE");
-      boolean isNullable = false;
-      logger.debug("Is nullable:{}", nullable);
-      if ("YES".equalsIgnoreCase(nullable)) {
-        logger.debug("{} is nullable", colName);
-        isNullable = true;
-      } else {
-        logger.debug("{} is not nullable", colName);
-        isNullable = false;
-      }
-
-      String autoIncable = cset.getString("IS_AUTOINCREMENT");
-      boolean isAutoInc = false;
-      if ("YES".equalsIgnoreCase(autoIncable)) {
-        logger.debug("{} is autoincrement", colName);
-        isAutoInc = true;
-        mapperXmlClass.setHasAutoIncCol(isAutoInc);
-      } else {
-        logger.debug("{} is not autoincrement", autoIncable);
-        isAutoInc = false;
-      }
-
-      //属性、方法
-      if (!this.ignoreColumnList.contains(colName)) {
-        //根据字段类型映射属性类型
-        Parameter parameter = getParameter(domainClass, dbClass, cset, colName);
-
-        String humpName = CaseFormat.LOWER_UNDERSCORE.to(CaseFormat.LOWER_CAMEL, colName);
-        //add to db fields only
-        Field dbField = new Field();
-        dbFields.add(dbField);
-        dbField.setColName(colName);
-        dbField.setHumpName(humpName);
-        dbField.setType(parameter.getType());
-        dbField.setAutoInc(isAutoInc);
-
-        Method method = new Method();
-        methods.add(method);
-        method.setName(CaseFormat.LOWER_CAMEL.to(CaseFormat.UPPER_CAMEL, humpName));
-        method.setParameter(parameter);
-
-        Field field = new Field();
-        fields.add(field);
-        field.setNullable(isNullable);
-        field.setSize(colSize);
-        field.setColName(colName);
-        field.setHumpName(humpName);
-        field.setType(parameter.getType());
-        field.setDefaultValue(defaultValue);
-        field.setPrimitive(parameter.getType().isPrimitive());
-        field.setAutoInc(isAutoInc);
-
-        boolean isPkCol = domainClass.getPkeys().containsKey(colName);
-        if (isPkCol) {
-          domainClass.getPkeys().put(colName, parameter.getType());
-          logger.debug("Found pk col:{} , type:{}", colName, parameter.getType().getName());
-
-        }
-        //判断mapperXmlClass的乐观锁字段
-        if (optimisticLockColumn.equalsIgnoreCase(colName)) {
-          mapperXmlClass.setOptimisticLockColumn(colName);
-        }
-      } else {
-        logger.debug("ColName:{} is in ignore column list, so not adding", colName);
-      }
+      Column column = createColumn(cset, pks);
+      table.addColumn(column);
+      LOGGER.debug("Found Column:" + column);
     }
-
-    domainClass.createFile();
-//		dbClass.createFile ();
-    mapperClass.createFile();
-    mapperXmlClass.createFile();
+    return table;
   }
 
+  private Column createColumn(ResultSet cset, Set<String> pks) throws SQLException {
+    Column.ColumnBuilder builder = Column.builder();
 
-  private Parameter getParameter(DomainClass domainClass, DBClass dbClass, ResultSet cset, String
-          colName) throws SQLException {
+    String colName = cset.getString("COLUMN_NAME").toLowerCase();
+    builder.setName(colName);
+
+    //pk
+    if (pks.contains(colName)) {
+      builder.setPrimary(true);
+    }
+
+    int colSize = cset.getInt("COLUMN_SIZE");
+    builder.setSize(colSize);
+
+    String defaultValue = cset.getString("COLUMN_DEF");
+    builder.setDefaultValue(defaultValue);
+
+    String nullable = cset.getString("IS_NULLABLE");
+    boolean isNullable = false;
+    if ("YES".equalsIgnoreCase(nullable)) {
+      builder.setNullable(true);
+    } else {
+      builder.setNullable(false);
+    }
+
+    String autoIncable = cset.getString("IS_AUTOINCREMENT");
+    if ("YES".equalsIgnoreCase(autoIncable)) {
+      builder.setAutoInc(true);
+    } else {
+      builder.setAutoInc(false);
+    }
+
+    if (pks.contains(colName)) {
+      builder.setPrimary(true);
+    }
+
     int type = cset.getInt("DATA_TYPE");
-    logger.debug("Column DataType:" + type);
+    builder.setType(type);
 
-    Parameter parameter = null;
-    if ((type == Types.VARCHAR) || (type == Types.LONGVARCHAR) || (type == Types.CLOB)) {
-      parameter = new Parameter(colName, ParameterType.STRING);
-    } else if (type == Types.BIGINT) {
-      parameter = new Parameter(colName, ParameterType.LONG);
-    } else if ((type == Types.DOUBLE) || (type == Types.NUMERIC)) {
-      parameter = new Parameter(colName, ParameterType.DOUBLE);
-    } else if ((type == Types.FLOAT) || (type == Types.DECIMAL)) {
-      parameter = new Parameter(colName, ParameterType.FLOAT);
-    } else if ((type == Types.INTEGER) || (type == Types.SMALLINT) || (type == Types.TINYINT)) {
-      parameter = new Parameter(colName, ParameterType.INTEGER);
-    } else if ((type == Types.TIMESTAMP) || (type == Types.TIME) || (type == Types.DATE)) {
-      if (!domainClass.getImports().contains("java.util.Date")) {
-        domainClass.getImports().add("java.util.Date");
-      }
-      if (!dbClass.getImports().contains("java.sql.Timestamp")) {
-        dbClass.getImports().add("java.sql.Timestamp");
-      }
-      parameter = new Parameter(colName, ParameterType.DATE);
-    } else if ((type == Types.BIT) || (type == Types.BOOLEAN)) {
-      parameter = new Parameter(colName, ParameterType.BOOLEAN);
-    } else if (type == Types.CHAR) {
-      parameter = new Parameter(colName, ParameterType.STRING);
-    } else {
-      // no specific type found so set to generic object
-      parameter = new Parameter(colName, ParameterType.OBJECT);
+    //属性、方法
+    //TODO 通配符
+    if (this.options.getIgnoreColumnList().contains(colName)) {
+      builder.setIgnore(true);
     }
-    return parameter;
+    return builder.build();
   }
-
-  private Connection getConnection() throws SQLException {
-    Connection conn = null;
-    logger.info("Trying to connect to db using the properties...");
-    String url = this.properties.getProperty("jdbc.url");
-    String userName = this.properties.getProperty("jdbc.username");
-    String password = this.properties.getProperty("jdbc.password");
-    logger.info("Connecting to database at:[" + url + "]" + " with username/password:[" +
-                        userName + "/" + password + "]");
-    Properties connProps = new Properties();
-    if (userName == null && password == null) {
-      conn = DriverManager.getConnection(url);
-    } else {
-      connProps.put("user", userName);
-      connProps.put("password", password);
-      conn = DriverManager.getConnection(url, connProps);
-    }
-
-    logger.info("Connected to database");
-    return conn;
-  }
-
-
 }
