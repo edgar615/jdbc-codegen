@@ -1,7 +1,7 @@
 package com.edgar.jdbc.codegen.test;
 
-import com.edgar.jdbc.codegen.CodegenOptions;
-import com.edgar.jdbc.codegen.CodeGenerator;
+import com.edgar.jdbc.codegen.gen.CodegenOptions;
+import com.edgar.jdbc.codegen.gen.Generator;
 
 /**
  * Created by Administrator on 2015/6/9.
@@ -9,17 +9,17 @@ import com.edgar.jdbc.codegen.CodeGenerator;
 public class FetchDataFromTest {
 
   public static void main(String[] args) throws Exception {
-    CodegenOptions options = new CodegenOptions().setUsername("root")
-            .setPassword("123456")
+    CodegenOptions options = new CodegenOptions().setUsername("admin")
+            .setPassword("csst")
             .setIgnoreTablesStr("*io,his*")
             .setIgnoreColumnsStr("created*,updated_on")
             .setJdbcUrl(
-                    "jdbc:mysql://localhost:3306/fire")
-            .setJsr303(true)
-            .setIgnoreColumnsStr("photo_path,degree")
-            .setDomainExtend("com.csst.core.model.BaseModel")
-            .setMapperExtends("com.csst.core.mapper.BaseMapper");
+                    "jdbc:mysql://test.ihorn.com.cn:3306/device")
+            .setTableNamePattern("device")
+            .setIgnoreColumnsStr("photo_path,degree");
 
-    CodeGenerator.create(options).generateCode();
+    new Generator(options).generate();
+
   }
+
 }

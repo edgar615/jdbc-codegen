@@ -3,67 +3,20 @@
          xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd"
         >
     <modelVersion>4.0.0</modelVersion>
-    <groupId>com.edgar.jdbc</groupId>
+    <groupId>com.edgar</groupId>
     <artifactId>jdbc-codegen</artifactId>
     <packaging>jar</packaging>
-    <version>1.0.6-SNAPSHOT</version>
+    <version>1.0.7</version>
     <name>Jdbc Code Generator</name>
-    <url>https://github.com/kalyanmulampaka</url>
     <properties>
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
-        <spring.version>4.0.2.RELEASE</spring.version>
-        <hibernate-validator.version>5.1.0.Final</hibernate-validator.version>
         <logback.version>1.0.11</logback.version>
         <slf4j.version>1.7.5</slf4j.version>
-        <cglib.version>2.2.2</cglib.version>
         <mysql.jdbc.version>5.1.24</mysql.jdbc.version>
-        <tomcat.jdbc.version>7.0.55</tomcat.jdbc.version>
         <junit.version>4.11</junit.version>
-        <commons.io.version>2.4</commons.io.version>
-        <guava.version>18.0</guava.version>
-        <mybatis.version>3.3.0</mybatis.version>
+        <guava.version>21.0</guava.version>
+        <handlebars.version>4.0.6</handlebars.version>
     </properties>
-
-    <!--<repositories>
-        <repository>
-            <id>public</id>
-            <name>Public Repositories</name>
-            <url>http://10.4.7.48:8081/nexus/content/groups/public/</url>
-            <releases>
-                <enabled>true</enabled>
-            </releases>
-            <snapshots>
-                <enabled>true</enabled>
-            </snapshots>
-        </repository>
-    </repositories>
-
-    <pluginRepositories>
-        <pluginRepository>
-            <id>public</id>
-            <url>http://10.4.7.48:8081/nexus/content/groups/public/</url>
-            <releases>
-                <enabled>true</enabled>
-            </releases>
-            <snapshots>
-                <enabled>true</enabled>
-            </snapshots>
-        </pluginRepository>
-    </pluginRepositories>-->
-
-    <distributionManagement>
-        <snapshotRepository>
-            <id>user-snapshots</id>
-            <name>User Porject Snapshot</name>
-            <url>http://10.4.7.48:8081/nexus/content/repositories/snapshots/</url>
-            <uniqueVersion>true</uniqueVersion>
-        </snapshotRepository>
-        <repository>
-            <id>user-releases</id>
-            <name>User Porject Release</name>
-            <url>http://10.4.7.48:8081/nexus/content/repositories/releases/</url>
-        </repository>
-    </distributionManagement>
 
     <dependencies>
         <dependency>
@@ -87,18 +40,24 @@
             <groupId>ch.qos.logback</groupId>
             <artifactId>logback-core</artifactId>
             <version>${logback.version}</version>
-            <scope>provided</scope>
+            <scope>test</scope>
         </dependency>
         <dependency>
             <groupId>ch.qos.logback</groupId>
             <artifactId>logback-classic</artifactId>
             <version>${logback.version}</version>
-            <scope>provided</scope>
+            <scope>test</scope>
         </dependency>
         <dependency>
             <groupId>com.google.guava</groupId>
             <artifactId>guava</artifactId>
             <version>${guava.version}</version>
+        </dependency>
+
+        <dependency>
+            <groupId>com.github.jknack</groupId>
+            <artifactId>handlebars</artifactId>
+            <version>${handlebars.version}</version>
         </dependency>
     </dependencies>
     <build>
@@ -130,58 +89,6 @@
                 </configuration>
             </plugin>
         </plugins>
-        <resources>
-            <resource>
-                <directory>src/main/java</directory>
-                <filtering>true</filtering>
-                <includes>
-                    <include>**/*.xml</include>
-                </includes>
-            </resource>
-            <resource>
-                <directory>src/main/resources</directory>
-                <filtering>true</filtering>
-            </resource>
-        </resources>
-        <testResources>
-            <testResource>
-                <directory>src/test/resources</directory>
-                <filtering>true</filtering>
-            </testResource>
-            <testResource>
-                <directory>src/test/java</directory>
-                <filtering>true</filtering>
-                <includes>
-                    <include>**/*.sql</include>
-                </includes>
-            </testResource>
-        </testResources>
     </build>
 
-    <reporting>
-        <plugins>
-            <plugin>
-                <groupId>org.apache.maven.plugins</groupId>
-                <artifactId>maven-project-info-reports-plugin</artifactId>
-                <version>2.7</version>
-                <reportSets>
-                    <reportSet>
-                        <reports>
-                        </reports>
-                    </reportSet>
-                </reportSets>
-                <!--<configuration>
-                    <dependencyLocationsEnabled>false</dependencyLocationsEnabled>
-                </configuration>-->
-            </plugin>
-            <plugin>
-                <groupId>org.apache.maven.plugins</groupId>
-                <artifactId>maven-checkstyle-plugin</artifactId>
-                <version>2.17</version>
-                <configuration>
-                    <configLocation>google_checks.xml</configLocation>
-                </configuration>
-            </plugin>
-        </plugins>
-    </reporting>
 </project>
