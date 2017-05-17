@@ -9,12 +9,12 @@ import com.edgar.jdbc.codegen.gen.Generator;
 public class FetchDataFromTest {
 
   public static void main(String[] args) throws Exception {
-    CodegenOptions options = new CodegenOptions().setUsername("admin")
-            .setPassword("csst")
+    CodegenOptions options = new CodegenOptions().setUsername("root")
+            .setPassword("123456")
             .setIgnoreTablesStr("*io,his*")
             .setIgnoreColumnsStr("created*,updated_on")
             .setJdbcUrl(
-                    "jdbc:mysql://test.ihorn.com.cn:3306/device")
+                    "jdbc:mysql://localhost:3306/device")
             .setTableNamePattern("device")
             .setIgnoreColumnsStr("photo_path,degree");
 
