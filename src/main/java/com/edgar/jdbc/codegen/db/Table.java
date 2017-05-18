@@ -109,8 +109,10 @@ public class Table {
               }
             });
     list.add("java.util.List");
+    list.add("java.util.Map");
     list.add("com.google.common.base.MoreObjects");
     list.add("com.google.common.collect.Lists");
+    list.add("com.google.common.collect.Maps");
     list.add("com.edgar.util.db.Persistable");
     list.addAll(imports);
     return list;

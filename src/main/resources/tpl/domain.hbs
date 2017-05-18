@@ -47,7 +47,7 @@ public class {{table.upperCamelName}} implements Persistable<{{table.pkType.name
     }
 
     @Override
-    public String primaryKey() {
+    public String primaryField() {
         return "{{lowUnderscoreToLowCamel table.pk}}";
     }
 
@@ -61,6 +61,12 @@ public class {{table.upperCamelName}} implements Persistable<{{table.pkType.name
         this.{{lowUnderscoreToLowCamel table.pk}} = id;
     }
 
-   {{safestr userSource}}
-
+    @Override
+    public Map<String, Object> toMap() {
+        Map<String, Object> map = Maps.newHashMap();{{#table.columns}}{{#if ignore}}{{else}}
+        map.put("{{lowerCamelName}}",  {{lowerCamelName}});{{/if}}{{/table.columns}}
+        return map;
     }
+
+   {{safestr userSource}}
+}
