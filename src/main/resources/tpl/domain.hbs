@@ -10,7 +10,7 @@ package {{package}};
 *
 * @author Jdbc Code Generator Date {{date}}
 */
-public class {{table.upperCamelName}} implements Persistable<{{table.pkType.name}}>  {
+public class {{table.upperCamelName}} implements Persistent<{{table.pkType.name}}>  {
 
     private static final long serialVersionUID = 1L;
     {{#table.columns}}{{#if ignore}}{{else}}

@@ -113,7 +113,7 @@ public class Table {
     list.add("com.google.common.base.MoreObjects");
     list.add("com.google.common.collect.Lists");
     list.add("com.google.common.collect.Maps");
-    list.add("com.edgar.util.db.Persistable");
+    list.add("com.edgar.util.db.Persistent");
     list.addAll(imports);
     return list;
   }
