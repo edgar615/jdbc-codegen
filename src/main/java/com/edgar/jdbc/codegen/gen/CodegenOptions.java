@@ -143,6 +143,14 @@ public class CodegenOptions {
     return this;
   }
 
+  public List<String> getIgnoreColumnStartsWithPattern() {
+    return ignoreColumnStartsWithPattern;
+  }
+
+  public List<String> getIgnoreColumnEndsWithPattern() {
+    return ignoreColumnEndsWithPattern;
+  }
+
   public String getDriverClass() {
     return driverClass;
   }
@@ -202,9 +210,9 @@ public class CodegenOptions {
       while (strTok.hasMoreTokens()) {
         String token = strTok.nextToken().toLowerCase().trim();
         if (CharMatcher.anyOf("*").indexIn(token) == 0) {
-          this.ignoreColumnStartsWithPattern.add(token.substring(1, token.length()));
+          this.ignoreColumnEndsWithPattern.add(token.substring(1, token.length()));
         } else if (CharMatcher.anyOf("*").lastIndexIn(token) == token.length() - 1) {
-          this.ignoreColumnEndsWithPattern.add(token.substring(0, token.length() - 1));
+          this.ignoreColumnStartsWithPattern.add(token.substring(0, token.length() - 1));
         } else {
           this.ignoreColumnList.add(token);
         }

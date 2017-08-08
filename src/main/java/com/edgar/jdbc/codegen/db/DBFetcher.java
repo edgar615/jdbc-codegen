@@ -247,10 +247,22 @@ public class DBFetcher {
     return builder.build();
   }
 
-  private boolean ignoreColumn(String tableName) {
+  private boolean ignoreColumn(String column) {
     // first do a actual match
-    if (this.options.getIgnoreColumnList().contains(tableName.toLowerCase())) {
+    if (this.options.getIgnoreColumnList().contains(column.toLowerCase())) {
       return true;
+    }
+    // do a startswith check
+    for (String ignoreStartsWithPattern : this.options.getIgnoreColumnStartsWithPattern()) {
+      if (column.startsWith(ignoreStartsWithPattern)) {
+        return true;
+      }
+    }
+    // do a startswith check
+    for (String ignoreEndsWithPattern : this.options.getIgnoreColumnEndsWithPattern()) {
+      if (column.endsWith(ignoreEndsWithPattern)) {
+        return true;
+      }
     }
     return false;
   }
