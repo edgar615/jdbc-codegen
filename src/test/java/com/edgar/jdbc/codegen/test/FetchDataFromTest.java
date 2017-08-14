@@ -14,8 +14,8 @@ public class FetchDataFromTest {
             .setIgnoreTablesStr("*io,his*")
             .setIgnoreColumnsStr("created*,updated_on")
             .setJdbcUrl(
-                    "jdbc:mysql://test.ihorn.com.cn:3306/device")
-            .setTableNamePattern("device")
+                    "jdbc:mysql://test.ihorn.com.cn:3306/oem")
+//            .setTableNamePattern("device")
             .setIgnoreColumnsStr("photo_path,degree");
 
     new Generator(options).generate();

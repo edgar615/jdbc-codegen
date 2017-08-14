@@ -29,6 +29,8 @@ import java.net.URLDecoder;
 import java.nio.ByteBuffer;
 import java.nio.charset.Charset;
 import java.nio.file.Files;
+import java.text.SimpleDateFormat;
+import java.util.Date;
 import java.util.Enumeration;
 import java.util.List;
 import java.util.jar.JarEntry;
@@ -111,10 +113,13 @@ public class Generator {
       Template template = handlebars.compileInline(tpl);
       String code = template.apply(ImmutableMap.of("table", table,
                                                    "package", packageName,
+                                                   "date", new SimpleDateFormat("yyyy-MM-dd")
+                                                           .format(new Date()),
                                                    "userSource", userSource.toString()));
       createFile(table, code);
-    } catch (Exception e) {
-      throw new RuntimeException(e);
+    } catch (Throwable e) {
+      LOGGER.error("{}" , table.getName(), e);
+      throw new RuntimeException(table.getName(), e);
     }
   }
 
