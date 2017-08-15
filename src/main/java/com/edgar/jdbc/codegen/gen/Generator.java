@@ -104,7 +104,9 @@ public class Generator {
 
   public void generate() {
     List<Table> tables = new DBFetcher(options).fetchTablesFromDb();
-    tables.forEach(t -> execute(t));
+    tables.stream()
+            .filter(t -> !t.isIgnore())
+            .forEach(t -> execute(t));
   }
 
   private void execute(Table table) {

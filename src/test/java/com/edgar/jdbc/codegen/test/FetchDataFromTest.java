@@ -11,7 +11,7 @@ public class FetchDataFromTest {
   public static void main(String[] args) throws Exception {
     CodegenOptions options = new CodegenOptions().setUsername("admin")
             .setPassword("csst")
-            .setIgnoreTablesStr("*io,his*")
+            .setIgnoreTablesStr("dict*")
             .setIgnoreColumnsStr("created*,updated_on")
             .setJdbcUrl(
                     "jdbc:mysql://test.ihorn.com.cn:3306/oem")
