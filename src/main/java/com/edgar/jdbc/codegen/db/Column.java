@@ -152,9 +152,11 @@ public class Column {
       parameter = ParameterType.BIGDECIMAL;
     } else if ((type == Types.FLOAT) || (type == Types.DECIMAL)) {
       parameter = ParameterType.BIGDECIMAL;
-    } else if ((type == Types.INTEGER) || (type == Types.SMALLINT) || (type
-                                                                             == Types.TINYINT)) {
+    } else if ((type == Types.INTEGER) || (type == Types.SMALLINT)) {
       parameter = ParameterType.INTEGER;
+    } else if (type == Types.TINYINT) {
+      //TINYINT转换为boolean
+      parameter = ParameterType.BOOLEAN;
     } else if ((type == Types.TIMESTAMP) || (type == Types.TIME) || (type == Types.DATE)) {
       parameter = ParameterType.DATE;
     } else if ((type == Types.BIT) || (type == Types.BOOLEAN)) {
