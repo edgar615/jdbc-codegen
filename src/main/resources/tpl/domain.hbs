@@ -36,7 +36,7 @@ public class {{table.upperCamelName}} implements Persistent<{{table.pkType.name}
     {{/if}}{{/table.columns}}
     @Override
     public String toString() {
-        return MoreObjects.toStringHelper("Company"){{#table.columns}}{{#if ignore}}{{else}}
+        return MoreObjects.toStringHelper("{{table.upperCamelName}}"){{#table.columns}}{{#if ignore}}{{else}}
             .add("{{lowerCamelName}}",  {{lowerCamelName}}){{/if}}{{/table.columns}}
            .toString();
     }
