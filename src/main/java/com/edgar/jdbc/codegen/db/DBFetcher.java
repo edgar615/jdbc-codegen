@@ -66,6 +66,11 @@ public class DBFetcher {
           if (ignoreTable(tableName)) {
             table.setIgnore(true);
           }
+          if (!options.getTableList().isEmpty()) {
+              if (!options.getTableList().contains(tableName)) {
+                table.setIgnore(true);
+              }
+          }
           printIndexInfo(dbmd, table);
           fetchColumns(dbmd, table);
           tables.add(table);

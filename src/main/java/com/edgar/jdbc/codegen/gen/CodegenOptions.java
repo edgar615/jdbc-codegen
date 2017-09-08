@@ -55,6 +55,9 @@ public class CodegenOptions {
   //查询的表名
   private String tableNamePattern = DEFAULT_TABLE_NAME_PATTERN;
 
+  //只生成这些表
+  private final List<String> tableList = new ArrayList<>();
+
   private String srcFolderPath;
 
   private String domainPackage = DEFAULT_DOMAIN_PACKAGE;
@@ -130,6 +133,20 @@ public class CodegenOptions {
   public CodegenOptions setIgnoreTablesStr(String ignoreTablesStr) {
     this.ignoreTablesStr = ignoreTablesStr;
     this.setIgnoreTable();
+    return this;
+  }
+
+  public CodegenOptions addGenTable(String tableName) {
+    this.tableList.add(tableName);
+    return this;
+  }
+
+  public List<String> getTableList() {
+    return tableList;
+  }
+
+  public CodegenOptions addGenTables(List<String> tableNames) {
+    this.tableList.addAll(tableNames);
     return this;
   }
 
