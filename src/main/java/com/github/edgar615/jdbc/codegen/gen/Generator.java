@@ -1,4 +1,4 @@
-package com.edgar.jdbc.codegen.gen;
+package com.github.edgar615.jdbc.codegen.gen;
 
 import com.google.common.base.CaseFormat;
 import com.google.common.base.CharMatcher;
@@ -8,8 +8,8 @@ import com.google.common.collect.ImmutableMap;
 import com.google.common.collect.Iterables;
 import com.google.common.io.ByteStreams;
 
-import com.edgar.jdbc.codegen.db.DBFetcher;
-import com.edgar.jdbc.codegen.db.Table;
+import com.github.edgar615.jdbc.codegen.db.DBFetcher;
+import com.github.edgar615.jdbc.codegen.db.Table;
 import com.github.jknack.handlebars.Handlebars;
 import com.github.jknack.handlebars.Helper;
 import com.github.jknack.handlebars.Options;
@@ -17,16 +17,13 @@ import com.github.jknack.handlebars.Template;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import java.io.ByteArrayOutputStream;
 import java.io.File;
 import java.io.FileWriter;
 import java.io.IOException;
-import java.io.StringWriter;
 import java.io.UnsupportedEncodingException;
 import java.net.JarURLConnection;
 import java.net.URL;
 import java.net.URLDecoder;
-import java.nio.ByteBuffer;
 import java.nio.charset.Charset;
 import java.nio.file.Files;
 import java.text.SimpleDateFormat;

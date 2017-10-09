@@ -1,7 +1,7 @@
-package com.edgar.jdbc.codegen.test;
+package com.github.edgar615.jdbc.codegen.test;
 
-import com.edgar.jdbc.codegen.gen.CodegenOptions;
-import com.edgar.jdbc.codegen.gen.Generator;
+import com.github.edgar615.jdbc.codegen.gen.CodegenOptions;
+import com.github.edgar615.jdbc.codegen.gen.Generator;
 
 /**
  * Created by Administrator on 2015/6/9.

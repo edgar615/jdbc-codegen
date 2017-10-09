@@ -1,4 +1,4 @@
-package com.edgar.jdbc.codegen.db;
+package com.github.edgar615.jdbc.codegen.db;
 
 import com.google.common.base.CaseFormat;
 import com.google.common.base.Joiner;
@@ -113,7 +113,7 @@ public class Table {
     list.add("com.google.common.base.MoreObjects");
     list.add("com.google.common.collect.Lists");
     list.add("com.google.common.collect.Maps");
-    list.add("com.edgar.util.db.Persistent");
+    list.add("com.github.edgar615.util.db.Persistent");
     list.addAll(imports);
     return list;
   }

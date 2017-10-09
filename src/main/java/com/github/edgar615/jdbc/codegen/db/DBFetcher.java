@@ -1,6 +1,6 @@
-package com.edgar.jdbc.codegen.db;
+package com.github.edgar615.jdbc.codegen.db;
 
-import com.edgar.jdbc.codegen.gen.CodegenOptions;
+import com.github.edgar615.jdbc.codegen.gen.CodegenOptions;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 

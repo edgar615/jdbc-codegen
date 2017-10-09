@@ -1,4 +1,4 @@
-package com.edgar.jdbc.codegen.db;
+package com.github.edgar615.jdbc.codegen.db;
 
 import com.google.common.base.CaseFormat;
 

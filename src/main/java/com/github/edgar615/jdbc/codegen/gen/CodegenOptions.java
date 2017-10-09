@@ -1,4 +1,4 @@
-package com.edgar.jdbc.codegen.gen;
+package com.github.edgar615.jdbc.codegen.gen;
 
 import com.google.common.base.CharMatcher;
 import com.google.common.base.Strings;
@@ -16,7 +16,7 @@ public class CodegenOptions {
   public static final String DEFAULT_SRC_FOLDER_PATH = "src";
 
   //domain
-  public static final String DEFAULT_DOMAIN_PACKAGE = "com.edgar.code.domain";
+  public static final String DEFAULT_DOMAIN_PACKAGE = "com.github.edgar615.code.domain";
 
   //支持通配符,product, exa*, *e
   public static final String DEFAULT_IGNORE_TABLES = null;
