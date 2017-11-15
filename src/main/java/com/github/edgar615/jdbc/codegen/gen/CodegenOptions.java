@@ -34,6 +34,8 @@ public class CodegenOptions {
 
   private static final String DEFAULT_TABLE_NAME_PATTERN = null;
 
+  private static final boolean DEFAULT_GEN_RULE = false;
+
   //忽略的字段
   private final List<String> ignoreColumnList = new ArrayList<String>();
 
@@ -52,13 +54,13 @@ public class CodegenOptions {
   //使用后缀匹配忽略的表
   private final List<String> ignoreTableEndsWithPattern = new ArrayList<String>();
 
-  //查询的表名
-  private String tableNamePattern = DEFAULT_TABLE_NAME_PATTERN;
-
   //只生成这些表
   private final List<String> tableList = new ArrayList<>();
 
-  private String srcFolderPath;
+  //查询的表名
+  private String tableNamePattern = DEFAULT_TABLE_NAME_PATTERN;
+
+  private String srcFolderPath = DEFAULT_SRC_FOLDER_PATH;
 
   private String domainPackage = DEFAULT_DOMAIN_PACKAGE;
 
@@ -74,6 +76,8 @@ public class CodegenOptions {
 
   private String password = DEFAULT_PASSWORD;
 
+  private boolean genRule = DEFAULT_GEN_RULE;
+
   /**
    * Default constructor
    */
@@ -81,6 +85,15 @@ public class CodegenOptions {
     setIgnoreTable();
 
     setIgnoreColumn();
+  }
+
+  public boolean isGenRule() {
+    return genRule;
+  }
+
+  public CodegenOptions setGenRule(boolean genRule) {
+    this.genRule = genRule;
+    return this;
   }
 
   public String getSrcFolderPath() {

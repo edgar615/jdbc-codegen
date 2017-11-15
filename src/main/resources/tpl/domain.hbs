@@ -10,7 +10,7 @@ package {{package}};
 *
 * @author Jdbc Code Generator Date {{date}}
 */
-public class {{table.upperCamelName}} implements Persistent<{{table.pkType.name}}>  {
+public class {{table.upperCamelName}} implements Persistent<{{table.pkType.name}}> {
 
     private static final long serialVersionUID = 1L;
     {{#table.columns}}{{#if ignore}}{{else}}
@@ -63,13 +63,13 @@ public class {{table.upperCamelName}} implements Persistent<{{table.pkType.name}
 
     @Override
     public void setGeneratedKey(Number key) {
-    {{#if table.pkType.name eq "Integer"}}
+    {{#eq table.pkType.name "Integer"}}
         this.{{lowUnderscoreToLowCamel table.pk}} = key.intValue();
-    {{else if table.pkType.name eq "Long"}}
+    {{else eq table.pkType.name "Long"}}
         this.{{lowUnderscoreToLowCamel table.pk}} = key.longValue();
     {{else}}
         throw new UnsupportedOperationException();
-    {{/if}}
+    {{/eq}}
     }
 
     @Override

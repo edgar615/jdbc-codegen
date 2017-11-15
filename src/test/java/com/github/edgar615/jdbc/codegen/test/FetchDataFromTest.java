@@ -10,11 +10,12 @@ public class FetchDataFromTest {
 
   public static void main(String[] args) throws Exception {
     CodegenOptions options = new CodegenOptions().setUsername("admin")
-            .setPassword("csst")
+            .setPassword("admin")
             .setIgnoreTablesStr("dict*")
             .setIgnoreColumnsStr("created*,updated_on")
+            .setGenRule(true)
             .setJdbcUrl(
-                    "jdbc:mysql://test.ihorn.com.cn:3306/oem")
+                    "jdbc:mysql://127.0.0.1:3306/test")
 //            .setTableNamePattern("device")
             .setIgnoreColumnsStr("photo_path,degree");
 
