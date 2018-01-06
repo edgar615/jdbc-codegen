@@ -32,8 +32,6 @@ public class CodegenOptions {
 
   public static final String DEFAULT_PASSWORD = "";
 
-  private static final String DEFAULT_TABLE_NAME_PATTERN = null;
-
   private static final boolean DEFAULT_GEN_RULE = false;
 
   //忽略的字段
@@ -56,9 +54,6 @@ public class CodegenOptions {
 
   //只生成这些表
   private final List<String> tableList = new ArrayList<>();
-
-  //查询的表名
-  private String tableNamePattern = DEFAULT_TABLE_NAME_PATTERN;
 
   private String srcFolderPath = DEFAULT_SRC_FOLDER_PATH;
 
@@ -205,15 +200,6 @@ public class CodegenOptions {
 
   public CodegenOptions setPassword(String password) {
     this.password = password;
-    return this;
-  }
-
-  public String getTableNamePattern() {
-    return tableNamePattern;
-  }
-
-  public CodegenOptions setTableNamePattern(String tableNamePattern) {
-    this.tableNamePattern = tableNamePattern;
     return this;
   }
 

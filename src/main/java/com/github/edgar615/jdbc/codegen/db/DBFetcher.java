@@ -50,7 +50,7 @@ public class DBFetcher {
          * TEMPORARY"、"ALIAS" 和 "SYNONYM";null表示包含所有的表类型;可包含单字符通配符("_"),或多字符通配符("%");
          */
         ResultSet rset =
-                dbmd.getTables(null, null, options.getTableNamePattern(), new String[]{"TABLE"});
+                dbmd.getTables(null, null, "%", new String[]{"TABLE"});
         while (rset.next()) {
 //TABLE_CAT表类别(可为null)
 //TABLE_SCHEM 表模式（可能为空）
@@ -167,7 +167,7 @@ public class DBFetcher {
      * tableNamePattern - 表名称;可包含单字符通配符("_"),或多字符通配符("%");
      * columnNamePattern - 列名称; ""表示获取列名为""的列(当然获取不到);null表示获取所有的列;可包含单字符通配符("_"),或多字符通配符("%");
      */
-    ResultSet cset = metaData.getColumns(null, null, table.getName(), null);
+    ResultSet cset = metaData.getColumns(null, null, table.getName(), "%");
     while (cset.next()) {
       Column column = createColumn(cset, pks);
       table.addColumn(column);
@@ -206,6 +206,7 @@ public class DBFetcher {
     //ORDINAL_POSITION 表中列的索引（从1开始）
     //IS_NULLABLE  ISO规则用来确定某一列的是否可为空 0-不允许，1-运行 2-不确定
 //IS_AUTOINCREMENT 指示此列是否是自动递增 YES -是 NO-不是 空字符串-不确定
+//    IS_GENERATEDCOLUMN 指示此列是否是虚拟列  YES -是 NO-不是 空字符串-不确定
 
     String colName = cset.getString("COLUMN_NAME").toLowerCase();
     builder.setName(colName);
@@ -236,6 +237,12 @@ public class DBFetcher {
       builder.setAutoInc(true);
     } else {
       builder.setAutoInc(false);
+    }
+    String genColumn = cset.getString("IS_GENERATEDCOLUMN");
+    if ("YES".equalsIgnoreCase(genColumn)) {
+      builder.setGenColumn(true);
+    } else {
+      builder.setGenColumn(false);
     }
 
     if (pks.contains(colName)) {

@@ -37,6 +37,11 @@ public class Column {
   private final boolean isAutoInc;
 
   /**
+   * 是否虚拟列
+   */
+  private final boolean isGenColumn;
+
+  /**
    * 是否忽略该字段，依赖于codegen的配置.
    */
   private final boolean isIgnore;
@@ -57,7 +62,7 @@ public class Column {
 
   private Column(String name, int size, String defaultValue, boolean isNullable,
                  boolean isAutoInc,
-                 boolean isIgnore,
+                 boolean isGenColumn, boolean isIgnore,
                  boolean isPrimary,
                  boolean isVersion,
                  int type,
@@ -67,6 +72,7 @@ public class Column {
     this.defaultValue = defaultValue;
     this.isNullable = isNullable;
     this.isAutoInc = isAutoInc;
+    this.isGenColumn = isGenColumn;
     this.isIgnore = isIgnore;
     this.isPrimary = isPrimary;
     this.isVersion = isVersion;
@@ -126,6 +132,10 @@ public class Column {
     return (CaseFormat.LOWER_UNDERSCORE.to(CaseFormat.LOWER_CAMEL, name));
   }
 
+  public boolean isGenColumn() {
+    return isGenColumn;
+  }
+
   @Override
   public String toString() {
     return "Column{" +
@@ -134,6 +144,7 @@ public class Column {
            ", defaultValue='" + defaultValue + '\'' +
            ", isNullable=" + isNullable +
            ", isAutoInc=" + isAutoInc +
+            ", isGenColumn=" + isGenColumn +
            ", isIgnore=" + isIgnore +
            ", isVersion=" + isVersion +
            ", isPrimary=" + isPrimary +
@@ -181,6 +192,8 @@ public class Column {
 
     private boolean isAutoInc = false;
 
+    private boolean isGenColumn = false;
+
     private boolean isIgnore = false;
 
     private boolean isPrimary = false;
@@ -192,6 +205,15 @@ public class Column {
     private String remarks;
 
     private ColumnBuilder() {
+    }
+
+    public boolean isGenColumn() {
+      return isGenColumn;
+    }
+
+    public ColumnBuilder setGenColumn(boolean genColumn) {
+      isGenColumn = genColumn;
+      return this;
     }
 
     public String getRemarks() {
@@ -249,7 +271,7 @@ public class Column {
     }
 
     public Column build() {
-      return new Column(name, size, defaultValue, isNullable, isAutoInc, isIgnore, isPrimary,
+      return new Column(name, size, defaultValue, isNullable, isAutoInc, isGenColumn, isIgnore, isPrimary,
                         isVersion, type, remarks);
     }
   }
