@@ -45,14 +45,11 @@ public class {{table.upperCamelName}} implements Persistent<{{table.pkType.name}
     public List<String> fields() {
       return Lists.newArrayList({{safestr table.fields}});
     }
-
-    @Override
+    {{#if table.containsVirtual}}
     public List<String> virtualFields() {
-        List<String> fields = new ArrayList<>();
-        {{#table.columns}}{{#if genColumn}}fields.add("{{lowerCamelName}}");{{else}}{{/if}}{{/table.columns}}
-        return fields;
+        return Lists.newArrayList({{safestr table.virtualFields}});
     }
-
+    {{/if}}
     @Override
     public String primaryField() {
         return "{{lowUnderscoreToLowCamel table.pk}}";

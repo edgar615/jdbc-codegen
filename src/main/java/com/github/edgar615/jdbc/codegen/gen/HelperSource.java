@@ -3,6 +3,7 @@ package com.github.edgar615.jdbc.codegen.gen;
 import com.github.jknack.handlebars.Options;
 
 import java.io.IOException;
+import java.util.Collection;
 
 public class HelperSource {
 

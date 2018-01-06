@@ -21,7 +21,7 @@ public class Table {
 
   private final List<Column> columns = new ArrayList<>();
 
-  List<String> imports= Lists.newArrayList();
+  List<String> imports = Lists.newArrayList();
 
   /**
    * 是否忽略该字段，依赖于codegen的配置.
@@ -64,10 +64,23 @@ public class Table {
   public String getFields() {
     return Joiner.on(",\n\t\t\t\t\t\t")
             .join(columns.stream()
-                          .filter(c -> !c.isIgnore())
-                          .map(c -> "\""+c.getLowerCamelName() + "\"")
-                          .collect(Collectors.toList
-                                  ()));
+                    .filter(c -> !c.isIgnore())
+                    .map(c -> "\"" + c.getLowerCamelName() + "\"")
+                    .collect(Collectors.toList
+                            ()));
+  }
+
+  public String getVirtualFields() {
+    return  Joiner.on(",\n\t\t\t\t\t\t")
+            .join(columns.stream()
+            .filter(c -> c.isGenColumn())
+            .map(c -> "\"" + c.getLowerCamelName() + "\"")
+            .collect(Collectors.toList()));
+  }
+
+  public boolean getContainsVirtual() {
+    return columns.stream()
+            .anyMatch(c -> c.isGenColumn());
   }
 
   public String getPk() {
@@ -89,11 +102,11 @@ public class Table {
   }
 
   public void addImport(String imp) {
-      this.imports.add(imp);
+    this.imports.add(imp);
   }
 
   public List<String> getImports() {
-    List<String> list= Lists.newArrayList();
+    List<String> list = Lists.newArrayList();
     columns.stream()
             .filter(c -> !c.isIgnore())
             .map(c -> c.getParameterType())
@@ -125,10 +138,10 @@ public class Table {
   @Override
   public String toString() {
     return "Table{" +
-           "remarks='" + remarks + '\'' +
-           ", name='" + name + '\'' +
-           ", isIgnore=" + isIgnore +
-           ", columns=" + columns +
-           '}';
+            "remarks='" + remarks + '\'' +
+            ", name='" + name + '\'' +
+            ", isIgnore=" + isIgnore +
+            ", columns=" + columns +
+            '}';
   }
 }

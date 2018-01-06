@@ -12,6 +12,7 @@ public class FetchDataFromTest {
     CodegenOptions options = new CodegenOptions().setUsername("user")
             .setPassword("sdwaxech")
             .addGenTable("test")
+            .addGenTable("user")
             .setIgnoreColumnsStr("created*,updated_on")
             .setGenRule(true)
             .setJdbcUrl(
