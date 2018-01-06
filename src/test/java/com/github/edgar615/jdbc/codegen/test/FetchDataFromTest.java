@@ -9,14 +9,14 @@ import com.github.edgar615.jdbc.codegen.gen.Generator;
 public class FetchDataFromTest {
 
   public static void main(String[] args) throws Exception {
-    CodegenOptions options = new CodegenOptions().setUsername("user")
-            .setPassword("sdwaxech")
+    CodegenOptions options = new CodegenOptions().setUsername("root")
+            .setPassword("123456")
             .addGenTable("test")
             .addGenTable("user")
             .setIgnoreColumnsStr("created*,updated_on")
             .setGenRule(true)
             .setJdbcUrl(
-                    "jdbc:mysql://www.edgar615.com:3306/user")
+                    "jdbc:mysql://localhost:3306/user")
 //            .setTableNamePattern("device")
             .setIgnoreColumnsStr("photo_path,degree");
 
