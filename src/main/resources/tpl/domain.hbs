@@ -30,8 +30,8 @@ public class {{table.upperCamelName}} implements Persistent<{{table.pkType.name}
         return {{lowerCamelName}};
     }
 
-    public {{parameterType.name}} set{{upperCamelName}}({{parameterType.name}} {{lowerCamelName}}) {
-        return this.{{lowerCamelName}} = {{lowerCamelName}};
+    public void set{{upperCamelName}}({{parameterType.name}} {{lowerCamelName}}) {
+        this.{{lowerCamelName}} = {{lowerCamelName}};
     }
     {{/if}}{{/table.columns}}
     @Override
