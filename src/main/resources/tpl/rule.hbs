@@ -32,7 +32,8 @@ public class {{table.upperCamelName}}Rule {
     */
     public static Multimap<String, Rule> requiredRule() {
         Multimap<String, Rule> rules = ArrayListMultimap.create();
-        {{#table.columns}}{{#if nullable}}{{else}}rules.put("{{lowerCamelName}}", Rule.required());{{/if}}{{/table.columns}}
+        {{#table.columns}}{{#if nullable}}{{else}}
+        rules.put("{{lowerCamelName}}", Rule.required());{{/if}}{{/table.columns}}
         return rules;
     }
 
