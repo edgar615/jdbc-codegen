@@ -322,7 +322,7 @@ public class DBFetcher {
      * unique - 该参数为 true时,仅返回唯一值的索引; 该参数为 false时,返回所有索引;
      * approximate - 该参数为true时,允许结果是接近的数据值或这些数据值以外的值;该参数为 false时,要求结果是精确结果;
      */
-    ResultSet rs = dbmd.getIndexInfo(null, null, table.getName(), false, true);
+    ResultSet rs = dbmd.getIndexInfo(options.getDatabase(), null, table.getName(), false, true);
     while (rs.next()) {
       String tableCat = rs.getString("TABLE_CAT");  //表类别(可为null)
       String tableSchemaName = rs.getString("TABLE_SCHEM");//表模式（可能为空）,在oracle中获取的是命名空间,其它数据库未知

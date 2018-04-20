@@ -9,8 +9,8 @@ import com.github.edgar615.jdbc.codegen.gen.Generator;
 public class FetchDataFromTest {
 
   public static void main(String[] args) throws Exception {
-    CodegenOptions options = new CodegenOptions().setUsername("admin")
-            .setPassword("csst")
+    CodegenOptions options = new CodegenOptions().setUsername("root")
+            .setPassword("123456")
 //            .addGenTable("dict")
 //            .addGenTable("dict_item")
             .addGenTable("user")
@@ -19,7 +19,7 @@ public class FetchDataFromTest {
             .setIgnoreColumnsStr("created*,updated_on")
             .setGenRule(true)
             .setDatabase("user_new")
-            .setHost("test.ihorn.com.cn")
+            .setHost("localhost")
             .setJdbcArg("verifyServerCertificate=false&useSSL=true&requireSSL=true")
 //            .setTableNamePattern("device")
 //                .setIgnoreColumnsStr("photo_path,degree")
