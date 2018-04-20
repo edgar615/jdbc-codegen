@@ -12,7 +12,7 @@
     <groupId>com.github.edgar615</groupId>
     <artifactId>jdbc-codegen</artifactId>
     <packaging>jar</packaging>
-    <version>1.0.10</version>
+    <version>1.0.11</version>
     <name>Jdbc Code Generator</name>
     <properties>
         <java.version>1.8</java.version>

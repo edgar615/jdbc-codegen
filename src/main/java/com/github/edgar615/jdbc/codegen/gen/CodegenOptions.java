@@ -26,7 +26,13 @@ public class CodegenOptions {
 
   public static final String DEFAULT_JDBC_DRIVER = "com.mysql.jdbc.Driver";
 
-  public static final String DEFAULT_JDBC_URL = "jdbc:mysql://localhost:3306/test";
+  public static final String DEFAULT_JDBC_ARG = "";
+
+  public static final String DEFAULT_HOST = "localhost";
+
+  public static final int DEFAULT_PORT = 3306;
+
+  public static final String DEFAULT_DATABASE = "test";
 
   public static final String DEFAULT_USERNAME = "root";
 
@@ -65,7 +71,13 @@ public class CodegenOptions {
 
   private String driverClass = DEFAULT_JDBC_DRIVER;
 
-  private String jdbcUrl = DEFAULT_JDBC_URL;
+  private String host = DEFAULT_HOST;
+
+  private int port = DEFAULT_PORT;
+
+  private String database = DEFAULT_DATABASE;
+
+  private String jdbcArg = DEFAULT_JDBC_ARG;
 
   private String username = DEFAULT_USERNAME;
 
@@ -101,11 +113,46 @@ public class CodegenOptions {
   }
 
   public String getJdbcUrl() {
+    String jdbcUrl =  "jdbc:mysql://"+ host + ":" + port + "/" + database;
+    if (Strings.isNullOrEmpty(jdbcArg)) {
+      jdbcUrl += "?" + jdbcArg;
+    }
     return jdbcUrl;
   }
 
-  public CodegenOptions setJdbcUrl(String jdbcUrl) {
-    this.jdbcUrl = jdbcUrl;
+  public String getHost() {
+    return host;
+  }
+
+  public CodegenOptions setHost(String host) {
+    this.host = host;
+    return this;
+  }
+
+  public int getPort() {
+    return port;
+  }
+
+  public CodegenOptions setPort(int port) {
+    this.port = port;
+    return this;
+  }
+
+  public String getDatabase() {
+    return database;
+  }
+
+  public CodegenOptions setDatabase(String database) {
+    this.database = database;
+    return this;
+  }
+
+  public String getJdbcArg() {
+    return jdbcArg;
+  }
+
+  public CodegenOptions setJdbcArg(String jdbcArg) {
+    this.jdbcArg = jdbcArg;
     return this;
   }
 

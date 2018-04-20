@@ -9,17 +9,18 @@ import com.github.edgar615.jdbc.codegen.gen.Generator;
 public class FetchDataFromTest {
 
   public static void main(String[] args) throws Exception {
-    CodegenOptions options = new CodegenOptions().setUsername("root")
-            .setPassword("123456")
+    CodegenOptions options = new CodegenOptions().setUsername("admin")
+            .setPassword("csst")
 //            .addGenTable("dict")
 //            .addGenTable("dict_item")
-            .addGenTable("sys_resource")
+            .addGenTable("user")
             .addGenTable("sys_subsystem")
             .addGenTable("sys_permission")
             .setIgnoreColumnsStr("created*,updated_on")
             .setGenRule(true)
-            .setJdbcUrl(
-                    "jdbc:mysql://localhost:3306/sys")
+            .setDatabase("user_new")
+            .setHost("test.ihorn.com.cn")
+            .setJdbcArg("verifyServerCertificate=false&useSSL=true&requireSSL=true")
 //            .setTableNamePattern("device")
 //                .setIgnoreColumnsStr("photo_path,degree")
             .setSrcFolderPath("src/main/java")

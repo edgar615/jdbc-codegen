@@ -50,7 +50,7 @@ public class DBFetcher {
          * TEMPORARY"、"ALIAS" 和 "SYNONYM";null表示包含所有的表类型;可包含单字符通配符("_"),或多字符通配符("%");
          */
         ResultSet rset =
-                dbmd.getTables(null, null, "%", new String[]{"TABLE"});
+                dbmd.getTables(options.getDatabase(), null, "%", new String[]{"TABLE"});
         while (rset.next()) {
 //TABLE_CAT表类别(可为null)
 //TABLE_SCHEM 表模式（可能为空）
@@ -62,18 +62,20 @@ public class DBFetcher {
           String tableType = rset.getString("TABLE_TYPE");
           String remarks = rset.getString("REMARKS");
           LOGGER.info("Found {}:{}, {}", tableType, tableName, remarks);
-          Table table = Table.create(tableName, remarks);
-          if (ignoreTable(tableName)) {
-            table.setIgnore(true);
-          }
+          boolean ignore = ignoreTable(tableName);
           if (!options.getTableList().isEmpty()) {
-              if (!options.getTableList().contains(tableName)) {
-                table.setIgnore(true);
-              }
+            if (!options.getTableList().contains(tableName)) {
+              ignore = true;
+            }
           }
-          printIndexInfo(dbmd, table);
-          fetchColumns(dbmd, table);
-          tables.add(table);
+          if (ignore) {
+            LOGGER.info("Ignore {}", tableName);
+          } else {
+            Table table = Table.create(tableName, remarks);
+            printIndexInfo(dbmd, table);
+            fetchColumns(dbmd, table);
+            tables.add(table);
+          }
         }
       }
     } catch (Exception e) {
@@ -136,7 +138,7 @@ public class DBFetcher {
      * 或多字符通配符("%");
      * table - 表名称;可包含单字符通配符("_"),或多字符通配符("%");
      */
-    ResultSet pkSet = metaData.getPrimaryKeys(null, null, table.getName());
+    ResultSet pkSet = metaData.getPrimaryKeys(options.getDatabase(), null, table.getName());
     while (pkSet.next()) {
 //      TABLE_CAT表类别(可为null)
 //      TABLE_SCHEM 表模式（可能为空）,在oracle中获取的是命名空间,其它数据库未知
@@ -167,7 +169,7 @@ public class DBFetcher {
      * tableNamePattern - 表名称;可包含单字符通配符("_"),或多字符通配符("%");
      * columnNamePattern - 列名称; ""表示获取列名为""的列(当然获取不到);null表示获取所有的列;可包含单字符通配符("_"),或多字符通配符("%");
      */
-    ResultSet cset = metaData.getColumns(null, null, table.getName(), "%");
+    ResultSet cset = metaData.getColumns(options.getDatabase(), null, table.getName(), "%");
     while (cset.next()) {
       Column column = createColumn(cset, pks);
       table.addColumn(column);
