@@ -114,7 +114,7 @@ public class CodegenOptions {
 
   public String getJdbcUrl() {
     String jdbcUrl =  "jdbc:mysql://"+ host + ":" + port + "/" + database;
-    if (Strings.isNullOrEmpty(jdbcArg)) {
+    if (!Strings.isNullOrEmpty(jdbcArg)) {
       jdbcUrl += "?" + jdbcArg;
     }
     return jdbcUrl;
