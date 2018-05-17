@@ -83,5 +83,16 @@ public class {{table.upperCamelName}} implements Persistent<{{table.pkType.name}
         return map;
     }
 
+    @Override
+    public void fromMap(Map<String, Object> map) {
+        if (map == null) {
+            return;
+        }
+        {{#table.columns}}{{#if ignore}}{{else}}if (map.get("{{lowerCamelName}}") instanceof {{parameterType lowerCamelName table.columns}}) {
+            this.{{lowerCamelName}} = ({{parameterType lowerCamelName table.columns}}) map.get("{{lowerCamelName}}");
+        }
+        {{/if}}{{/table.columns}}
+    }
+
    {{safestr userSource}}
 }
