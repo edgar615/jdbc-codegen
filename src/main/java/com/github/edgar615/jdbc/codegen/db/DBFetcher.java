@@ -16,7 +16,7 @@ import java.util.Properties;
 import java.util.Set;
 
 /**
- * Created by Edgar on 2017/5/17.
+ * 查询数据库属性.
  *
  * @author Edgar  Date 2017/5/17
  */

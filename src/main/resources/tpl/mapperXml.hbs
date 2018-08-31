@@ -1,0 +1,24 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+        PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="{{mapperPackage}}.{{table.upperCamelName}}Mapper">
+	<resultMap id="{{table.upperCamelName}}ResultMap" type="{{table.upperCamelName}}">
+        {{#table.columns}}{{#if ignore}}{{else}}
+        <result column="{{name}}" property="{{lowerCamelName}}" />{{/if}}{{/table.columns}}
+	</resultMap>
+
+	<sql id="all_column">
+        {{columnWithComma table.columns}}
+	</sql>
+
+	<sql id="limit">
+		<if test="limit != null">
+			limit
+			<if test="offset != null">
+			#{offset},
+			</if>
+			#{limit}
+		</if>
+	</sql>
+</mapper>

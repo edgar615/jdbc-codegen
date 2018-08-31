@@ -10,10 +10,10 @@ import java.util.List;
  * @author Edgar  Date 2016/4/1
  */
 public class CodegenOptions extends TableMappingOptions {
-  public static final String DEFAULT_SRC_FOLDER_PATH = "src";
+  private static final String DEFAULT_SRC_FOLDER_PATH = "src";
 
   //domain
-  public static final String DEFAULT_DOMAIN_PACKAGE = "com.github.edgar615.code.domain";
+  private static final String DEFAULT_DOMAIN_PACKAGE = "com.github.edgar615.codegen.domain";
 
   private static final boolean DEFAULT_GEN_RULE = false;
 
@@ -22,6 +22,10 @@ public class CodegenOptions extends TableMappingOptions {
   private String domainPackage = DEFAULT_DOMAIN_PACKAGE;
 
   private boolean genRule = DEFAULT_GEN_RULE;
+
+  private boolean genMybatis = false;
+
+  private MybatisOptions mybatisOptions;
 
   /**
    * Default constructor
@@ -39,6 +43,20 @@ public class CodegenOptions extends TableMappingOptions {
   public CodegenOptions setGenRule(boolean genRule) {
     this.genRule = genRule;
     return this;
+  }
+
+  public boolean isGenMybatis() {
+    return genMybatis;
+  }
+
+  public CodegenOptions setGenMybatis(MybatisOptions options) {
+    this.mybatisOptions = options;
+    this.genMybatis = true;
+    return this;
+  }
+
+  public MybatisOptions getMybatisOptions() {
+    return mybatisOptions;
   }
 
   public String getSrcFolderPath() {
