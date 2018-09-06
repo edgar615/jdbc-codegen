@@ -3,6 +3,8 @@ package com.github.edgar615.jdbc.codegen.db;
 import com.google.common.base.CaseFormat;
 
 import java.sql.Types;
+import java.util.ArrayList;
+import java.util.List;
 
 /**
  * 数据库的字段.
@@ -134,6 +136,23 @@ public class Column {
 
   public boolean isGenColumn() {
     return isGenColumn;
+  }
+
+  public boolean isAnnotations() {
+    return isPrimary || isGenColumn || isVersion;
+  }
+  public List<String> getAnnotationsClass() {
+    List<String> columnAnnotations = new ArrayList<>();
+    if (isPrimary) {
+      columnAnnotations.add("@PrimaryKey");
+    }
+    if (isVersion) {
+      columnAnnotations.add("@VersionKey");
+    }
+    if (isGenColumn) {
+      columnAnnotations.add("@VirtualKey");
+    }
+    return columnAnnotations;
   }
 
   @Override

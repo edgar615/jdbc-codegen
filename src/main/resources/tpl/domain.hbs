@@ -13,7 +13,21 @@ package {{package}};
 public class {{table.upperCamelName}} implements Persistent<{{table.pkType.name}}> {
 
     private static final long serialVersionUID = 1L;
-    {{#table.columns}}{{#if ignore}}{{else}}
+    {{#table.columns}}{{#if ignore}}{{else if annotations}}
+    /**
+    * Column : {{name}}
+    * remarks: {{remarks}}
+    * default: {{defaultValue}}
+    * isNullable: {{nullable}}
+    * isAutoInc: {{autoInc}}
+    * isPrimary: {{primary}}
+    * type: {{type}}
+    * size: {{size}}
+    */
+    {{#annotationsClass}}{{this}}
+    {{/annotationsClass}}
+    {{~columnField this~}}
+    {{else}}
     /**
     * Column : {{name}}
     * remarks: {{remarks}}

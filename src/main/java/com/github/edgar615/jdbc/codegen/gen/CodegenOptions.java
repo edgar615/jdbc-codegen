@@ -2,7 +2,9 @@ package com.github.edgar615.jdbc.codegen.gen;
 
 import com.github.edgar615.mysql.mapping.TableMappingOptions;
 
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 /**
  * Created by Edgar on 2016/4/1.
@@ -22,6 +24,8 @@ public class CodegenOptions extends TableMappingOptions {
   private String domainPackage = DEFAULT_DOMAIN_PACKAGE;
 
   private boolean genRule = DEFAULT_GEN_RULE;
+
+  private final Map<String, String> versions = new HashMap<>();
 
   /**
    * Default constructor
@@ -126,4 +130,17 @@ public class CodegenOptions extends TableMappingOptions {
     return this;
   }
 
+  public Map<String, String> getVersions() {
+    return versions;
+  }
+
+  public CodegenOptions addVersion(String table, String column) {
+    this.versions.put(table, column);
+    return this;
+  }
+
+  public CodegenOptions addVersions(Map<String, String> versions) {
+    this.versions.putAll(versions);
+    return this;
+  }
 }

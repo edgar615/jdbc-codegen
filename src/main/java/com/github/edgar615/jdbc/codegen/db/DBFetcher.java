@@ -171,14 +171,14 @@ public class DBFetcher {
      */
     ResultSet cset = metaData.getColumns(options.getDatabase(), null, table.getName(), "%");
     while (cset.next()) {
-      Column column = createColumn(cset, pks);
+      Column column = createColumn(table, cset, pks);
       table.addColumn(column);
       LOGGER.debug("Found Column:" + column);
     }
     return table;
   }
 
-  private Column createColumn(ResultSet cset, Set<String> pks) throws SQLException {
+  private Column createColumn(Table table, ResultSet cset, Set<String> pks) throws SQLException {
     Column.ColumnBuilder builder = Column.builder();
 
     /**
@@ -254,9 +254,11 @@ public class DBFetcher {
     int type = cset.getInt("DATA_TYPE");
     builder.setType(type);
 
-    //属性、方法
     if (ignoreColumn(colName)) {
       builder.setIgnore(true);
+    }
+    if (colName.equalsIgnoreCase(options.getVersions().get(table.getName()))) {
+      builder.setVersion(true);
     }
     return builder.build();
   }
