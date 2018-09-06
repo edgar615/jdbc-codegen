@@ -10,10 +10,10 @@ import java.util.List;
  * @author Edgar  Date 2016/4/1
  */
 public class CodegenOptions extends TableMappingOptions {
-  private static final String DEFAULT_SRC_FOLDER_PATH = "src";
+  public static final String DEFAULT_SRC_FOLDER_PATH = "src";
 
   //domain
-  private static final String DEFAULT_DOMAIN_PACKAGE = "com.github.edgar615.codegen.domain";
+  public static final String DEFAULT_DOMAIN_PACKAGE = "com.github.edgar615.code.domain";
 
   private static final boolean DEFAULT_GEN_RULE = false;
 
@@ -22,10 +22,6 @@ public class CodegenOptions extends TableMappingOptions {
   private String domainPackage = DEFAULT_DOMAIN_PACKAGE;
 
   private boolean genRule = DEFAULT_GEN_RULE;
-
-  private boolean genMybatis = false;
-
-  private MybatisOptions mybatisOptions;
 
   /**
    * Default constructor
@@ -45,20 +41,6 @@ public class CodegenOptions extends TableMappingOptions {
     return this;
   }
 
-  public boolean isGenMybatis() {
-    return genMybatis;
-  }
-
-  public CodegenOptions setGenMybatis(MybatisOptions options) {
-    this.mybatisOptions = options;
-    this.genMybatis = true;
-    return this;
-  }
-
-  public MybatisOptions getMybatisOptions() {
-    return mybatisOptions;
-  }
-
   public String getSrcFolderPath() {
     return srcFolderPath;
   }
@@ -68,21 +50,25 @@ public class CodegenOptions extends TableMappingOptions {
     return this;
   }
 
+  @Override
   public CodegenOptions setHost(String host) {
     super.setHost(host);
     return this;
   }
 
+  @Override
   public CodegenOptions setPort(int port) {
     super.setPort(port);
     return this;
   }
 
+  @Override
   public CodegenOptions setDatabase(String database) {
     super.setDatabase(database);
     return this;
   }
 
+  @Override
   public CodegenOptions setJdbcArg(String jdbcArg) {
     super.setJdbcArg(jdbcArg);
     return this;
@@ -98,37 +84,43 @@ public class CodegenOptions extends TableMappingOptions {
     return this;
   }
 
+  @Override
   public CodegenOptions setIgnoreTablesStr(String ignoreTablesStr) {
     super.setIgnoreTablesStr(ignoreTablesStr);
     return this;
   }
 
+  @Override
   public CodegenOptions addGenTable(String tableName) {
     super.addGenTable(tableName);
     return this;
   }
 
+  @Override
   public CodegenOptions addGenTables(List<String> tableNames) {
     super.addGenTables(tableNames);
     return this;
   }
 
+  @Override
   public CodegenOptions setIgnoreColumnsStr(String ignoreColumnsStr) {
     super.setIgnoreColumnsStr(ignoreColumnsStr);
     return this;
   }
 
-
+  @Override
   public CodegenOptions setDriverClass(String driverClass) {
     super.setDriverClass(driverClass);
     return this;
   }
 
+  @Override
   public CodegenOptions setUsername(String username) {
     super.setUsername(username);
     return this;
   }
 
+  @Override
   public CodegenOptions setPassword(String password) {
     super.setPassword(password);
     return this;
