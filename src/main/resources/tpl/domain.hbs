@@ -24,7 +24,6 @@ public class {{table.upperCamelName}} implements Persistent<{{table.pkType.name}
     * type: {{type}}
     * size: {{size}}
     */
-    {{columnAnnotation this}}
     private {{parameterType.name}} {{lowerCamelName}};
     {{/if}}{{/table.columns}}{{#table.columns}}{{#if ignore}}{{else}}
     public {{parameterType.name}} get{{upperCamelName}}() {
