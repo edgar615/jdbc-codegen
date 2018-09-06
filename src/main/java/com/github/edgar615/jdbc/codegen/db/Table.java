@@ -3,7 +3,6 @@ package com.github.edgar615.jdbc.codegen.db;
 import com.google.common.base.CaseFormat;
 import com.google.common.base.Joiner;
 import com.google.common.collect.Lists;
-
 import java.util.ArrayList;
 import java.util.List;
 import java.util.stream.Collectors;
@@ -63,16 +62,16 @@ public class Table {
 
   public String getFields() {
     return Joiner.on(",\n\t\t\t\t\t\t")
-            .join(columns.stream()
-                    .filter(c -> !c.isIgnore())
-                    .map(c -> "\"" + c.getLowerCamelName() + "\"")
-                    .collect(Collectors.toList
-                            ()));
+        .join(columns.stream()
+            .filter(c -> !c.isIgnore())
+            .map(c -> "\"" + c.getLowerCamelName() + "\"")
+            .collect(Collectors.toList
+                ()));
   }
 
   public String getVirtualFields() {
-    return  Joiner.on(",\n\t\t\t\t\t\t")
-            .join(columns.stream()
+    return Joiner.on(",\n\t\t\t\t\t\t")
+        .join(columns.stream()
             .filter(c -> c.isGenColumn())
             .map(c -> "\"" + c.getLowerCamelName() + "\"")
             .collect(Collectors.toList()));
@@ -80,25 +79,25 @@ public class Table {
 
   public boolean getContainsVirtual() {
     return columns.stream()
-            .anyMatch(c -> c.isGenColumn());
+        .anyMatch(c -> c.isGenColumn());
   }
 
   public String getPk() {
     return columns.stream()
-            .filter(c -> !c.isIgnore())
-            .filter(c -> c.isPrimary())
-            .map(c -> c.getName())
-            .findFirst()
-            .get();
+        .filter(c -> !c.isIgnore())
+        .filter(c -> c.isPrimary())
+        .map(c -> c.getName())
+        .findFirst()
+        .get();
   }
 
   public ParameterType getPkType() {
     return columns.stream()
-            .filter(c -> !c.isIgnore())
-            .filter(c -> c.isPrimary())
-            .map(c -> c.getParameterType())
-            .findFirst()
-            .get();
+        .filter(c -> !c.isIgnore())
+        .filter(c -> c.isPrimary())
+        .map(c -> c.getParameterType())
+        .findFirst()
+        .get();
   }
 
   public void addImport(String imp) {
@@ -108,26 +107,37 @@ public class Table {
   public List<String> getImports() {
     List<String> list = Lists.newArrayList();
     columns.stream()
-            .filter(c -> !c.isIgnore())
-            .map(c -> c.getParameterType())
-            .forEach(t -> {
-              if (t == ParameterType.DATE) {
-                list.add("java.util.Date");
-              }
-              if (t == ParameterType.TIMESTAMP) {
-                list.add("java.sql.Timestamp");
-              }
-              if (t == ParameterType.BIGDECIMAL) {
-                list.add("java.math.BigDecimal");
-              }
-            });
+        .filter(c -> !c.isIgnore())
+        .map(c -> c.getParameterType())
+        .forEach(t -> {
+          if (t == ParameterType.DATE) {
+            list.add("java.util.Date");
+          }
+          if (t == ParameterType.TIMESTAMP) {
+            list.add("java.sql.Timestamp");
+          }
+          if (t == ParameterType.BIGDECIMAL) {
+            list.add("java.math.BigDecimal");
+          }
+        });
     list.add("java.util.List");
     list.add("java.util.Map");
     list.add("com.google.common.base.MoreObjects");
     list.add("com.google.common.collect.Lists");
     list.add("com.google.common.collect.Maps");
     list.add("com.github.edgar615.util.db.Persistent");
+    list.add("com.github.edgar615.util.db.PrimaryKey");
     list.addAll(imports);
+    boolean containsVersion = columns.stream()
+        .filter(c -> !c.isIgnore())
+        .anyMatch(c -> c.isVersion());
+    if (containsVersion) {
+      list.add("com.github.edgar615.util.db.VersionKey");
+    }
+    if (getContainsVirtual()) {
+      list.add("com.github.edgar615.util.db.VirtualKey");
+    }
+
     return list;
   }
 
@@ -138,10 +148,10 @@ public class Table {
   @Override
   public String toString() {
     return "Table{" +
-            "remarks='" + remarks + '\'' +
-            ", name='" + name + '\'' +
-            ", isIgnore=" + isIgnore +
-            ", columns=" + columns +
-            '}';
+        "remarks='" + remarks + '\'' +
+        ", name='" + name + '\'' +
+        ", isIgnore=" + isIgnore +
+        ", columns=" + columns +
+        '}';
   }
 }
