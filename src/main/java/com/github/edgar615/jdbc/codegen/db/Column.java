@@ -1,7 +1,6 @@
 package com.github.edgar615.jdbc.codegen.db;
 
 import com.google.common.base.CaseFormat;
-
 import java.sql.Types;
 import java.util.ArrayList;
 import java.util.List;
@@ -63,12 +62,12 @@ public class Column {
   private final String remarks;
 
   private Column(String name, int size, String defaultValue, boolean isNullable,
-                 boolean isAutoInc,
-                 boolean isGenColumn, boolean isIgnore,
-                 boolean isPrimary,
-                 boolean isVersion,
-                 int type,
-                 String remarks) {
+      boolean isAutoInc,
+      boolean isGenColumn, boolean isIgnore,
+      boolean isPrimary,
+      boolean isVersion,
+      int type,
+      String remarks) {
     this.name = name;
     this.size = size;
     this.defaultValue = defaultValue;
@@ -84,6 +83,23 @@ public class Column {
 
   public static ColumnBuilder builder() {
     return new ColumnBuilder();
+  }
+
+  @Override
+  public String toString() {
+    return "Column{" +
+        "name='" + name + '\'' +
+        ", size=" + size +
+        ", defaultValue='" + defaultValue + '\'' +
+        ", isNullable=" + isNullable +
+        ", isAutoInc=" + isAutoInc +
+        ", isGenColumn=" + isGenColumn +
+        ", isIgnore=" + isIgnore +
+        ", isVersion=" + isVersion +
+        ", isPrimary=" + isPrimary +
+        ", type=" + type +
+        ", remarks=" + remarks +
+        '}';
   }
 
   public String getName() {
@@ -141,6 +157,7 @@ public class Column {
   public boolean isAnnotations() {
     return isPrimary || isGenColumn || isVersion;
   }
+
   public List<String> getAnnotationsClass() {
     List<String> columnAnnotations = new ArrayList<>();
     if (isPrimary) {
@@ -153,23 +170,6 @@ public class Column {
       columnAnnotations.add("@VirtualKey");
     }
     return columnAnnotations;
-  }
-
-  @Override
-  public String toString() {
-    return "Column{" +
-           "name='" + name + '\'' +
-           ", size=" + size +
-           ", defaultValue='" + defaultValue + '\'' +
-           ", isNullable=" + isNullable +
-           ", isAutoInc=" + isAutoInc +
-            ", isGenColumn=" + isGenColumn +
-           ", isIgnore=" + isIgnore +
-           ", isVersion=" + isVersion +
-           ", isPrimary=" + isPrimary +
-           ", type=" + type +
-           ", remarks=" + remarks +
-           '}';
   }
 
   public ParameterType getParameterType() {
@@ -201,6 +201,7 @@ public class Column {
   }
 
   public static class ColumnBuilder {
+
     private String name;
 
     private int size;
@@ -224,6 +225,12 @@ public class Column {
     private String remarks;
 
     private ColumnBuilder() {
+    }
+
+    public Column build() {
+      return new Column(name, size, defaultValue, isNullable, isAutoInc, isGenColumn, isIgnore,
+          isPrimary,
+          isVersion, type, remarks);
     }
 
     public boolean isGenColumn() {
@@ -287,11 +294,6 @@ public class Column {
     public ColumnBuilder setVersion(boolean isVersion) {
       this.isVersion = isVersion;
       return this;
-    }
-
-    public Column build() {
-      return new Column(name, size, defaultValue, isNullable, isAutoInc, isGenColumn, isIgnore, isPrimary,
-                        isVersion, type, remarks);
     }
   }
 }

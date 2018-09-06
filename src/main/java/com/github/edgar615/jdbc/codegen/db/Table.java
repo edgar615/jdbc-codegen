@@ -40,6 +40,20 @@ public class Table {
     columns.add(column);
   }
 
+  public void addImport(String imp) {
+    this.imports.add(imp);
+  }
+
+  @Override
+  public String toString() {
+    return "Table{" +
+        "remarks='" + remarks + '\'' +
+        ", name='" + name + '\'' +
+        ", isIgnore=" + isIgnore +
+        ", columns=" + columns +
+        '}';
+  }
+
   public String getName() {
     return name;
   }
@@ -100,10 +114,6 @@ public class Table {
         .get();
   }
 
-  public void addImport(String imp) {
-    this.imports.add(imp);
-  }
-
   public List<String> getImports() {
     List<String> list = Lists.newArrayList();
     columns.stream()
@@ -143,15 +153,5 @@ public class Table {
 
   public String getUpperCamelName() {
     return CaseFormat.LOWER_UNDERSCORE.to(CaseFormat.UPPER_CAMEL, name);
-  }
-
-  @Override
-  public String toString() {
-    return "Table{" +
-        "remarks='" + remarks + '\'' +
-        ", name='" + name + '\'' +
-        ", isIgnore=" + isIgnore +
-        ", columns=" + columns +
-        '}';
   }
 }

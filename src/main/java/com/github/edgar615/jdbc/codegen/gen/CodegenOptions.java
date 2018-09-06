@@ -1,7 +1,6 @@
 package com.github.edgar615.jdbc.codegen.gen;
 
 import com.github.edgar615.mysql.mapping.TableMappingOptions;
-
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -12,20 +11,17 @@ import java.util.Map;
  * @author Edgar  Date 2016/4/1
  */
 public class CodegenOptions extends TableMappingOptions {
+
   public static final String DEFAULT_SRC_FOLDER_PATH = "src";
 
   //domain
   public static final String DEFAULT_DOMAIN_PACKAGE = "com.github.edgar615.code.domain";
 
   private static final boolean DEFAULT_GEN_RULE = false;
-
-  private String srcFolderPath = DEFAULT_SRC_FOLDER_PATH;
-
-  private String domainPackage = DEFAULT_DOMAIN_PACKAGE;
-
-  private boolean genRule = DEFAULT_GEN_RULE;
-
   private final Map<String, String> versions = new HashMap<>();
+  private String srcFolderPath = DEFAULT_SRC_FOLDER_PATH;
+  private String domainPackage = DEFAULT_DOMAIN_PACKAGE;
+  private boolean genRule = DEFAULT_GEN_RULE;
 
   /**
    * Default constructor
@@ -34,6 +30,28 @@ public class CodegenOptions extends TableMappingOptions {
     setIgnoreTable();
 
     setIgnoreColumn();
+  }
+
+  @Override
+  public CodegenOptions addGenTable(String tableName) {
+    super.addGenTable(tableName);
+    return this;
+  }
+
+  @Override
+  public CodegenOptions addGenTables(List<String> tableNames) {
+    super.addGenTables(tableNames);
+    return this;
+  }
+
+  public CodegenOptions addVersion(String table, String column) {
+    this.versions.put(table, column);
+    return this;
+  }
+
+  public CodegenOptions addVersions(Map<String, String> versions) {
+    this.versions.putAll(versions);
+    return this;
   }
 
   public boolean isGenRule() {
@@ -52,6 +70,19 @@ public class CodegenOptions extends TableMappingOptions {
   public CodegenOptions setSrcFolderPath(String srcFolderPath) {
     this.srcFolderPath = srcFolderPath;
     return this;
+  }
+
+  public String getDomainPackage() {
+    return domainPackage;
+  }
+
+  public CodegenOptions setDomainPackage(String domainPackage) {
+    this.domainPackage = domainPackage;
+    return this;
+  }
+
+  public Map<String, String> getVersions() {
+    return versions;
   }
 
   @Override
@@ -78,31 +109,9 @@ public class CodegenOptions extends TableMappingOptions {
     return this;
   }
 
-
-  public String getDomainPackage() {
-    return domainPackage;
-  }
-
-  public CodegenOptions setDomainPackage(String domainPackage) {
-    this.domainPackage = domainPackage;
-    return this;
-  }
-
   @Override
   public CodegenOptions setIgnoreTablesStr(String ignoreTablesStr) {
     super.setIgnoreTablesStr(ignoreTablesStr);
-    return this;
-  }
-
-  @Override
-  public CodegenOptions addGenTable(String tableName) {
-    super.addGenTable(tableName);
-    return this;
-  }
-
-  @Override
-  public CodegenOptions addGenTables(List<String> tableNames) {
-    super.addGenTables(tableNames);
     return this;
   }
 
@@ -127,20 +136,6 @@ public class CodegenOptions extends TableMappingOptions {
   @Override
   public CodegenOptions setPassword(String password) {
     super.setPassword(password);
-    return this;
-  }
-
-  public Map<String, String> getVersions() {
-    return versions;
-  }
-
-  public CodegenOptions addVersion(String table, String column) {
-    this.versions.put(table, column);
-    return this;
-  }
-
-  public CodegenOptions addVersions(Map<String, String> versions) {
-    this.versions.putAll(versions);
     return this;
   }
 }

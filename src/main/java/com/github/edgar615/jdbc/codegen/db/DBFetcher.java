@@ -1,9 +1,6 @@
 package com.github.edgar615.jdbc.codegen.db;
 
 import com.github.edgar615.jdbc.codegen.gen.CodegenOptions;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-
 import java.sql.Connection;
 import java.sql.DatabaseMetaData;
 import java.sql.DriverManager;
@@ -14,6 +11,8 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Properties;
 import java.util.Set;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 /**
  * 查询数据库属性.
@@ -21,11 +20,14 @@ import java.util.Set;
  * @author Edgar  Date 2017/5/17
  */
 public class DBFetcher {
+
   private static final Logger LOGGER = LoggerFactory.getLogger(DBFetcher.class);
 
   private final CodegenOptions options;
 
-  public DBFetcher(CodegenOptions options) {this.options = options;}
+  public DBFetcher(CodegenOptions options) {
+    this.options = options;
+  }
 
   public List<Table> fetchTablesFromDb() {
     List<Table> tables = new ArrayList<>();
@@ -50,7 +52,7 @@ public class DBFetcher {
          * TEMPORARY"、"ALIAS" 和 "SYNONYM";null表示包含所有的表类型;可包含单字符通配符("_"),或多字符通配符("%");
          */
         ResultSet rset =
-                dbmd.getTables(options.getDatabase(), null, "%", new String[]{"TABLE"});
+            dbmd.getTables(options.getDatabase(), null, "%", new String[]{"TABLE"});
         while (rset.next()) {
 //TABLE_CAT表类别(可为null)
 //TABLE_SCHEM 表模式（可能为空）
@@ -104,30 +106,8 @@ public class DBFetcher {
     LOGGER.info("DB Driver version:{}", dbmd.getDriverVersion());
   }
 
-  private Connection getConnection() throws SQLException {
-    Connection conn;
-    String userName = options.getUsername();
-    String password = options.getPassword();
-    LOGGER.info(
-            "Connecting to database at:[" + options.getJdbcUrl() + "]" + " with username/password:["
-            +
-            userName + "/" + password + "]");
-    if (userName == null && password == null) {
-      conn = DriverManager.getConnection(options.getJdbcUrl());
-    } else {
-      Properties connProps = new Properties();
-      connProps.put("user", userName);
-      connProps.put("password", password);
-      connProps.setProperty("remarks", "true"); //设置可以获取remarks信息
-      connProps.setProperty("useInformationSchema", "true");//设置可以获取tables remarks信息
-      conn = DriverManager.getConnection(options.getJdbcUrl(), connProps);
-    }
-    LOGGER.info("Connected to database");
-    return conn;
-  }
-
   private Table fetchColumns(DatabaseMetaData metaData, Table table) throws
-          Exception {
+      Exception {
 
     Set<String> pks = new HashSet<>();
     /**主键
@@ -151,7 +131,7 @@ public class DBFetcher {
       String keySeq = pkSet.getString("KEY_SEQ").toLowerCase();
       pks.add(pkColName);
       LOGGER.debug("PK:ColName:{}, PKName:{}, Key Seq:{}", new Object[]{pkColName, pkName,
-              keySeq});
+          keySeq});
     }
     if (pks.size() != 1) {
       LOGGER.error("should be only 1 pk,but:" + pks.size());
@@ -330,9 +310,9 @@ public class DBFetcher {
       String tableSchemaName = rs.getString("TABLE_SCHEM");//表模式（可能为空）,在oracle中获取的是命名空间,其它数据库未知
       String tableName = rs.getString("TABLE_NAME");  //表名
       boolean nonUnique =
-              rs.getBoolean("NON_UNIQUE");// 索引值是否可以不唯一,TYPE为 tableIndexStatistic时索引值为 false;
+          rs.getBoolean("NON_UNIQUE");// 索引值是否可以不唯一,TYPE为 tableIndexStatistic时索引值为 false;
       String indexQualifier =
-              rs.getString("INDEX_QUALIFIER");//索引类别（可能为空）,TYPE为 tableIndexStatistic 时索引类别为 null;
+          rs.getString("INDEX_QUALIFIER");//索引类别（可能为空）,TYPE为 tableIndexStatistic 时索引类别为 null;
       String indexName = rs.getString("INDEX_NAME");//索引的名称 ;TYPE为 tableIndexStatistic 时索引名称为 null;
       /**
        * 索引类型：
@@ -343,13 +323,13 @@ public class DBFetcher {
        */
       short type = rs.getShort("TYPE");//索引类型;
       short ordinalPosition =
-              rs.getShort("ORDINAL_POSITION");//在索引列顺序号;TYPE为 tableIndexStatistic 时该序列号为零;
+          rs.getShort("ORDINAL_POSITION");//在索引列顺序号;TYPE为 tableIndexStatistic 时该序列号为零;
       String columnName = rs.getString("COLUMN_NAME");//列名;TYPE为 tableIndexStatistic时列名称为 null;
       String ascOrDesc = rs.getString(
-              "ASC_OR_DESC");//列排序顺序:升序还是降序[A:升序; B:降序];如果排序序列不受支持,可能为 null;TYPE为
+          "ASC_OR_DESC");//列排序顺序:升序还是降序[A:升序; B:降序];如果排序序列不受支持,可能为 null;TYPE为
       // tableIndexStatistic时排序序列为 null;
       int cardinality =
-              rs.getInt("CARDINALITY");   //基数;TYPE为 tableIndexStatistic 时,它是表中的行数;否则,它是索引中唯一值的数量。
+          rs.getInt("CARDINALITY");   //基数;TYPE为 tableIndexStatistic 时,它是表中的行数;否则,它是索引中唯一值的数量。
       int pages = rs.getInt("PAGES"); //TYPE为 tableIndexStatisic时,它是用于表的页数,否则它是用于当前索引的页数。
       String filterCondition = rs.getString("FILTER_CONDITION"); //过滤器条件,如果有的话(可能为 null)。
 
@@ -357,5 +337,27 @@ public class DBFetcher {
       LOGGER.info("Index NON_UNIQUE:{}", nonUnique);
 
     }
+  }
+
+  private Connection getConnection() throws SQLException {
+    Connection conn;
+    String userName = options.getUsername();
+    String password = options.getPassword();
+    LOGGER.info(
+        "Connecting to database at:[" + options.getJdbcUrl() + "]" + " with username/password:["
+            +
+            userName + "/" + password + "]");
+    if (userName == null && password == null) {
+      conn = DriverManager.getConnection(options.getJdbcUrl());
+    } else {
+      Properties connProps = new Properties();
+      connProps.put("user", userName);
+      connProps.put("password", password);
+      connProps.setProperty("remarks", "true"); //设置可以获取remarks信息
+      connProps.setProperty("useInformationSchema", "true");//设置可以获取tables remarks信息
+      conn = DriverManager.getConnection(options.getJdbcUrl(), connProps);
+    }
+    LOGGER.info("Connected to database");
+    return conn;
   }
 }
