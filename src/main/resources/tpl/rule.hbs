@@ -20,8 +20,8 @@ public class {{table.upperCamelName}}Rule {
     */
     public static Multimap<String, Rule> maxLengthRule() {
         Multimap<String, Rule> rules = ArrayListMultimap.create();
-        {{#table.columns}}{{#eq parameterType.name "String"}} rules.put("{{lowerCamelName}}",  Rule.maxLength({{size}}));
-        {{else}}{{/eq}}{{/table.columns}} return rules;
+        {{#table.columns}}{{#eq parameterType.name "String"}}rules.put("{{lowerCamelName}}",  Rule.maxLength({{size}}));
+        {{else}}{{/eq}}{{/table.columns}}return rules;
     }
 
     /**
