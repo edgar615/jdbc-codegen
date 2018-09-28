@@ -8,6 +8,8 @@ public enum ParameterType {
   TIMESTAMP("Timestamp", "Timestamp", false),
   LONG("Long", "long", true),
   INTEGER("Integer", "int", true),
+  SHORT("Short", "short", true),
+  BYTE("Byte", "byte", true),
   FLOAT("Float", "float", true),
   BIGDECIMAL("BigDecimal", "BigDecimal", true),
   DOUBLE("Double", "double", true),

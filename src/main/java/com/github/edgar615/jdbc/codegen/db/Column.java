@@ -81,10 +81,6 @@ public class Column {
     this.remarks = remarks;
   }
 
-  public static ColumnBuilder builder() {
-    return new ColumnBuilder();
-  }
-
   @Override
   public String toString() {
     return "Column{" +
@@ -100,6 +96,10 @@ public class Column {
         ", type=" + type +
         ", remarks=" + remarks +
         '}';
+  }
+
+  public static ColumnBuilder builder() {
+    return new ColumnBuilder();
   }
 
   public String getName() {
@@ -182,14 +182,25 @@ public class Column {
       parameter = ParameterType.BIGDECIMAL;
     } else if ((type == Types.FLOAT) || (type == Types.DECIMAL)) {
       parameter = ParameterType.BIGDECIMAL;
-    } else if ((type == Types.INTEGER) || (type == Types.SMALLINT)) {
+    } else if (type == Types.INTEGER) {
       parameter = ParameterType.INTEGER;
-    } else if (type == Types.TINYINT) {
+    } else if (type == Types.SMALLINT) {
+      //不适用short
+      parameter = ParameterType.INTEGER;
+    } else if (type == Types.TINYINT && size == 1) {
       //TINYINT转换为boolean
       parameter = ParameterType.BOOLEAN;
+    } else if (type == Types.TINYINT) {
+      //不使用byte
+      parameter = ParameterType.INTEGER;
     } else if ((type == Types.TIMESTAMP) || (type == Types.TIME) || (type == Types.DATE)) {
       parameter = ParameterType.DATE;
-    } else if ((type == Types.BIT) || (type == Types.BOOLEAN)) {
+    } else if (type == Types.BIT && size == 1) {
+      //BIT转换为boolean
+      parameter = ParameterType.BOOLEAN;
+    } else if (type == Types.BIT && size > 1) {
+      parameter = ParameterType.STRING;
+    } else if (type == Types.BOOLEAN) {
       parameter = ParameterType.BOOLEAN;
     } else if (type == Types.CHAR) {
       parameter = ParameterType.STRING;
@@ -225,12 +236,6 @@ public class Column {
     private String remarks;
 
     private ColumnBuilder() {
-    }
-
-    public Column build() {
-      return new Column(name, size, defaultValue, isNullable, isAutoInc, isGenColumn, isIgnore,
-          isPrimary,
-          isVersion, type, remarks);
     }
 
     public boolean isGenColumn() {
@@ -294,6 +299,12 @@ public class Column {
     public ColumnBuilder setVersion(boolean isVersion) {
       this.isVersion = isVersion;
       return this;
+    }
+
+    public Column build() {
+      return new Column(name, size, defaultValue, isNullable, isAutoInc, isGenColumn, isIgnore,
+          isPrimary,
+          isVersion, type, remarks);
     }
   }
 }
