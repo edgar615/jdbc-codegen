@@ -4,6 +4,7 @@ import com.github.edgar615.mysql.mapping.TableMappingOptions;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Objects;
 
 /**
  * Created by Edgar on 2016/4/1.
@@ -22,6 +23,8 @@ public class CodegenOptions extends TableMappingOptions {
   private String srcFolderPath = DEFAULT_SRC_FOLDER_PATH;
   private String domainPackage = DEFAULT_DOMAIN_PACKAGE;
   private boolean genRule = DEFAULT_GEN_RULE;
+  private DaoOptions daoOptions;
+  private boolean genDao = false;
 
   /**
    * Default constructor
@@ -42,47 +45,6 @@ public class CodegenOptions extends TableMappingOptions {
   public CodegenOptions addGenTables(List<String> tableNames) {
     super.addGenTables(tableNames);
     return this;
-  }
-
-  public CodegenOptions addVersion(String table, String column) {
-    this.versions.put(table, column);
-    return this;
-  }
-
-  public CodegenOptions addVersions(Map<String, String> versions) {
-    this.versions.putAll(versions);
-    return this;
-  }
-
-  public boolean isGenRule() {
-    return genRule;
-  }
-
-  public CodegenOptions setGenRule(boolean genRule) {
-    this.genRule = genRule;
-    return this;
-  }
-
-  public String getSrcFolderPath() {
-    return srcFolderPath;
-  }
-
-  public CodegenOptions setSrcFolderPath(String srcFolderPath) {
-    this.srcFolderPath = srcFolderPath;
-    return this;
-  }
-
-  public String getDomainPackage() {
-    return domainPackage;
-  }
-
-  public CodegenOptions setDomainPackage(String domainPackage) {
-    this.domainPackage = domainPackage;
-    return this;
-  }
-
-  public Map<String, String> getVersions() {
-    return versions;
   }
 
   @Override
@@ -136,6 +98,62 @@ public class CodegenOptions extends TableMappingOptions {
   @Override
   public CodegenOptions setPassword(String password) {
     super.setPassword(password);
+    return this;
+  }
+
+  public boolean isGenDao() {
+    return genDao;
+  }
+
+  public DaoOptions getDaoOptions() {
+    return daoOptions;
+  }
+
+  public CodegenOptions setDaoOptions(DaoOptions daoOptions) {
+    Objects.requireNonNull(daoOptions);
+    this.daoOptions = daoOptions;
+    this.genDao = true;
+    return this;
+  }
+
+  public boolean isGenRule() {
+    return genRule;
+  }
+
+  public CodegenOptions setGenRule(boolean genRule) {
+    this.genRule = genRule;
+    return this;
+  }
+
+  public String getSrcFolderPath() {
+    return srcFolderPath;
+  }
+
+  public CodegenOptions setSrcFolderPath(String srcFolderPath) {
+    this.srcFolderPath = srcFolderPath;
+    return this;
+  }
+
+  public String getDomainPackage() {
+    return domainPackage;
+  }
+
+  public CodegenOptions setDomainPackage(String domainPackage) {
+    this.domainPackage = domainPackage;
+    return this;
+  }
+
+  public Map<String, String> getVersions() {
+    return versions;
+  }
+
+  public CodegenOptions addVersion(String table, String column) {
+    this.versions.put(table, column);
+    return this;
+  }
+
+  public CodegenOptions addVersions(Map<String, String> versions) {
+    this.versions.putAll(versions);
     return this;
   }
 }

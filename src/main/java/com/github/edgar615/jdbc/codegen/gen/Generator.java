@@ -19,6 +19,10 @@ public class Generator {
 
   private static final String ruleTplFile = "tpl/rule.hbs";
 
+  private static final String daoTplFile = "tpl/dao.hbs";
+
+  private static final String daoImplTplFile = "tpl/daoImpl.hbs";
+
   private final CodegenOptions options;
 
   private final Codegen domainGen;
@@ -41,6 +45,25 @@ public class Generator {
       tables.stream()
           .filter(t -> !t.isIgnore())
           .forEach(t -> ruleGen.genCode(t));
+    }
+    if (options.isGenDao()) {
+      //接口
+      Codegen daoGen = new Codegen(this.options.getSrcFolderPath(),
+          this.options.getDaoOptions().getDaoPackage(), "Dao", daoTplFile);
+      daoGen.addVariable("domainPackage", this.options.getDomainPackage());
+      tables.stream()
+          .filter(t -> !t.isIgnore())
+          .forEach(t -> daoGen.genCode(t));
+      //实现类
+      Codegen daoImplGen = new Codegen(this.options.getSrcFolderPath(),
+          this.options.getDaoOptions().getDaoPackage() + ".impl", "DaoImpl", daoImplTplFile);
+      daoImplGen.addVariable("daoPackage", this.options.getDaoOptions().getDaoPackage());
+      daoImplGen.addVariable("domainPackage", this.options.getDomainPackage());
+      daoImplGen.addVariable("supportSpring", this.options.getDaoOptions().isSupportSpring());
+      tables.stream()
+          .filter(t -> !t.isIgnore())
+          .forEach(t -> daoImplGen.genCode(t));
+
     }
   }
 

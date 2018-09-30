@@ -32,18 +32,6 @@ public class Table {
     this.remarks = remarks;
   }
 
-  public static Table create(String name, String remarks) {
-    return new Table(name, remarks);
-  }
-
-  public void addColumn(Column column) {
-    columns.add(column);
-  }
-
-  public void addImport(String imp) {
-    this.imports.add(imp);
-  }
-
   @Override
   public String toString() {
     return "Table{" +
@@ -52,6 +40,10 @@ public class Table {
         ", isIgnore=" + isIgnore +
         ", columns=" + columns +
         '}';
+  }
+
+  public static Table create(String name, String remarks) {
+    return new Table(name, remarks);
   }
 
   public String getName() {
@@ -153,5 +145,13 @@ public class Table {
 
   public String getUpperCamelName() {
     return CaseFormat.LOWER_UNDERSCORE.to(CaseFormat.UPPER_CAMEL, name);
+  }
+
+  public void addColumn(Column column) {
+    columns.add(column);
+  }
+
+  public void addImport(String imp) {
+    this.imports.add(imp);
   }
 }

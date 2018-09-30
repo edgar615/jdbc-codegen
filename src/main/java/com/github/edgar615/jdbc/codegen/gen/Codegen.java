@@ -104,6 +104,19 @@ public class Codegen {
     }
   }
 
+  private ClassLoader getClassLoader() {
+    ClassLoader cl = Thread.currentThread().getContextClassLoader();
+    if (cl == null) {
+      cl = getClass().getClassLoader();
+    }
+    return cl;
+  }
+
+  public Codegen setFileType(String fileType) {
+    this.fileType = fileType;
+    return this;
+  }
+
   public Codegen addVariable(String name, Object value) {
     this.variables.put(name, value);
     return this;
@@ -120,6 +133,7 @@ public class Codegen {
       Template template = handlebars.compileInline(tpl);
       Map<String, Object> codeGenVariables = new HashMap<>();
       codeGenVariables.putAll(variables);
+      codeGenVariables.put("suffix", suffix);
       codeGenVariables.put("table", table);
       codeGenVariables.put("package", packageName);
       codeGenVariables.put("date", new SimpleDateFormat("yyyy-MM-dd").format(new Date()));
@@ -276,18 +290,5 @@ public class Codegen {
       throw new RuntimeException(e);
     }
     return null;
-  }
-
-  private ClassLoader getClassLoader() {
-    ClassLoader cl = Thread.currentThread().getContextClassLoader();
-    if (cl == null) {
-      cl = getClass().getClassLoader();
-    }
-    return cl;
-  }
-
-  public Codegen setFileType(String fileType) {
-    this.fileType = fileType;
-    return this;
   }
 }

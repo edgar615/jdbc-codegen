@@ -29,6 +29,28 @@ public class DBFetcher {
     this.options = options;
   }
 
+  private Connection getConnection() throws SQLException {
+    Connection conn;
+    String userName = options.getUsername();
+    String password = options.getPassword();
+    LOGGER.info(
+        "Connecting to database at:[" + options.getJdbcUrl() + "]" + " with username/password:["
+            +
+            userName + "/" + password + "]");
+    if (userName == null && password == null) {
+      conn = DriverManager.getConnection(options.getJdbcUrl());
+    } else {
+      Properties connProps = new Properties();
+      connProps.put("user", userName);
+      connProps.put("password", password);
+      connProps.setProperty("remarks", "true"); //设置可以获取remarks信息
+      connProps.setProperty("useInformationSchema", "true");//设置可以获取tables remarks信息
+      conn = DriverManager.getConnection(options.getJdbcUrl(), connProps);
+    }
+    LOGGER.info("Connected to database");
+    return conn;
+  }
+
   public List<Table> fetchTablesFromDb() {
     List<Table> tables = new ArrayList<>();
     Connection conn = null;
@@ -337,27 +359,5 @@ public class DBFetcher {
       LOGGER.info("Index NON_UNIQUE:{}", nonUnique);
 
     }
-  }
-
-  private Connection getConnection() throws SQLException {
-    Connection conn;
-    String userName = options.getUsername();
-    String password = options.getPassword();
-    LOGGER.info(
-        "Connecting to database at:[" + options.getJdbcUrl() + "]" + " with username/password:["
-            +
-            userName + "/" + password + "]");
-    if (userName == null && password == null) {
-      conn = DriverManager.getConnection(options.getJdbcUrl());
-    } else {
-      Properties connProps = new Properties();
-      connProps.put("user", userName);
-      connProps.put("password", password);
-      connProps.setProperty("remarks", "true"); //设置可以获取remarks信息
-      connProps.setProperty("useInformationSchema", "true");//设置可以获取tables remarks信息
-      conn = DriverManager.getConnection(options.getJdbcUrl(), connProps);
-    }
-    LOGGER.info("Connected to database");
-    return conn;
   }
 }
