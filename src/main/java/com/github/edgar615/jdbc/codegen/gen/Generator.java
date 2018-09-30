@@ -1,8 +1,11 @@
 package com.github.edgar615.jdbc.codegen.gen;
 
 import com.github.edgar615.jdbc.codegen.db.DBFetcher;
+import com.github.edgar615.jdbc.codegen.db.ParameterType;
 import com.github.edgar615.jdbc.codegen.db.Table;
+import com.google.common.collect.Lists;
 import java.util.List;
+import javafx.scene.control.Tab;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -25,45 +28,106 @@ public class Generator {
 
   private final CodegenOptions options;
 
-  private final Codegen domainGen;
-
   public Generator(CodegenOptions options) {
     this.options = options;
-    domainGen = new Codegen(options.getSrcFolderPath(), options.getDomainPackage(), "", tplFile);
-
   }
 
+  private void generateDomain(Table table) {
+    Codegen codegen = new Codegen(options.getSrcFolderPath(), options.getDomainPackage(), "", tplFile);
+    table.getColumns().stream()
+        .filter(c -> !c.isIgnore())
+        .map(c -> c.getParameterType())
+        .forEach(t -> {
+          if (t == ParameterType.DATE) {
+            codegen.addImport("java.util.Date");
+          }
+          if (t == ParameterType.TIMESTAMP) {
+            codegen.addImport("java.sql.Timestamp");
+          }
+          if (t == ParameterType.BIGDECIMAL) {
+            codegen.addImport("java.math.BigDecimal");
+          }
+        });
+    codegen.addImport("java.util.List");
+    codegen.addImport("java.util.Map");
+    codegen.addImport("com.google.common.base.MoreObjects");
+    codegen.addImport("com.google.common.collect.Lists");
+    codegen.addImport("com.google.common.collect.Maps");
+    codegen.addImport("com.github.edgar615.util.db.Persistent");
+    codegen.addImport("com.github.edgar615.util.db.PrimaryKey");
+    boolean containsVersion = table.getColumns().stream()
+        .filter(c -> !c.isIgnore())
+        .anyMatch(c -> c.isVersion());
+    if (containsVersion) {
+      codegen.addImport("com.github.edgar615.util.db.VersionKey");
+    }
+    if (table.getContainsVirtual()) {
+      codegen.addImport("com.github.edgar615.util.db.VirtualKey");
+    }
+    codegen.genCode(table);
+  }
+
+  private void generateRule(Table table) {
+    Codegen codegen = new Codegen(this.options.getSrcFolderPath(),
+        this.options.getDomainPackage(), "Rule", ruleTplFile);
+    codegen.addImport("com.google.common.collect.ArrayListMultimap")
+        .addImport("com.google.common.collect.Multimap")
+        .addImport("com.github.edgar615.util.validation.Rule");
+    codegen.genCode(table);
+  }
+
+  private void generateDao(Table table) {
+    Codegen daoGen = new Codegen(this.options.getSrcFolderPath(),
+        this.options.getDaoOptions().getDaoPackage(), "Dao", daoTplFile);
+    daoGen.addVariable("domainPackage", this.options.getDomainPackage());
+    daoGen.addImport("com.github.edgar615.util.db.BaseDao");
+    if (!this.options.getDomainPackage().equals(this.options.getDaoOptions().getDaoPackage())) {
+      daoGen.addImport(this.options.getDomainPackage() + "." + table.getUpperCamelName());
+    }
+
+    daoGen.genCode(table);
+  }
+
+  private void generateDaoImpl(Table table) {
+    String daoImplPackage = this.options.getDaoOptions().getDaoPackage() + ".impl";
+    Codegen daoImplGen = new Codegen(this.options.getSrcFolderPath(),
+        daoImplPackage, "DaoImpl", daoImplTplFile);
+    daoImplGen.addVariable("daoPackage", this.options.getDaoOptions().getDaoPackage());
+    daoImplGen.addVariable("domainPackage", this.options.getDomainPackage());
+    daoImplGen.addVariable("supportSpring", this.options.getDaoOptions().isSupportSpring());
+    daoImplGen.addImport("com.github.edgar615.util.db.BaseDaoImpl")
+        .addImport("com.github.edgar615.util.db.Jdbc");
+
+    if (!this.options.getDomainPackage().equals(daoImplPackage)) {
+      daoImplGen.addImport(this.options.getDomainPackage() + "." + table.getUpperCamelName());
+    }
+
+    daoImplGen.addImport(this.options.getDaoOptions().getDaoPackage() + "." + table.getUpperCamelName() + "Dao");
+    if (this.options.getDaoOptions().isSupportSpring()) {
+      daoImplGen.addImport("org.springframework.stereotype.Service");
+    }
+    daoImplGen.genCode(table);
+  }
 
   public void generate() {
     List<Table> tables = new DBFetcher(options).fetchTablesFromDb();
     tables.stream()
         .filter(t -> !t.isIgnore())
-        .forEach(t -> domainGen.genCode(t));
+        .forEach(t -> generateDomain(t));
     if (options.isGenRule()) {
-      Codegen ruleGen = new Codegen(this.options.getSrcFolderPath(),
-          this.options.getDomainPackage(), "Rule", ruleTplFile);
       tables.stream()
           .filter(t -> !t.isIgnore())
-          .forEach(t -> ruleGen.genCode(t));
+          .forEach(t -> generateRule(t));
     }
     if (options.isGenDao()) {
-      //接口
-      Codegen daoGen = new Codegen(this.options.getSrcFolderPath(),
-          this.options.getDaoOptions().getDaoPackage(), "Dao", daoTplFile);
-      daoGen.addVariable("domainPackage", this.options.getDomainPackage());
       tables.stream()
           .filter(t -> !t.isIgnore())
-          .forEach(t -> daoGen.genCode(t));
-      //实现类
-      Codegen daoImplGen = new Codegen(this.options.getSrcFolderPath(),
-          this.options.getDaoOptions().getDaoPackage() + ".impl", "DaoImpl", daoImplTplFile);
-      daoImplGen.addVariable("daoPackage", this.options.getDaoOptions().getDaoPackage());
-      daoImplGen.addVariable("domainPackage", this.options.getDomainPackage());
-      daoImplGen.addVariable("supportSpring", this.options.getDaoOptions().isSupportSpring());
+          .forEach(t -> generateDao(t));
+    }
+    if (options.getDaoOptions().isGenImpl()) {
       tables.stream()
           .filter(t -> !t.isIgnore())
-          .forEach(t -> daoImplGen.genCode(t));
-
+          .forEach(t -> generateDaoImpl(t));
     }
   }
 

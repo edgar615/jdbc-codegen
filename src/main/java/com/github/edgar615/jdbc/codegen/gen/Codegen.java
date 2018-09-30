@@ -10,6 +10,7 @@ import com.google.common.base.CharMatcher;
 import com.google.common.base.Splitter;
 import com.google.common.base.Strings;
 import com.google.common.collect.Iterables;
+import com.google.common.collect.Lists;
 import com.google.common.io.ByteStreams;
 import java.io.File;
 import java.io.FileWriter;
@@ -21,6 +22,7 @@ import java.net.URLDecoder;
 import java.nio.charset.Charset;
 import java.nio.file.Files;
 import java.text.SimpleDateFormat;
+import java.util.Comparator;
 import java.util.Date;
 import java.util.Enumeration;
 import java.util.HashMap;
@@ -28,6 +30,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.jar.JarEntry;
 import java.util.jar.JarFile;
+import java.util.stream.Collectors;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -36,19 +39,21 @@ import org.slf4j.LoggerFactory;
  *
  * @author Edgar  Date 2017/11/15
  */
-public class Codegen {
+class Codegen {
 
-  static final String COMMENT_START = "/* START Do not remove/edit this line. CodeGenerator "
+  private static final String COMMENT_START = "/* START Do not remove/edit this line. CodeGenerator "
       + "will preserve any code between start and end tags.*/";
 
-  static final String COMMENT_END = "/* END Do not remove/edit this line. CodeGenerator will "
+  private static final String COMMENT_END = "/* END Do not remove/edit this line. CodeGenerator will "
       + "preserve any code between start and end tags.*/";
 
-  static final String IS_COMMENT_START = "/* START";
+  private static final String IS_COMMENT_START = "/* START";
 
-  static final String IS_COMMENT_END = "/* END";
+  private static final String IS_COMMENT_END = "/* END";
 
-  static final Handlebars handlebars = new Handlebars();
+  private static final Handlebars handlebars = new Handlebars();
+
+  private final List<String> imports = Lists.newArrayList();
 
   private static final Logger LOGGER = LoggerFactory.getLogger(Generator.class);
 
@@ -76,7 +81,7 @@ public class Codegen {
   private final Map<String, Object> variables = new HashMap<>();
   private String fileType = ".java";
 
-  protected Codegen(String srcFolderPath, String packageName, String suffix,
+  Codegen(String srcFolderPath, String packageName, String suffix,
       String tplFile) {
     this.srcFolderPath = srcFolderPath;
     this.packageName = packageName;
@@ -127,6 +132,11 @@ public class Codegen {
     return this;
   }
 
+  public Codegen addImport(String imp) {
+    this.imports.add(imp);
+    return this;
+  }
+
   public void genCode(Table table) {
     try {
       StringBuffer userSource = readUserSourceCode(table);
@@ -138,12 +148,20 @@ public class Codegen {
       codeGenVariables.put("package", packageName);
       codeGenVariables.put("date", new SimpleDateFormat("yyyy-MM-dd").format(new Date()));
       codeGenVariables.put("userSource", userSource.toString());
+      codeGenVariables.put("imports", sortedImports());
       String code = template.apply(codeGenVariables);
       createFile(table, code);
     } catch (Throwable e) {
       LOGGER.error("{}", table.getName(), e);
       throw new RuntimeException(table.getName(), e);
     }
+  }
+
+  private List<String> sortedImports() {
+    //java和javax开头的在最后面，
+    return imports.stream()
+        .sorted(Comparator.comparing(i -> i))
+        .collect(Collectors.toList());
   }
 
   private void createPackage(String rootFolderPath, String packageName) throws Exception {
@@ -224,14 +242,14 @@ public class Codegen {
           if (tokens.length > 2) {
             String iClass = tokens[1] + " " + tokens[2].substring(0, tokens[2].length() - 1);
             LOGGER.debug("iClass:{}", iClass);
-            if (!table.getImports().contains(iClass)) {
-              table.addImport(iClass);
+            if (!imports.contains(iClass)) {
+              imports.add(iClass);
             }
           } else {
             String iClass = tokens[1].substring(0, tokens[1].length() - 1);
             LOGGER.debug("iClass:{}", iClass);
-            if (!table.getImports().contains(iClass)) {
-              table.addImport(iClass);
+            if (!imports.contains(iClass)) {
+              imports.add(iClass);
             }
           }
         }

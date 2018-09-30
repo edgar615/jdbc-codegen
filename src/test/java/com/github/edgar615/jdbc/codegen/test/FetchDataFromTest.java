@@ -10,22 +10,22 @@ import com.github.edgar615.jdbc.codegen.gen.Generator;
 public class FetchDataFromTest {
 
   public static void main(String[] args) throws Exception {
-    CodegenOptions options = new CodegenOptions().setUsername("device")
-        .setPassword("fec40bf3aff7209a")
+    CodegenOptions options = new CodegenOptions().setUsername("root")
+        .setPassword("123456")
 //            .addGenTable("dict")
 //            .addGenTable("dict_item")
-        .addGenTable("app_push_policy")
+        .addGenTable("device")
         .setIgnoreColumnsStr("created*,updated_on")
         .setGenRule(true)
         .setDatabase("device")
-        .setHost("test.ihorn.com.cn")
+        .setHost("localhost")
         .setPort(3307)
         .setJdbcArg("verifyServerCertificate=false&useSSL=true&requireSSL=true")
 //            .setTableNamePattern("device")
 //                .setIgnoreColumnsStr("photo_path,degree")
         .setSrcFolderPath("src/test/codegen")
         .setDomainPackage("com.github.edgar615.test.codegen.domain")
-        .setDaoOptions(new DaoOptions().setDaoPackage("com.github.edgar615.test.codegen.dao")
+        .setDaoOptions(new DaoOptions().setGenImpl(false).setDaoPackage("com.github.edgar615.test.codegen.dao")
         .setSupportSpring(true));
 
     new Generator(options).generate();

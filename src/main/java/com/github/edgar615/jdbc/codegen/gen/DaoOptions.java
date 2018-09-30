@@ -10,10 +10,13 @@ public class DaoOptions {
 
   private static final String DEFAULT_DAO_PACKAGE = "com.github.edgar615.codegen.dao";
   private static final boolean DEFAULT_SUPPORT_SPRING = true;
+  private static final boolean DEFAULT_GEN_IMPL = true;
 
   private String daoPackage = DEFAULT_DAO_PACKAGE;
 
   private boolean supportSpring = DEFAULT_SUPPORT_SPRING;
+
+  private boolean genImpl = DEFAULT_GEN_IMPL;
 
   public String getDaoPackage() {
     return daoPackage;
@@ -30,6 +33,15 @@ public class DaoOptions {
 
   public DaoOptions setSupportSpring(boolean supportSpring) {
     this.supportSpring = supportSpring;
+    return this;
+  }
+
+  public boolean isGenImpl() {
+    return genImpl;
+  }
+
+  public DaoOptions setGenImpl(boolean genImpl) {
+    this.genImpl = genImpl;
     return this;
   }
 }

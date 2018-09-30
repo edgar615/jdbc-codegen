@@ -20,8 +20,6 @@ public class Table {
 
   private final List<Column> columns = new ArrayList<>();
 
-  List<String> imports = Lists.newArrayList();
-
   /**
    * 是否忽略该字段，依赖于codegen的配置.
    */
@@ -78,6 +76,7 @@ public class Table {
   public String getVirtualFields() {
     return Joiner.on(",\n\t\t\t\t\t\t")
         .join(columns.stream()
+            .filter(c -> !c.isIgnore())
             .filter(c -> c.isGenColumn())
             .map(c -> "\"" + c.getLowerCamelName() + "\"")
             .collect(Collectors.toList()));
@@ -85,6 +84,7 @@ public class Table {
 
   public boolean getContainsVirtual() {
     return columns.stream()
+        .filter(c -> !c.isIgnore())
         .anyMatch(c -> c.isGenColumn());
   }
 
@@ -106,43 +106,6 @@ public class Table {
         .get();
   }
 
-  public List<String> getImports() {
-    List<String> list = Lists.newArrayList();
-    columns.stream()
-        .filter(c -> !c.isIgnore())
-        .map(c -> c.getParameterType())
-        .forEach(t -> {
-          if (t == ParameterType.DATE) {
-            list.add("java.util.Date");
-          }
-          if (t == ParameterType.TIMESTAMP) {
-            list.add("java.sql.Timestamp");
-          }
-          if (t == ParameterType.BIGDECIMAL) {
-            list.add("java.math.BigDecimal");
-          }
-        });
-    list.add("java.util.List");
-    list.add("java.util.Map");
-    list.add("com.google.common.base.MoreObjects");
-    list.add("com.google.common.collect.Lists");
-    list.add("com.google.common.collect.Maps");
-    list.add("com.github.edgar615.util.db.Persistent");
-    list.add("com.github.edgar615.util.db.PrimaryKey");
-    list.addAll(imports);
-    boolean containsVersion = columns.stream()
-        .filter(c -> !c.isIgnore())
-        .anyMatch(c -> c.isVersion());
-    if (containsVersion) {
-      list.add("com.github.edgar615.util.db.VersionKey");
-    }
-    if (getContainsVirtual()) {
-      list.add("com.github.edgar615.util.db.VirtualKey");
-    }
-
-    return list;
-  }
-
   public String getUpperCamelName() {
     return CaseFormat.LOWER_UNDERSCORE.to(CaseFormat.UPPER_CAMEL, name);
   }
@@ -151,7 +114,4 @@ public class Table {
     columns.add(column);
   }
 
-  public void addImport(String imp) {
-    this.imports.add(imp);
-  }
 }
