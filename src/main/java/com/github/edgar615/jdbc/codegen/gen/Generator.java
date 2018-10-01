@@ -3,9 +3,7 @@ package com.github.edgar615.jdbc.codegen.gen;
 import com.github.edgar615.jdbc.codegen.db.DBFetcher;
 import com.github.edgar615.jdbc.codegen.db.ParameterType;
 import com.github.edgar615.jdbc.codegen.db.Table;
-import com.google.common.collect.Lists;
 import java.util.List;
-import javafx.scene.control.Tab;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -33,7 +31,8 @@ public class Generator {
   }
 
   private void generateDomain(Table table) {
-    Codegen codegen = new Codegen(options.getSrcFolderPath(), options.getDomainPackage(), "", tplFile);
+    Codegen codegen = new Codegen(options.getSrcFolderPath(), options.getDomainPackage(), "",
+        tplFile);
     table.getColumns().stream()
         .filter(c -> !c.isIgnore())
         .map(c -> c.getParameterType())
@@ -102,7 +101,8 @@ public class Generator {
       daoImplGen.addImport(this.options.getDomainPackage() + "." + table.getUpperCamelName());
     }
 
-    daoImplGen.addImport(this.options.getDaoOptions().getDaoPackage() + "." + table.getUpperCamelName() + "Dao");
+    daoImplGen.addImport(
+        this.options.getDaoOptions().getDaoPackage() + "." + table.getUpperCamelName() + "Dao");
     if (this.options.getDaoOptions().isSupportSpring()) {
       daoImplGen.addImport("org.springframework.stereotype.Service");
     }

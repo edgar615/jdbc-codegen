@@ -41,20 +41,19 @@ import org.slf4j.LoggerFactory;
  */
 class Codegen {
 
-  private static final String COMMENT_START = "/* START Do not remove/edit this line. CodeGenerator "
-      + "will preserve any code between start and end tags.*/";
+  private static final String COMMENT_START =
+      "/* START Do not remove/edit this line. CodeGenerator "
+          + "will preserve any code between start and end tags.*/";
 
-  private static final String COMMENT_END = "/* END Do not remove/edit this line. CodeGenerator will "
-      + "preserve any code between start and end tags.*/";
+  private static final String COMMENT_END =
+      "/* END Do not remove/edit this line. CodeGenerator will "
+          + "preserve any code between start and end tags.*/";
 
   private static final String IS_COMMENT_START = "/* START";
 
   private static final String IS_COMMENT_END = "/* END";
 
   private static final Handlebars handlebars = new Handlebars();
-
-  private final List<String> imports = Lists.newArrayList();
-
   private static final Logger LOGGER = LoggerFactory.getLogger(Generator.class);
 
   static {
@@ -73,6 +72,7 @@ class Codegen {
     handlebars.registerHelpers(new HelperSource());
   }
 
+  private final List<String> imports = Lists.newArrayList();
   private final String srcFolderPath;
   private final String packageName;
   private final String suffix;

@@ -2,7 +2,6 @@ package com.github.edgar615.jdbc.codegen.db;
 
 import com.google.common.base.CaseFormat;
 import com.google.common.base.Joiner;
-import com.google.common.collect.Lists;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.stream.Collectors;
