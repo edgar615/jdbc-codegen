@@ -119,16 +119,17 @@ public class Generator {
           .filter(t -> !t.isIgnore())
           .forEach(t -> generateRule(t));
     }
-    if (options.isGenDao()) {
+    if (options.isGenDao() && options.getDaoOptions() != null) {
       tables.stream()
           .filter(t -> !t.isIgnore())
           .forEach(t -> generateDao(t));
+      if (options.getDaoOptions().isGenImpl()) {
+        tables.stream()
+            .filter(t -> !t.isIgnore())
+            .forEach(t -> generateDaoImpl(t));
+      }
     }
-    if (options.getDaoOptions().isGenImpl()) {
-      tables.stream()
-          .filter(t -> !t.isIgnore())
-          .forEach(t -> generateDaoImpl(t));
-    }
+
   }
 
 
