@@ -1,6 +1,6 @@
-package com.github.edgar615.jdbc.codegen.gen;
+package com.github.edgar615.jdbc.codegen;
 
-import com.github.edgar615.jdbc.codegen.db.Table;
+import com.github.edgar615.mysql.mapping.Table;
 import com.github.jknack.handlebars.Handlebars;
 import com.github.jknack.handlebars.Helper;
 import com.github.jknack.handlebars.Options;

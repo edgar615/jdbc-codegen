@@ -1,6 +1,6 @@
-package com.github.edgar615.jdbc.codegen.gen;
+package com.github.edgar615.jdbc.codegen;
 
-import com.github.edgar615.jdbc.codegen.db.Column;
+import com.github.edgar615.mysql.mapping.Column;
 import com.github.jknack.handlebars.Options;
 import com.google.common.base.Joiner;
 import java.io.IOException;

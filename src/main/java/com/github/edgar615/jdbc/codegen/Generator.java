@@ -1,8 +1,8 @@
-package com.github.edgar615.jdbc.codegen.gen;
+package com.github.edgar615.jdbc.codegen;
 
-import com.github.edgar615.jdbc.codegen.db.DBFetcher;
-import com.github.edgar615.jdbc.codegen.db.ParameterType;
-import com.github.edgar615.jdbc.codegen.db.Table;
+import com.github.edgar615.mysql.mapping.ParameterType;
+import com.github.edgar615.mysql.mapping.Table;
+import com.github.edgar615.mysql.mapping.TableMapping;
 import java.util.List;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -109,24 +109,20 @@ public class Generator {
     daoImplGen.genCode(table);
   }
 
-  public void generate() {
-    List<Table> tables = new DBFetcher(options).fetchTablesFromDb();
+  public void generate() throws Exception {
+    List<Table> tables = new TableMapping(options).fetchTable();
     tables.stream()
-        .filter(t -> !t.isIgnore())
         .forEach(t -> generateDomain(t));
     if (options.isGenRule()) {
       tables.stream()
-          .filter(t -> !t.isIgnore())
           .forEach(t -> generateRule(t));
     }
     if (options.isGenDao()) {
       tables.stream()
-          .filter(t -> !t.isIgnore())
           .forEach(t -> generateDao(t));
     }
     if (options.getDaoOptions().isGenImpl()) {
       tables.stream()
-          .filter(t -> !t.isIgnore())
           .forEach(t -> generateDaoImpl(t));
     }
   }
