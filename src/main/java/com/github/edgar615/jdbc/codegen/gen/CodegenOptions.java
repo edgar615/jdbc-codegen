@@ -1,4 +1,4 @@
-package com.github.edgar615.jdbc.codegen;
+package com.github.edgar615.jdbc.codegen.gen;
 
 import com.github.edgar615.mysql.mapping.TableMappingOptions;
 import java.util.HashMap;

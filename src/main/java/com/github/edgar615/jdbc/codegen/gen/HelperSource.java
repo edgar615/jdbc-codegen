@@ -1,6 +1,6 @@
-package com.github.edgar615.jdbc.codegen;
+package com.github.edgar615.jdbc.codegen.gen;
 
-import com.github.edgar615.mysql.mapping.Column;
+import com.github.edgar615.jdbc.codegen.db.DbColumn;
 import com.github.jknack.handlebars.Options;
 import com.google.common.base.Joiner;
 import java.io.IOException;
@@ -31,7 +31,7 @@ public class HelperSource {
     if (v2 == null) {
       return options.inverse(this);
     }
-    List<Column> columns = (List<Column>) v2;
+    List<DbColumn> columns = (List<DbColumn>) v2;
     Optional<String> optional = columns.stream()
         .filter(c -> v1.toString().equals(c.getLowerCamelName()))
         .map(c -> c.getParameterType().getName())
@@ -43,7 +43,7 @@ public class HelperSource {
     if (v1 == null) {
       return options.inverse(this);
     }
-    List<Column> columns = (List<Column>) v1;
+    List<DbColumn> columns = (List<DbColumn>) v1;
     List<String> columnWithComma = columns.stream().map(c -> c.getName())
         .collect(Collectors.toList());
     return Joiner.on(",").join(columnWithComma);
@@ -56,7 +56,7 @@ public class HelperSource {
     if (v1 == null) {
       return options.inverse(this);
     }
-    Column column = (Column) v1;
+    DbColumn column = (DbColumn) v1;
     StringBuilder sb = new StringBuilder("private ")
         .append(column.getParameterType().getName())
         .append(" ")
