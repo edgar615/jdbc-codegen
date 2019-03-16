@@ -117,13 +117,13 @@ public class Generator {
       tables.stream()
           .forEach(t -> generateRule(t));
     }
-    if (options.isGenDao()) {
+    if (options.isGenDao() && options.getDaoOptions() != null) {
       tables.stream()
           .forEach(t -> generateDao(t));
-    }
-    if (options.getDaoOptions().isGenImpl()) {
-      tables.stream()
-          .forEach(t -> generateDaoImpl(t));
+      if (options.getDaoOptions().isGenImpl()) {
+        tables.stream()
+            .forEach(t -> generateDaoImpl(t));
+      }
     }
   }
 
