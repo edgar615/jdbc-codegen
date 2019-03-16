@@ -1,4 +1,4 @@
-package com.github.edgar615.jdbc.codegen.gen;
+package com.github.edgar615.jdbc.codegen;
 
 import com.github.edgar615.jdbc.codegen.db.DbColumn;
 import com.github.jknack.handlebars.Options;

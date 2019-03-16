@@ -1,6 +1,6 @@
 package com.github.edgar615.jdbc.codegen.db;
 
-import com.github.edgar615.jdbc.codegen.gen.CodegenOptions;
+import com.github.edgar615.jdbc.codegen.CodegenOptions;
 import java.sql.Connection;
 import java.sql.DatabaseMetaData;
 import java.sql.DriverManager;

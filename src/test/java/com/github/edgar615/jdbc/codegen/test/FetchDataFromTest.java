@@ -1,8 +1,8 @@
 package com.github.edgar615.jdbc.codegen.test;
 
-import com.github.edgar615.jdbc.codegen.gen.CodegenOptions;
-import com.github.edgar615.jdbc.codegen.gen.DaoOptions;
-import com.github.edgar615.jdbc.codegen.gen.Generator;
+import com.github.edgar615.jdbc.codegen.CodegenOptions;
+import com.github.edgar615.jdbc.codegen.DaoOptions;
+import com.github.edgar615.jdbc.codegen.Generator;
 
 /**
  * Created by Administrator on 2015/6/9.

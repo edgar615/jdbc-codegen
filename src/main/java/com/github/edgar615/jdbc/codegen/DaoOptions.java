@@ -1,4 +1,4 @@
-package com.github.edgar615.jdbc.codegen.gen;
+package com.github.edgar615.jdbc.codegen;
 
 /**
  * 用于生成DAO的参数.为了避免后期扩展，单独列出来.
