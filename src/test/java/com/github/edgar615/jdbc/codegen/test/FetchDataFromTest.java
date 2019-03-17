@@ -1,8 +1,8 @@
 package com.github.edgar615.jdbc.codegen.test;
 
-import com.github.edgar615.jdbc.codegen.CodegenOptions;
-import com.github.edgar615.jdbc.codegen.DaoOptions;
-import com.github.edgar615.jdbc.codegen.Generator;
+import com.github.edgar615.jdbc.codegen.gen.CodegenOptions;
+import com.github.edgar615.jdbc.codegen.gen.DaoOptions;
+import com.github.edgar615.jdbc.codegen.gen.Generator;
 
 /**
  * Created by Administrator on 2015/6/9.
@@ -11,15 +11,13 @@ public class FetchDataFromTest {
 
   public static void main(String[] args) throws Exception {
     CodegenOptions options = new CodegenOptions().setUsername("root")
-        .setPassword("123456")
-//            .addGenTable("dict")
-//            .addGenTable("dict_item")
-        .addGenTable("device")
+        .setPassword("G4xEViQUhs@B2SAf8tqxDL")
+        .addGenTable("sys_user")
         .setIgnoreColumnsStr("created*,updated_on")
         .setGenRule(true)
-        .setDatabase("device")
-        .setHost("localhost")
-        .setPort(3307)
+        .setDatabase("tabao")
+        .setHost("47.92.126.53")
+        .setPort(3306)
         .setJdbcArg("verifyServerCertificate=false&useSSL=true&requireSSL=true")
 //            .setTableNamePattern("device")
 //                .setIgnoreColumnsStr("photo_path,degree")

@@ -1,6 +1,6 @@
 package com.github.edgar615.jdbc.codegen.db;
 
-import com.github.edgar615.jdbc.codegen.CodegenOptions;
+import com.github.edgar615.jdbc.codegen.gen.CodegenOptions;
 import java.sql.Connection;
 import java.sql.DatabaseMetaData;
 import java.sql.DriverManager;
@@ -173,15 +173,15 @@ public class DBFetcher {
      */
     ResultSet cset = metaData.getColumns(options.getDatabase(), null, table.getName(), "%");
     while (cset.next()) {
-      DbColumn column = createColumn(table, cset, pks);
+      Column column = createColumn(table, cset, pks);
       table.addColumn(column);
-      LOGGER.debug("Found DbColumn:" + column);
+      LOGGER.debug("Found Column:" + column);
     }
     return table;
   }
 
-  private DbColumn createColumn(Table table, ResultSet cset, Set<String> pks) throws SQLException {
-    DbColumn.ColumnBuilder builder = DbColumn.builder();
+  private Column createColumn(Table table, ResultSet cset, Set<String> pks) throws SQLException {
+    Column.ColumnBuilder builder = Column.builder();
 
     /**
      * 获取可在指定类别中使用的表列的描述。

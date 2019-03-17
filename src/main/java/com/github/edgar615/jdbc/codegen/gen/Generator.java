@@ -1,8 +1,8 @@
-package com.github.edgar615.jdbc.codegen;
+package com.github.edgar615.jdbc.codegen.gen;
 
 import com.github.edgar615.jdbc.codegen.db.DBFetcher;
+import com.github.edgar615.jdbc.codegen.db.ParameterType;
 import com.github.edgar615.jdbc.codegen.db.Table;
-import com.github.edgar615.mysql.mapping.ParameterType;
 import java.util.List;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -23,6 +23,8 @@ public class Generator {
   private static final String daoTplFile = "tpl/dao.hbs";
 
   private static final String daoImplTplFile = "tpl/daoImpl.hbs";
+
+  private static final String mapperXmlTplFile = "tpl/xmlMapper.hbs";
 
   private final CodegenOptions options;
 
@@ -109,6 +111,25 @@ public class Generator {
     daoImplGen.genCode(table);
   }
 
+  private void generateMapperClass(Table table) {
+    Codegen daoGen = new Codegen(this.options.getSrcFolderPath(),
+        this.options.getDaoOptions().getDaoPackage(), "Dao", daoTplFile);
+    daoGen.addVariable("domainPackage", this.options.getDomainPackage());
+    if (!this.options.getDomainPackage().equals(this.options.getDaoOptions().getDaoPackage())) {
+      daoGen.addImport(this.options.getDomainPackage() + "." + table.getUpperCamelName());
+    }
+
+    daoGen.genCode(table);
+  }
+
+  private void generateMapperXml(Table table) {
+    Codegen daoGen = new Codegen(this.options.getSrcFolderPath(),
+        this.options.getDaoOptions().getDaoPackage(), "Mapper", mapperXmlTplFile);
+    daoGen.addVariable("domainPackage", this.options.getDomainPackage());
+    daoGen.setFileType(".xml");
+    daoGen.genCode(table);
+  }
+
   public void generate() {
     List<Table> tables = new DBFetcher(options).fetchTablesFromDb();
     tables.stream()
@@ -129,6 +150,10 @@ public class Generator {
             .forEach(t -> generateDaoImpl(t));
       }
     }
+
+    tables.stream()
+        .filter(t -> !t.isIgnore())
+        .forEach(t -> generateMapperXml(t));
 
   }
 

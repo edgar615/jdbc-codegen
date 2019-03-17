@@ -1,0 +1,119 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+    PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+    "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.csst.microservice.jpush.mapper.UserMapper">
+  <sql id="all_column">
+		sys_user_id,company_id,company_code,username,password,tel,mail,fullname,salt,state,sorted,must_change_passwd,passwd_changed,last_login_on,add_on,language,time_zone,ext,internal
+
+  </sql>
+
+  <resultMap id="SysUserResultMap" type="com.github.edgar615.test.codegen.domain.SysUser">
+    
+      <result column="sys_user_id" property="sysUserId" />
+      <result column="company_id" property="companyId" />
+      <result column="company_code" property="companyCode" />
+      <result column="username" property="username" />
+      <result column="password" property="password" />
+      <result column="tel" property="tel" />
+      <result column="mail" property="mail" />
+      <result column="fullname" property="fullname" />
+      <result column="salt" property="salt" />
+      <result column="state" property="state" />
+      <result column="sorted" property="sorted" />
+      <result column="must_change_passwd" property="mustChangePasswd" />
+      <result column="passwd_changed" property="passwdChanged" />
+      <result column="last_login_on" property="lastLoginOn" />
+      <result column="add_on" property="addOn" />
+      <result column="language" property="language" />
+      <result column="time_zone" property="timeZone" />
+      <result column="ext" property="ext" />
+      <result column="internal" property="internal" />
+  </resultMap>
+
+  <insert id="insert" parameterType="com.github.edgar615.test.codegen.domain.SysUser">
+    insert into
+    sys_user(sys_user_id,company_id,company_code,username,password,tel,mail,fullname,salt,state,sorted,must_change_passwd,passwd_changed,last_login_on,add_on,language,time_zone,ext,internal)
+    values(#{sysUserId},#{companyId},#{companyCode},#{username},#{password},#{tel},#{mail},#{fullname},#{salt},#{state},#{sorted},#{mustChangePasswd},#{passwdChanged},#{lastLoginOn},#{addOn},#{language},#{timeZone},#{ext},#{internal})
+  </insert>
+
+  <insert id="insertAndGenerateKey" parameterType="com.github.edgar615.test.codegen.domain.SysUser"
+          useGeneratedKeys="true" keyProperty="id" keyColumn="sys_user_id">
+    insert into
+    sys_user(sys_user_id,company_id,company_code,username,password,tel,mail,fullname,salt,state,sorted,must_change_passwd,passwd_changed,last_login_on,add_on,language,time_zone,ext,internal)
+    values(#{sysUserId},#{companyId},#{companyCode},#{username},#{password},#{tel},#{mail},#{fullname},#{salt},#{state},#{sorted},#{mustChangePasswd},#{passwdChanged},#{lastLoginOn},#{addOn},#{language},#{timeZone},#{ext},#{internal})
+
+    <selectKey resultType="int" order="AFTER" keyProperty="id" keyColumn="sys_user_id">
+      select LAST_INSERT_ID() as sys_user_id
+    </selectKey>
+  </insert>
+
+  <delete id="deleteById" parameterType="">
+    delete from sys_user where sys_user_id = #{id}
+  </delete>
+
+  <update id="updateById" parameterType="com.github.edgar615.test.codegen.domain.SysUser">
+    update user
+    <set>
+      
+      <if test="sysUserId != null">
+        sys_user_id = #{sysUserId},
+      </if>
+      <if test="companyId != null">
+        company_id = #{companyId},
+      </if>
+      <if test="companyCode != null">
+        company_code = #{companyCode},
+      </if>
+      <if test="username != null">
+        username = #{username},
+      </if>
+      <if test="password != null">
+        password = #{password},
+      </if>
+      <if test="tel != null">
+        tel = #{tel},
+      </if>
+      <if test="mail != null">
+        mail = #{mail},
+      </if>
+      <if test="fullname != null">
+        fullname = #{fullname},
+      </if>
+      <if test="salt != null">
+        salt = #{salt},
+      </if>
+      <if test="state != null">
+        state = #{state},
+      </if>
+      <if test="sorted != null">
+        sorted = #{sorted},
+      </if>
+      <if test="mustChangePasswd != null">
+        must_change_passwd = #{mustChangePasswd},
+      </if>
+      <if test="passwdChanged != null">
+        passwd_changed = #{passwdChanged},
+      </if>
+      <if test="lastLoginOn != null">
+        last_login_on = #{lastLoginOn},
+      </if>
+      <if test="addOn != null">
+        add_on = #{addOn},
+      </if>
+      <if test="language != null">
+        language = #{language},
+      </if>
+      <if test="timeZone != null">
+        time_zone = #{timeZone},
+      </if>
+      <if test="ext != null">
+        ext = #{ext},
+      </if>
+      <if test="internal != null">
+        internal = #{internal},
+      </if>
+    </set>
+    where sys_user_id = #{id}
+  </update>
+</mapper>

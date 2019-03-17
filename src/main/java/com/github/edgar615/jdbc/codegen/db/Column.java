@@ -1,6 +1,5 @@
 package com.github.edgar615.jdbc.codegen.db;
 
-import com.github.edgar615.mysql.mapping.ParameterType;
 import com.google.common.base.CaseFormat;
 import java.sql.Types;
 import java.util.ArrayList;
@@ -11,7 +10,7 @@ import java.util.List;
  *
  * @author Edgar  Date 2016/4/1
  */
-public class DbColumn {
+public class Column {
 
   /**
    * 字段名
@@ -62,7 +61,7 @@ public class DbColumn {
 
   private final String remarks;
 
-  private DbColumn(String name, int size, String defaultValue, boolean isNullable,
+  private Column(String name, int size, String defaultValue, boolean isNullable,
       boolean isAutoInc,
       boolean isGenColumn, boolean isIgnore,
       boolean isPrimary,
@@ -84,7 +83,7 @@ public class DbColumn {
 
   @Override
   public String toString() {
-    return "DbColumn{" +
+    return "Column{" +
         "name='" + name + '\'' +
         ", size=" + size +
         ", defaultValue='" + defaultValue + '\'' +
@@ -175,20 +174,26 @@ public class DbColumn {
 
   public ParameterType getParameterType() {
     ParameterType parameter;
-    if (isCharacterColumn()) {
+    if ((type == Types.VARCHAR) || (type == Types.LONGVARCHAR) || (type == Types.CLOB)) {
       parameter = ParameterType.STRING;
-    } else if (isBLOBColumn()){
-      parameter = ParameterType.BYTE_ARRAY;
-    } else if (isIntColumn()){
-      parameter = ParameterType.INTEGER;
     } else if (type == Types.BIGINT) {
       parameter = ParameterType.LONG;
-    }else if (isNumberColumn()){
+    } else if ((type == Types.DOUBLE) || (type == Types.NUMERIC)) {
       parameter = ParameterType.BIGDECIMAL;
+    } else if ((type == Types.FLOAT) || (type == Types.DECIMAL)) {
+      parameter = ParameterType.BIGDECIMAL;
+    } else if (type == Types.INTEGER) {
+      parameter = ParameterType.INTEGER;
+    } else if (type == Types.SMALLINT) {
+      //不适用short
+      parameter = ParameterType.INTEGER;
     } else if (type == Types.TINYINT && size == 1) {
       //TINYINT转换为boolean
       parameter = ParameterType.BOOLEAN;
-    } else if (isDateColumn()) {
+    } else if (type == Types.TINYINT) {
+      //不使用byte
+      parameter = ParameterType.INTEGER;
+    } else if ((type == Types.TIMESTAMP) || (type == Types.TIME) || (type == Types.DATE)) {
       parameter = ParameterType.DATE;
     } else if (type == Types.BIT && size == 1) {
       //BIT转换为boolean
@@ -197,40 +202,13 @@ public class DbColumn {
       parameter = ParameterType.STRING;
     } else if (type == Types.BOOLEAN) {
       parameter = ParameterType.BOOLEAN;
+    } else if (type == Types.CHAR) {
+      parameter = ParameterType.STRING;
     } else {
       // no specific type found so set to generic object
       parameter = ParameterType.OBJECT;
     }
     return parameter;
-  }
-
-  private boolean isCharacterColumn() {
-    return type == Types.CHAR || type == Types.CLOB
-        || type == Types.LONGVARCHAR || type == Types.VARCHAR
-        || type == Types.LONGNVARCHAR || type == Types.NCHAR
-        || type == Types.NCLOB || type == Types.NVARCHAR;
-  }
-
-  private boolean isBLOBColumn() {
-    return type == Types.BINARY || type == Types.BLOB
-        || type == Types.VARBINARY || type == Types.LONGVARBINARY;
-  }
-
-  private boolean isIntColumn() {
-    //SMALLINT理论上是short，TINYINT理论上byte，为了简化操作，我们将tiny(1)转换为boolean
-    return type == Types.INTEGER || type == Types.SMALLINT
-        || (type == Types.TINYINT && size > 1);
-  }
-
-  private boolean isNumberColumn() {
-    return type == Types.FLOAT || type == Types.DOUBLE
-        || type == Types.NUMERIC || type == Types.DECIMAL
-        || type == Types.REAL;
-  }
-
-  private boolean isDateColumn() {
-    return type == Types.TIMESTAMP || type == Types.TIME
-        || type == Types.DATE;
   }
 
   public static class ColumnBuilder {
@@ -323,8 +301,8 @@ public class DbColumn {
       return this;
     }
 
-    public DbColumn build() {
-      return new DbColumn(name, size, defaultValue, isNullable, isAutoInc, isGenColumn, isIgnore,
+    public Column build() {
+      return new Column(name, size, defaultValue, isNullable, isAutoInc, isGenColumn, isIgnore,
           isPrimary,
           isVersion, type, remarks);
     }

@@ -1,6 +1,5 @@
 package com.github.edgar615.jdbc.codegen.db;
 
-import com.github.edgar615.mysql.mapping.ParameterType;
 import com.google.common.base.CaseFormat;
 import com.google.common.base.Joiner;
 import java.util.ArrayList;
@@ -18,7 +17,7 @@ public class Table {
 
   private final String name;
 
-  private final List<DbColumn> columns = new ArrayList<>();
+  private final List<Column> columns = new ArrayList<>();
 
   /**
    * 是否忽略该字段，依赖于codegen的配置.
@@ -48,7 +47,7 @@ public class Table {
     return name;
   }
 
-  public List<DbColumn> getColumns() {
+  public List<Column> getColumns() {
     return columns;
   }
 
@@ -110,7 +109,7 @@ public class Table {
     return CaseFormat.LOWER_UNDERSCORE.to(CaseFormat.UPPER_CAMEL, name);
   }
 
-  public void addColumn(DbColumn column) {
+  public void addColumn(Column column) {
     columns.add(column);
   }
 

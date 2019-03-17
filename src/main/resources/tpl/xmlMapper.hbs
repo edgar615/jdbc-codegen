@@ -1,0 +1,48 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+    PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+    "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.csst.microservice.jpush.mapper.UserMapper">
+  <sql id="all_column">
+    {{~newLine}}{{~blank}}{{~blank}}
+    {{~mapperXmlAllField table.columns~}}
+    {{~newLine}}
+  </sql>
+
+  <resultMap id="{{table.upperCamelName}}ResultMap" type="{{domainPackage}}.{{table.upperCamelName}}">
+    {{#table.columns}}{{#if ignore}}{{else}}
+      <result column="{{name}}" property="{{lowerCamelName}}" />{{/if}}{{/table.columns}}
+  </resultMap>
+
+  <insert id="insert" parameterType="{{domainPackage}}.{{table.upperCamelName}}">
+    insert into
+    {{table.name}}({{~mapperXmlAllField table.columns~}})
+    values({{~mapperXmlInsertValues table.columns~}})
+  </insert>
+
+  <insert id="insertAndGenerateKey" parameterType="{{domainPackage}}.{{table.upperCamelName}}"
+          useGeneratedKeys="true" keyProperty="id" keyColumn="{{table.pk}}">
+    insert into
+    {{table.name}}({{~mapperXmlAllField table.columns~}})
+    values({{~mapperXmlInsertValues table.columns~}})
+
+    <selectKey resultType="int" order="AFTER" keyProperty="id" keyColumn="{{table.pk}}">
+      select LAST_INSERT_ID() as {{table.pk}}
+    </selectKey>
+  </insert>
+
+  <delete id="deleteById" parameterType="{{pkType.primitiveName}}">
+    delete from {{table.name}} where {{table.pk}} = #{id}
+  </delete>
+
+  <update id="updateById" parameterType="{{domainPackage}}.{{table.upperCamelName}}">
+    update user
+    <set>
+      {{#table.columns}}{{#if ignore}}{{else}}
+      <if test="{{lowerCamelName}} != null">
+        {{name}} = {{~mapperXmlColumnValue this}},
+      </if>{{/if}}{{/table.columns}}
+    </set>
+    where {{table.pk}} = #{id}
+  </update>
+</mapper>
