@@ -26,17 +26,17 @@
     {{table.name}}({{~mapperXmlAllField table.columns~}})
     values({{~mapperXmlInsertValues table.columns~}})
 
-    <selectKey resultType="int" order="AFTER" keyProperty="id" keyColumn="{{table.pk}}">
+    <selectKey resultType="{{table.pkType.primitiveName}}" order="AFTER" keyProperty="id" keyColumn="{{table.pk}}">
       select LAST_INSERT_ID() as {{table.pk}}
     </selectKey>
   </insert>
 
-  <delete id="deleteById" parameterType="{{pkType.primitiveName}}">
+  <delete id="deleteById" parameterType="{{table.pkType.primitiveName}}">
     delete from {{table.name}} where {{table.pk}} = #{id}
   </delete>
 
   <update id="updateById" parameterType="{{domainPackage}}.{{table.upperCamelName}}">
-    update user
+    update {{table.name}}
     <set>
       {{#table.columns}}{{#if ignore}}{{else}}
       <if test="{{lowerCamelName}} != null">
@@ -45,4 +45,20 @@
     </set>
     where {{table.pk}} = #{id}
   </update>
+
+  <select id="findById" resultMap="{{table.upperCamelName}}ResultMap" parameterType="{{table.pkType.primitiveName}}">
+    select
+      <include refid="all_column" />
+    from {{table.name}}
+    where  {{table.pk}} = #{id}
+  </select>
+
+  <select id="findCustomFieldById" resultMap="{{table.upperCamelName}}ResultMap" parameterType="{{table.pkType.primitiveName}}">
+    select
+     <foreach item="item" index="index" collection="fields" separator=",">
+            #{item}
+      </foreach>
+    from {{table.name}}
+    where {{table.pk}} = #{id}
+  </select>
 </mapper>

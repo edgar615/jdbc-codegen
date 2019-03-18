@@ -41,7 +41,7 @@ import org.slf4j.LoggerFactory;
  */
 class Codegen {
 
-  private static final String COMMENT_START =
+  private static  String COMMENT_START =
       "/* START Do not remove/edit this line. CodeGenerator "
           + "will preserve any code between start and end tags.*/";
 

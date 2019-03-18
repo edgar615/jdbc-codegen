@@ -105,4 +105,15 @@ public class HelperSource {
         .collect(Collectors.toList());
     return Joiner.on(",").join(fields);
   }
+
+  public CharSequence mapperXmlSelectField(Object v1, Options options) throws IOException {
+    if (v1 == null) {
+      return options.inverse(this);
+    }
+    List<String> columns = (List<String>) v1;
+    if (columns == null || columns.isEmpty()) {
+      return "*";
+    }
+    return Joiner.on(",").join(columns);
+  }
 }

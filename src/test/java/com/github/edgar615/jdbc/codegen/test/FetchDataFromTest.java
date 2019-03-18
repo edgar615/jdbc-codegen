@@ -11,12 +11,12 @@ public class FetchDataFromTest {
 
   public static void main(String[] args) throws Exception {
     CodegenOptions options = new CodegenOptions().setUsername("root")
-        .setPassword("123456")
+        .setPassword("G4xEViQUhs@B2SAf8tqxDL")
         .addGenTable("sys_user")
         .setIgnoreColumnsStr("created*,updated_on")
         .setGenRule(true)
         .setDatabase("tabao")
-        .setHost("localhost")
+        .setHost("47.92.126.53")
         .setPort(3306)
         .setJdbcArg("verifyServerCertificate=false&useSSL=true&requireSSL=true")
 //            .setTableNamePattern("device")
