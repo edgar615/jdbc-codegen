@@ -85,13 +85,15 @@ public class HelperSource {
     return Joiner.on(",").join(fields);
   }
 
-  public CharSequence mapperXmlColumnValue(Object v1, Options options) throws IOException {
+  public CharSequence mapperXmlUpdateValue(Object v1, Options options) throws IOException {
     if (v1 == null) {
       return options.inverse(this);
     }
     Column column = (Column) v1;
-    return " #{" +column.getLowerCamelName() + "}";
+    return " #{persistent." +column.getLowerCamelName() + "}";
   }
+
+
 
   public CharSequence mapperXmlInsertValues(Object v1, Options options) throws IOException {
     if (v1 == null) {

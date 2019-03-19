@@ -41,17 +41,17 @@ import org.slf4j.LoggerFactory;
  */
 class Codegen {
 
-  private static  String COMMENT_START =
+  private String commentStart =
       "/* START Do not remove/edit this line. CodeGenerator "
           + "will preserve any code between start and end tags.*/";
 
-  private static final String COMMENT_END =
+  private String commentEnd =
       "/* END Do not remove/edit this line. CodeGenerator will "
           + "preserve any code between start and end tags.*/";
 
-  private static final String IS_COMMENT_START = "/* START";
+  private String isCommentStart = "/* START";
 
-  private static final String IS_COMMENT_END = "/* END";
+  private String isCommentEnd = "/* END";
 
   private static final Handlebars handlebars = new Handlebars();
   private static final Logger LOGGER = LoggerFactory.getLogger(Generator.class);
@@ -137,6 +137,22 @@ class Codegen {
     return this;
   }
 
+  public void setCommentStart(String commentStart) {
+    this.commentStart = commentStart;
+  }
+
+  public void setCommentEnd(String commentEnd) {
+    this.commentEnd = commentEnd;
+  }
+
+  public void setIsCommentStart(String isCommentStart) {
+    this.isCommentStart = isCommentStart;
+  }
+
+  public void setIsCommentEnd(String isCommentEnd) {
+    this.isCommentEnd = isCommentEnd;
+  }
+
   public void genCode(Table table) {
     try {
       StringBuffer userSource = readUserSourceCode(table);
@@ -213,9 +229,9 @@ class Codegen {
     String fileName = this.getSourceFileName(table);
     File file = new File(fileName);
     if (!file.exists()) {
-      userSourceBuf.append(COMMENT_START)
+      userSourceBuf.append(commentStart)
           .append("\n\t")
-          .append(COMMENT_END);
+          .append(commentEnd);
       return userSourceBuf;
     }
 
@@ -227,12 +243,12 @@ class Codegen {
           com.google.common.io.Files.asByteSource(file).asCharSource(Charset.defaultCharset())
               .read();
 
-      int startIndex = contents.indexOf(IS_COMMENT_START);
-      int endIndex = contents.indexOf(IS_COMMENT_END);
+      int startIndex = contents.indexOf(isCommentStart);
+      int endIndex = contents.indexOf(isCommentEnd);
       LOGGER.debug("Start index:{} End index:{}", startIndex, endIndex);
       if (startIndex != -1 && endIndex != -1) {
         userSourceBuf.append(contents.substring(startIndex, endIndex));
-        userSourceBuf.append(COMMENT_END + "\n\n");
+        userSourceBuf.append(commentEnd + "\n\n");
       }
       // save the imports
       List<String> lines = com.google.common.io.Files.readLines(file, Charset.defaultCharset());
@@ -259,9 +275,9 @@ class Codegen {
       throw new RuntimeException(e);
     }
     if (userSourceBuf.length() == 0) {
-      userSourceBuf.append(COMMENT_START)
+      userSourceBuf.append(commentStart)
           .append("\n\t")
-          .append(COMMENT_END);
+          .append(commentEnd);
     }
     return userSourceBuf;
 

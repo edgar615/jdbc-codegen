@@ -26,6 +26,8 @@ public class Generator {
 
   private static final String mapperXmlTplFile = "tpl/xmlMapper.hbs";
 
+  private static final String mapperTplFile = "tpl/mapper.hbs";
+
   private final CodegenOptions options;
 
   public Generator(CodegenOptions options) {
@@ -112,22 +114,29 @@ public class Generator {
   }
 
   private void generateMapperClass(Table table) {
-    Codegen daoGen = new Codegen(this.options.getSrcFolderPath(),
-        this.options.getDaoOptions().getDaoPackage(), "Dao", daoTplFile);
-    daoGen.addVariable("domainPackage", this.options.getDomainPackage());
-    if (!this.options.getDomainPackage().equals(this.options.getDaoOptions().getDaoPackage())) {
-      daoGen.addImport(this.options.getDomainPackage() + "." + table.getUpperCamelName());
+    Codegen codegen = new Codegen(this.options.getSrcFolderPath(),
+        this.options.getMybatisOptions().getMapperClassPackage(), "Mapper", mapperTplFile);
+    codegen.addImport("com.github.edgar615.util.mybatis.BaseMapper");
+    codegen.addImport("org.apache.ibatis.annotations.Mapper");
+    codegen.addVariable("domainPackage", this.options.getDomainPackage());
+    if (!this.options.getDomainPackage().equals(this.options.getMybatisOptions().getMapperClassPackage())) {
+      codegen.addImport(this.options.getDomainPackage() + "." + table.getUpperCamelName());
     }
-
-    daoGen.genCode(table);
+    codegen.genCode(table);
   }
 
   private void generateMapperXml(Table table) {
-    Codegen daoGen = new Codegen(this.options.getSrcFolderPath(),
-        this.options.getDaoOptions().getDaoPackage(), "Mapper", mapperXmlTplFile);
-    daoGen.addVariable("domainPackage", this.options.getDomainPackage());
-    daoGen.setFileType(".xml");
-    daoGen.genCode(table);
+    Codegen codegen = new Codegen(this.options.getMybatisOptions().getXmlFolderPath(),
+        this.options.getMybatisOptions().getMapperClassPackage(), "Mapper", mapperXmlTplFile);
+    codegen.addVariable("domainPackage", this.options.getDomainPackage());
+    codegen.addVariable("mapperPackage", this.options.getMybatisOptions().getMapperClassPackage());
+    codegen.addVariable("mapperSuffix", "Mapper");
+    codegen.setFileType(".xml");
+    codegen.setCommentStart("<!-- START 写在START和END中间的代码不会被替换 -->");
+    codegen.setCommentEnd("<!-- END 写在START和END中间的代码不会被替换-->");
+    codegen.setIsCommentStart("<!-- START ");
+    codegen.setIsCommentEnd("<!-- END ");
+    codegen.genCode(table);
   }
 
   public void generate() {
@@ -151,10 +160,14 @@ public class Generator {
       }
     }
 
-    tables.stream()
-        .filter(t -> !t.isIgnore())
-        .forEach(t -> generateMapperXml(t));
-
+    if (options.isGenMybatis() && options.getMybatisOptions() != null) {
+      tables.stream()
+          .filter(t -> !t.isIgnore())
+          .forEach(t -> generateMapperClass(t));
+      tables.stream()
+          .filter(t -> !t.isIgnore())
+          .forEach(t -> generateMapperXml(t));
+    }
   }
 
 

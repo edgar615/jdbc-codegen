@@ -51,6 +51,8 @@ public class CodegenOptions {
   private boolean genRule = DEFAULT_GEN_RULE;
   private DaoOptions daoOptions;
   private boolean genDao = false;
+  private MybatisOptions mybatisOptions;
+  private boolean genMybatis = false;
 
   //忽略的字段
   private final List<String> ignoreColumnList = new ArrayList<String>();
@@ -285,6 +287,20 @@ public class CodegenOptions {
     this.daoOptions = daoOptions;
     this.genDao = true;
     return this;
+  }
+
+  public MybatisOptions getMybatisOptions() {
+    return mybatisOptions;
+  }
+
+  public CodegenOptions setMybatisOptions(MybatisOptions mybatisOptions) {
+    this.mybatisOptions = mybatisOptions;
+    this.genMybatis = true;
+    return this;
+  }
+
+  public boolean isGenMybatis() {
+    return genMybatis;
   }
 
   public boolean isGenRule() {
