@@ -10,7 +10,7 @@ package {{package}};
 * @author Jdbc Code Generator Date {{date}}
 */
 @Mapper
-public interface {{table.upperCamelName}}{{suffix}} extends BaseDao<{{table.pkType.name}}, {{table.upperCamelName}}> {
+public interface {{table.upperCamelName}}{{suffix}} extends BaseMapper<{{table.pkType.name}}, {{table.upperCamelName}}> {
 
    {{safestr userSource}}
 }
