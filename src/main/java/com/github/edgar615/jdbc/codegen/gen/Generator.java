@@ -117,7 +117,14 @@ public class Generator {
     Codegen codegen = new Codegen(this.options.getSrcFolderPath(),
         this.options.getMybatisOptions().getMapperClassPackage(), "Mapper", mapperTplFile);
     codegen.addImport("com.github.edgar615.util.mybatis.BaseMapper");
+    codegen.addImport("com.github.edgar615.util.search.Example");
+    codegen.addImport("java.util.List");
+    codegen.addImport("java.util.Map");
     codegen.addImport("org.apache.ibatis.annotations.Mapper");
+    codegen.addImport("org.apache.ibatis.annotations.Param");
+    codegen.addImport("org.springframework.cache.annotation.CacheConfig");
+    codegen.addImport("org.springframework.cache.annotation.CacheEvict");
+    codegen.addImport("org.springframework.cache.annotation.Cacheable");
     codegen.addVariable("domainPackage", this.options.getDomainPackage());
     if (!this.options.getDomainPackage().equals(this.options.getMybatisOptions().getMapperClassPackage())) {
       codegen.addImport(this.options.getDomainPackage() + "." + table.getUpperCamelName());
