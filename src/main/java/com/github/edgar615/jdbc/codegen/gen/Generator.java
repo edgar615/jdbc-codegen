@@ -28,6 +28,8 @@ public class Generator {
 
   private static final String mapperTplFile = "tpl/mapper.hbs";
 
+  private static final String wildcardEvictCacheMapperTplFile = "tpl/mapperWildcardCache.hbs";
+
   private final CodegenOptions options;
 
   public Generator(CodegenOptions options) {
@@ -114,8 +116,15 @@ public class Generator {
   }
 
   private void generateMapperClass(Table table) {
-    Codegen codegen = new Codegen(this.options.getSrcFolderPath(),
-        this.options.getMybatisOptions().getMapperClassPackage(), "Mapper", mapperTplFile);
+    Codegen codegen;
+    if (this.options.getMybatisOptions().isCacheWildcardEvict()) {
+      codegen = new Codegen(this.options.getSrcFolderPath(),
+          this.options.getMybatisOptions().getMapperClassPackage(), "Mapper", wildcardEvictCacheMapperTplFile);
+    } else {
+      codegen = new Codegen(this.options.getSrcFolderPath(),
+          this.options.getMybatisOptions().getMapperClassPackage(), "Mapper", mapperTplFile);
+    }
+
     codegen.addImport("com.github.edgar615.util.mybatis.BaseMapper");
     codegen.addImport("com.github.edgar615.util.search.Example");
     codegen.addImport("java.util.List");
