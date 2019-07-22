@@ -148,8 +148,8 @@ public class Generator {
     codegen.addVariable("mapperPackage", this.options.getMybatisOptions().getMapperClassPackage());
     codegen.addVariable("mapperSuffix", "Mapper");
     codegen.setFileType(".xml");
-    codegen.setCommentStart("<!-- START 写在START和END中间的代码不会被替换 -->");
-    codegen.setCommentEnd("<!-- END 写在START和END中间的代码不会被替换-->");
+    codegen.setCommentStart("<!-- START Do not remove/edit this line. CodeGenerator will preserve any code between start and end tags. -->");
+    codegen.setCommentEnd("<!-- END Do not remove/edit this line. CodeGenerator will preserve any code between start and end tags.-->");
     codegen.setIsCommentStart("<!-- START ");
     codegen.setIsCommentEnd("<!-- END ");
     codegen.genCode(table);
