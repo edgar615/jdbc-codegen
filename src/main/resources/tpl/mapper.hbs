@@ -48,7 +48,7 @@ public interface {{table.upperCamelName}}{{suffix}} extends BaseMapper<{{table.p
    * @return 删除记录数
    */
   @Override
-  @CacheEvict(cacheNames = "{{table.upperCamelName}}JdbcCache", allEntries = true)
+  @CacheEvict(cacheNames = "{{table.upperCamelName}}JdbcCache", key = "'wildcard:{{table.upperCamelName}}:*'")
   int deleteByExample(@Param("example") Example example);
 
   /**
@@ -70,7 +70,7 @@ public interface {{table.upperCamelName}}{{suffix}} extends BaseMapper<{{table.p
    * @return 修改记录数
    */
   @Override
-  @CacheEvict(cacheNames = "{{table.upperCamelName}}JdbcCache", allEntries = true)
+  @CacheEvict(cacheNames = "{{table.upperCamelName}}JdbcCache", key = "'wildcard:{{table.upperCamelName}}:*'")
   int updateByExample(@Param("persistent") {{table.upperCamelName}} persistent, @Param("example") Example example);
 
   /**
@@ -98,7 +98,7 @@ public interface {{table.upperCamelName}}{{suffix}} extends BaseMapper<{{table.p
    * @return 修改记录数
    */
   @Override
-  @CacheEvict(cacheNames = "{{table.upperCamelName}}JdbcCache", allEntries = true)
+  @CacheEvict(cacheNames = "{{table.upperCamelName}}JdbcCache", key = "'wildcard:{{table.upperCamelName}}:*'")
   int updateByExampleWithNull(@Param("persistent") {{table.upperCamelName}} persistent, @Param("addOrSub") Map<String, Number> addOrSub,
       @Param("nullFields") List<String> nullFields, @Param("example") Example example);
 
