@@ -89,9 +89,7 @@ public class Generator {
         });
     codegen.addImport("java.util.List");
     codegen.addImport("java.util.Map");
-    codegen.addImport("com.google.common.base.MoreObjects");
     codegen.addImport("com.google.common.collect.Lists");
-    codegen.addImport("com.google.common.collect.Maps");
     codegen.addImport("com.github.edgar615.util.db.PersistentKit");
     codegen.genCode(table);
   }
