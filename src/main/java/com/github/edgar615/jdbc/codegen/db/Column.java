@@ -142,6 +142,10 @@ public class Column {
     return remarks;
   }
 
+  public String getUpperUnderScoreName() {
+    return CaseFormat.LOWER_UNDERSCORE.to(CaseFormat.UPPER_UNDERSCORE, name);
+  }
+
   public String getUpperCamelName() {
     return CaseFormat.LOWER_UNDERSCORE.to(CaseFormat.UPPER_CAMEL, name);
   }

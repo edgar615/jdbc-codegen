@@ -69,6 +69,12 @@ class Codegen {
         return (CaseFormat.LOWER_UNDERSCORE.to(CaseFormat.LOWER_CAMEL, str));
       }
     });
+    handlebars.registerHelper("upperUnderscoreToLowCamel", new Helper<String>() {
+      @Override
+      public Object apply(String str, Options options) throws IOException {
+        return (CaseFormat.LOWER_UNDERSCORE.to(CaseFormat.UPPER_UNDERSCORE, str));
+      }
+    });
     handlebars.registerHelpers(new HelperSource());
   }
 

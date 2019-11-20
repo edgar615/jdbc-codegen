@@ -16,7 +16,9 @@ public class Generator {
 
   private static final Logger LOGGER = LoggerFactory.getLogger(Generator.class);
 
-  private static final String tplFile = "tpl/domain.hbs";
+  private static final String domainTplFile = "tpl/domain.hbs";
+
+  private static final String kitTplFile = "tpl/domainKit.hbs";
 
   private static final String ruleTplFile = "tpl/rule.hbs";
 
@@ -38,7 +40,39 @@ public class Generator {
 
   private void generateDomain(Table table) {
     Codegen codegen = new Codegen(options.getSrcFolderPath(), options.getDomainPackage(), "",
-        tplFile);
+        domainTplFile);
+    table.getColumns().stream()
+        .filter(c -> !c.isIgnore())
+        .map(c -> c.getParameterType())
+        .forEach(t -> {
+          if (t == ParameterType.DATE) {
+            codegen.addImport("java.util.Date");
+          }
+          if (t == ParameterType.TIMESTAMP) {
+            codegen.addImport("java.sql.Timestamp");
+          }
+          if (t == ParameterType.BIGDECIMAL) {
+            codegen.addImport("java.math.BigDecimal");
+          }
+        });
+    codegen.addImport("com.google.common.base.MoreObjects");
+    codegen.addImport("com.github.edgar615.util.db.Persistent");
+    codegen.addImport("com.github.edgar615.util.db.PrimaryKey");
+    boolean containsVersion = table.getColumns().stream()
+        .filter(c -> !c.isIgnore())
+        .anyMatch(c -> c.isVersion());
+    if (containsVersion) {
+      codegen.addImport("com.github.edgar615.util.db.VersionKey");
+    }
+    if (table.getContainsVirtual()) {
+      codegen.addImport("com.github.edgar615.util.db.VirtualKey");
+    }
+    codegen.genCode(table);
+  }
+
+  private void generateKit(Table table) {
+    Codegen codegen = new Codegen(options.getSrcFolderPath(), options.getDomainPackage(), "Kit",
+        kitTplFile);
     table.getColumns().stream()
         .filter(c -> !c.isIgnore())
         .map(c -> c.getParameterType())
@@ -58,17 +92,7 @@ public class Generator {
     codegen.addImport("com.google.common.base.MoreObjects");
     codegen.addImport("com.google.common.collect.Lists");
     codegen.addImport("com.google.common.collect.Maps");
-    codegen.addImport("com.github.edgar615.util.db.Persistent");
-    codegen.addImport("com.github.edgar615.util.db.PrimaryKey");
-    boolean containsVersion = table.getColumns().stream()
-        .filter(c -> !c.isIgnore())
-        .anyMatch(c -> c.isVersion());
-    if (containsVersion) {
-      codegen.addImport("com.github.edgar615.util.db.VersionKey");
-    }
-    if (table.getContainsVirtual()) {
-      codegen.addImport("com.github.edgar615.util.db.VirtualKey");
-    }
+    codegen.addImport("com.github.edgar615.util.db.PersistentKit");
     codegen.genCode(table);
   }
 
@@ -160,6 +184,9 @@ public class Generator {
     tables.stream()
         .filter(t -> !t.isIgnore())
         .forEach(t -> generateDomain(t));
+    tables.stream()
+        .filter(t -> !t.isIgnore())
+        .forEach(t -> generateKit(t));
     if (options.isGenRule()) {
       tables.stream()
           .filter(t -> !t.isIgnore())

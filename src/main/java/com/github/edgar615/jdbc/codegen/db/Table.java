@@ -72,12 +72,30 @@ public class Table {
                 ()));
   }
 
+  public String getUpperUnderscoreFields() {
+    return Joiner.on(",\n\t\t\t\t\t\t")
+        .join(columns.stream()
+            .filter(c -> !c.isIgnore())
+            .map(c -> c.getUpperUnderScoreName())
+            .collect(Collectors.toList
+                ()));
+  }
+
   public String getVirtualFields() {
     return Joiner.on(",\n\t\t\t\t\t\t")
         .join(columns.stream()
             .filter(c -> !c.isIgnore())
             .filter(c -> c.isGenColumn())
             .map(c -> "\"" + c.getLowerCamelName() + "\"")
+            .collect(Collectors.toList()));
+  }
+
+  public String getUpperUnderscoreVirtualFields() {
+    return Joiner.on(",\n\t\t\t\t\t\t")
+        .join(columns.stream()
+            .filter(c -> !c.isIgnore())
+            .filter(c -> c.isGenColumn())
+            .map(c -> c.getUpperUnderScoreName())
             .collect(Collectors.toList()));
   }
 
@@ -107,6 +125,10 @@ public class Table {
 
   public String getUpperCamelName() {
     return CaseFormat.LOWER_UNDERSCORE.to(CaseFormat.UPPER_CAMEL, name);
+  }
+
+  public String getLowerCamelName() {
+    return CaseFormat.LOWER_UNDERSCORE.to(CaseFormat.LOWER_CAMEL, name);
   }
 
   public void addColumn(Column column) {

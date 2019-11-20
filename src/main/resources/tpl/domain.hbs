@@ -8,7 +8,7 @@ package {{package}};
 * Table : {{table.name}}
 * remarks: {{table.remarks}}
 *
-* @author Jdbc Code Generator Date {{date}}
+* @author Jdbc Code Generator
 */
 public class {{table.upperCamelName}} implements Persistent<{{table.pkType.name}}> {
 
@@ -56,20 +56,6 @@ public class {{table.upperCamelName}} implements Persistent<{{table.pkType.name}
     }
 
     @Override
-    public List<String> fields() {
-      return Lists.newArrayList({{safestr table.fields}});
-    }
-    {{#if table.containsVirtual}}
-    public List<String> virtualFields() {
-        return Lists.newArrayList({{safestr table.virtualFields}});
-    }
-    {{/if}}
-    @Override
-    public String primaryField() {
-        return "{{lowUnderscoreToLowCamel table.pk}}";
-    }
-
-    @Override
     public {{table.pkType.name}} id () {
     return {{lowUnderscoreToLowCamel table.pk}};
     }
@@ -88,24 +74,6 @@ public class {{table.upperCamelName}} implements Persistent<{{table.pkType.name}
     {{else}}
         throw new UnsupportedOperationException();
     {{/eq}}
-    }
-
-    @Override
-    public Map<String, Object> toMap() {
-        Map<String, Object> map = Maps.newHashMap();{{#table.columns}}{{#if ignore}}{{else}}
-        map.put("{{lowerCamelName}}",  {{lowerCamelName}});{{/if}}{{/table.columns}}
-        return map;
-    }
-
-    @Override
-    public void fromMap(Map<String, Object> map) {
-        if (map == null) {
-            return;
-        }
-        {{#table.columns}}{{#if ignore}}{{else}}if (map.get("{{lowerCamelName}}") instanceof {{parameterType lowerCamelName table.columns}}) {
-            this.{{lowerCamelName}} = ({{parameterType lowerCamelName table.columns}}) map.get("{{lowerCamelName}}");
-        }
-        {{/if}}{{/table.columns}}
     }
 
    {{safestr userSource}}
