@@ -11,6 +11,7 @@ import com.google.common.base.Splitter;
 import com.google.common.base.Strings;
 import com.google.common.collect.Iterables;
 import com.google.common.collect.Lists;
+import com.google.common.hash.Hashing;
 import com.google.common.io.ByteStreams;
 import java.io.File;
 import java.io.FileWriter;
@@ -73,6 +74,13 @@ class Codegen {
       @Override
       public Object apply(String str, Options options) throws IOException {
         return (CaseFormat.LOWER_UNDERSCORE.to(CaseFormat.UPPER_UNDERSCORE, str));
+      }
+    });
+
+    handlebars.registerHelper("serialVersionUID", new Helper<String>() {
+      @Override
+      public Object apply(String str, Options options) throws IOException {
+        return Hashing.farmHashFingerprint64().hashString(str, Charset.defaultCharset()).padToLong() + "L";
       }
     });
     handlebars.registerHelpers(new HelperSource());

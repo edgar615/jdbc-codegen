@@ -12,7 +12,7 @@ package {{package}};
 */
 public class {{table.upperCamelName}} implements Persistent<{{table.pkType.name}}> {
 
-    private static final long serialVersionUID = 1L;
+    private static final long serialVersionUID = {{serialVersionUID table.upperCamelName}};
     {{#table.columns}}{{#if ignore}}{{else if annotations}}
     /**
     * Column : {{name}}
